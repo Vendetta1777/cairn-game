@@ -1,0 +1,31 @@
+# Godot 4 .gitignore
+
+# Godot-specific ignores
+.godot/
+/android/
+/build/
+*.translation
+
+# Imported assets cache (regenerated on import)
+.import/
+export.cfg
+
+# Exported builds
+*.exe
+*.pck
+*.zip
+*.apk
+*.aab
+*.dmg
+
+# Mono / .NET (unused now, future-proofing)
+.mono/
+data_*/
+mono_crash.*.json
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*~
+.vscode/
+.idea/

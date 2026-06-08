@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <rect width="128" height="128" fill="#0d0f13"/>
+  <!-- A cairn: a stack of stones, pale against the deep -->
+  <ellipse cx="64" cy="58" rx="26" ry="13" fill="#3a3f4b"/>
+  <ellipse cx="64" cy="78" rx="34" ry="15" fill="#2b2f38"/>
+  <ellipse cx="64" cy="98" rx="42" ry="17" fill="#22252c"/>
+  <ellipse cx="64" cy="36" rx="16" ry="9" fill="#525866"/>
+  <ellipse cx="64" cy="20" rx="9" ry="6" fill="#6b7384"/>
+</svg>

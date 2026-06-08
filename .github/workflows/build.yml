@@ -1,0 +1,38 @@
+name: Build (Web)
+
+# Exports a Godot web build on every push to dev and uploads it as an artifact.
+# Pinned to Godot 4.3 — bump GODOT_VERSION + the container image tag together if you upgrade.
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+env:
+  GODOT_VERSION: "4.3"
+
+jobs:
+  web-export:
+    name: Web Export
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install export templates
+        run: |
+          mkdir -v -p ~/.local/share/godot/export_templates/
+          mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+
+      - name: Export web build
+        run: |
+          mkdir -v -p build/web
+          godot --headless --verbose --export-release "Web" build/web/index.html
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cairn-web-build
+          path: build/web
+          if-no-files-found: error
