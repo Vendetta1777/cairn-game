@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="1_player"]
 [ext_resource type="Texture2D" path="res://assets/environment/caverns/background.png" id="2_bg"]
@@ -10,9 +10,6 @@ size = Vector2(512, 60)
 
 [sub_resource type="RectangleShape2D" id="shape_wall"]
 size = Vector2(20, 288)
-
-[sub_resource type="RectangleShape2D" id="shape_platform"]
-size = Vector2(120, 16)
 
 [sub_resource type="Gradient" id="grad_glow"]
 offsets = PackedFloat32Array(0, 1)
@@ -26,10 +23,22 @@ fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(0.5, 0)
 
+[sub_resource type="Gradient" id="grad_vig"]
+offsets = PackedFloat32Array(0.55, 1)
+colors = PackedColorArray(0, 0, 0, 0, 0.01, 0.01, 0.03, 0.66)
+
+[sub_resource type="GradientTexture2D" id="tex_vig"]
+gradient = SubResource("grad_vig")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
 [node name="TestLevel" type="Node2D"]
 
 [node name="Mood" type="CanvasModulate" parent="."]
-color = Color(0.72, 0.74, 0.88, 1)
+color = Color(0.7, 0.72, 0.86, 1)
 
 [node name="Background" type="Sprite2D" parent="."]
 texture_repeat = 1
@@ -42,6 +51,24 @@ region_rect = Rect2(0, 0, 512, 288)
 centered = false
 texture = ExtResource("3_walls")
 
+[node name="HazeBack" type="CPUParticles2D" parent="."]
+position = Vector2(256, 150)
+amount = 9
+lifetime = 16.0
+preprocess = 8.0
+lifetime_randomness = 0.5
+texture = SubResource("tex_glow")
+emission_shape = 3
+emission_rect_extents = Vector2(260, 120)
+direction = Vector2(1, 0)
+spread = 30.0
+gravity = Vector2(6, -1)
+initial_velocity_min = 1.0
+initial_velocity_max = 4.0
+scale_amount_min = 7.0
+scale_amount_max = 15.0
+color = Color(0.42, 0.4, 0.6, 0.05)
+
 [node name="Foreground" type="Sprite2D" parent="."]
 centered = false
 texture = ExtResource("4_fg")
@@ -49,9 +76,23 @@ texture = ExtResource("4_fg")
 [node name="ShrineLight" type="PointLight2D" parent="."]
 position = Vector2(256, 110)
 color = Color(0.95, 0.5, 0.65, 1)
-energy = 1.1
+energy = 1.2
 texture = SubResource("tex_glow")
-texture_scale = 1.0
+texture_scale = 1.1
+
+[node name="CrystalLightR" type="PointLight2D" parent="."]
+position = Vector2(438, 150)
+color = Color(0.32, 0.78, 0.82, 1)
+energy = 0.55
+texture = SubResource("tex_glow")
+texture_scale = 0.8
+
+[node name="CrystalLightL" type="PointLight2D" parent="."]
+position = Vector2(78, 182)
+color = Color(0.34, 0.72, 0.8, 1)
+energy = 0.5
+texture = SubResource("tex_glow")
+texture_scale = 0.7
 
 [node name="Floor" type="StaticBody2D" parent="."]
 position = Vector2(256, 150)
@@ -76,7 +117,7 @@ position = Vector2(120, 100)
 
 [node name="Dust" type="CPUParticles2D" parent="."]
 position = Vector2(256, 20)
-amount = 40
+amount = 44
 lifetime = 9.0
 preprocess = 5.0
 lifetime_randomness = 0.4
@@ -89,7 +130,49 @@ initial_velocity_min = 2.0
 initial_velocity_max = 7.0
 scale_amount_min = 0.5
 scale_amount_max = 1.6
-color = Color(0.7, 0.74, 0.85, 0.16)
+color = Color(0.72, 0.76, 0.88, 0.18)
+
+[node name="DripsA" type="CPUParticles2D" parent="."]
+position = Vector2(196, 72)
+amount = 5
+lifetime = 1.8
+lifetime_randomness = 0.6
+emission_shape = 3
+emission_rect_extents = Vector2(6, 1)
+direction = Vector2(0, 1)
+spread = 0.0
+gravity = Vector2(0, 120)
+initial_velocity_min = 4.0
+initial_velocity_max = 10.0
+scale_amount_min = 0.5
+scale_amount_max = 1.0
+color = Color(0.5, 0.72, 0.92, 0.6)
+
+[node name="DripsB" type="CPUParticles2D" parent="."]
+position = Vector2(360, 64)
+amount = 4
+lifetime = 2.0
+lifetime_randomness = 0.6
+emission_shape = 3
+emission_rect_extents = Vector2(6, 1)
+direction = Vector2(0, 1)
+spread = 0.0
+gravity = Vector2(0, 120)
+initial_velocity_min = 4.0
+initial_velocity_max = 10.0
+scale_amount_min = 0.5
+scale_amount_max = 1.0
+color = Color(0.5, 0.72, 0.92, 0.6)
+
+[node name="Vignette" type="CanvasLayer" parent="."]
+layer = 5
+
+[node name="Tex" type="TextureRect" parent="Vignette"]
+offset_right = 480.0
+offset_bottom = 270.0
+texture = SubResource("tex_vig")
+stretch_mode = 0
+mouse_filter = 2
 
 [node name="UI" type="CanvasLayer" parent="."]
 
