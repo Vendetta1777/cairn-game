@@ -1,0 +1,156 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1Terrain.gd" id="1_terrain"]
+[ext_resource type="Texture2D" path="res://assets/environment/caverns/background.png" id="2_bg"]
+[ext_resource type="Texture2D" path="res://assets/environment/caverns/back-walls.png" id="3_walls"]
+[ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="4_player"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/fly/Bat.tscn" id="5_bat"]
+[ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="6_hud"]
+
+[sub_resource type="Gradient" id="grad_light"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_light"]
+gradient = SubResource("grad_light")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[sub_resource type="Gradient" id="grad_vig"]
+offsets = PackedFloat32Array(0.55, 1)
+colors = PackedColorArray(0, 0, 0, 0, 0.01, 0.01, 0.03, 0.66)
+
+[sub_resource type="GradientTexture2D" id="tex_vig"]
+gradient = SubResource("grad_vig")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[node name="Area1" type="Node2D"]
+
+[node name="Mood" type="CanvasModulate" parent="."]
+color = Color(0.7, 0.72, 0.86, 1)
+
+[node name="Background" type="Node2D" parent="."]
+
+[node name="Deep" type="Sprite2D" parent="Background"]
+texture_repeat = 1
+centered = false
+texture = ExtResource("2_bg")
+region_enabled = true
+region_rect = Rect2(0, 0, 1440, 288)
+
+[node name="Walls" type="Sprite2D" parent="Background"]
+texture_repeat = 1
+centered = false
+texture = ExtResource("3_walls")
+region_enabled = true
+region_rect = Rect2(0, 0, 1440, 288)
+
+[node name="Terrain" type="Node2D" parent="."]
+script = ExtResource("1_terrain")
+
+[node name="Decor" type="Node2D" parent="."]
+
+[node name="Stal1" type="Polygon2D" parent="Decor"]
+color = Color(0.07, 0.08, 0.11, 1)
+polygon = PackedVector2Array(180, 14, 210, 14, 196, 46)
+
+[node name="Stal2" type="Polygon2D" parent="Decor"]
+color = Color(0.07, 0.08, 0.11, 1)
+polygon = PackedVector2Array(470, 14, 504, 14, 488, 52)
+
+[node name="Stal3" type="Polygon2D" parent="Decor"]
+color = Color(0.07, 0.08, 0.11, 1)
+polygon = PackedVector2Array(820, 14, 850, 14, 836, 44)
+
+[node name="Stal4" type="Polygon2D" parent="Decor"]
+color = Color(0.07, 0.08, 0.11, 1)
+polygon = PackedVector2Array(1180, 14, 1214, 14, 1198, 50)
+
+[node name="Moss1" type="PointLight2D" parent="Decor"]
+position = Vector2(226, 198)
+color = Color(0.32, 0.78, 0.74, 1)
+energy = 0.55
+texture = SubResource("tex_light")
+texture_scale = 0.8
+
+[node name="Moss2" type="PointLight2D" parent="Decor"]
+position = Vector2(596, 176)
+color = Color(0.32, 0.78, 0.74, 1)
+energy = 0.5
+texture = SubResource("tex_light")
+texture_scale = 0.75
+
+[node name="Moss3" type="PointLight2D" parent="Decor"]
+position = Vector2(1078, 158)
+color = Color(0.32, 0.78, 0.74, 1)
+energy = 0.5
+texture = SubResource("tex_light")
+texture_scale = 0.8
+
+[node name="RemnantStone" type="Polygon2D" parent="Decor"]
+position = Vector2(1363, 200)
+color = Color(0.16, 0.13, 0.2, 1)
+polygon = PackedVector2Array(-7, 0, 7, 0, 5, -30, -5, -30)
+
+[node name="RemnantGlow" type="Polygon2D" parent="Decor"]
+position = Vector2(1363, 200)
+color = Color(0.55, 0.35, 0.62, 1)
+polygon = PackedVector2Array(-4, -30, 4, -30, 2, -38, -2, -38)
+
+[node name="RemnantLight" type="PointLight2D" parent="Decor"]
+position = Vector2(1363, 178)
+color = Color(0.7, 0.45, 0.78, 1)
+energy = 1.0
+texture = SubResource("tex_light")
+texture_scale = 0.9
+
+[node name="Player" parent="." instance=ExtResource("4_player")]
+position = Vector2(50, 215)
+
+[node name="Bat1" parent="." instance=ExtResource("5_bat")]
+position = Vector2(480, 150)
+
+[node name="Bat2" parent="." instance=ExtResource("5_bat")]
+position = Vector2(660, 110)
+
+[node name="Bat3" parent="." instance=ExtResource("5_bat")]
+position = Vector2(1010, 108)
+
+[node name="Bat4" parent="." instance=ExtResource("5_bat")]
+position = Vector2(1250, 92)
+
+[node name="Dust" type="CPUParticles2D" parent="."]
+position = Vector2(720, 24)
+amount = 70
+lifetime = 9.0
+preprocess = 5.0
+lifetime_randomness = 0.4
+emission_shape = 3
+emission_rect_extents = Vector2(700, 8)
+direction = Vector2(0, 1)
+spread = 25.0
+gravity = Vector2(0, 5)
+initial_velocity_min = 2.0
+initial_velocity_max = 7.0
+scale_amount_min = 0.5
+scale_amount_max = 1.6
+color = Color(0.72, 0.76, 0.88, 0.16)
+
+[node name="Vignette" type="CanvasLayer" parent="."]
+layer = 5
+
+[node name="Tex" type="TextureRect" parent="Vignette"]
+offset_right = 480.0
+offset_bottom = 270.0
+texture = SubResource("tex_vig")
+stretch_mode = 0
+mouse_filter = 2
+
+[node name="HUD" parent="." instance=ExtResource("6_hud")]

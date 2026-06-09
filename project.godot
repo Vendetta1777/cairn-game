@@ -16,7 +16,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 config/name="Cairn"
 config/description="A cairn marks a grave. Or a path. In the deep, no one remembers which."
-run/main_scene="res://scenes/test/TestLevel.tscn"
+run/main_scene="res://scenes/world/area_01_hollowed_gate/Area1.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
