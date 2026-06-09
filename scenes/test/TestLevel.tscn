@@ -1,9 +1,10 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="1_player"]
 [ext_resource type="Texture2D" path="res://assets/environment/caverns/background.png" id="2_bg"]
 [ext_resource type="Texture2D" path="res://assets/environment/caverns/back-walls.png" id="3_walls"]
 [ext_resource type="Texture2D" path="res://assets/environment/caverns/foreground.png" id="4_fg"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/fly/Bat.tscn" id="5_bat"]
 
 [sub_resource type="RectangleShape2D" id="shape_floor"]
 size = Vector2(512, 60)
@@ -114,6 +115,12 @@ shape = SubResource("shape_wall")
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
 position = Vector2(120, 100)
+
+[node name="Bat1" parent="." instance=ExtResource("5_bat")]
+position = Vector2(285, 108)
+
+[node name="Bat2" parent="." instance=ExtResource("5_bat")]
+position = Vector2(360, 96)
 
 [node name="Dust" type="CPUParticles2D" parent="."]
 position = Vector2(256, 20)

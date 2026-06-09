@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scenes/player/PlayerController.gd" id="1_ctrl"]
 [ext_resource type="Script" path="res://scenes/player/PlayerStats.gd" id="2_stats"]
@@ -21,7 +21,10 @@ fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(0.5, 0)
 
-[node name="Player" type="CharacterBody2D"]
+[sub_resource type="RectangleShape2D" id="shape_hitbox"]
+size = Vector2(24, 26)
+
+[node name="Player" type="CharacterBody2D" groups=["player"]]
 script = ExtResource("1_ctrl")
 
 [node name="Collision" type="CollisionShape2D" parent="."]
@@ -40,6 +43,14 @@ scale = Vector2(1.15, 1.15)
 sprite_frames = ExtResource("5_frames")
 animation = &"idle"
 autoplay = "idle"
+
+[node name="Hitbox" type="Area2D" parent="."]
+position = Vector2(16, -12)
+collision_layer = 0
+collision_mask = 4
+
+[node name="Col" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("shape_hitbox")
 
 [node name="Stats" type="Node" parent="."]
 script = ExtResource("2_stats")
