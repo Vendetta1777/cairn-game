@@ -1,16 +1,27 @@
 extends Control
 class_name HUD
-## Cairn — HUD (GDD Section 10): a row of heart masks (each heart = 2 half-heart
-## units, shown full/half/empty) and a thin shadow-energy bar beneath. Drawn
-## procedurally for now (no heart art needed); binds to the player's PlayerStats.
+## Cairn — HUD (GDD Section 10). A row of heart masks (each heart = 2 half-heart
+## units: full / half / empty) and a Shadow-Energy bar (the assassin's "mana" —
+## powers cloak / shadow bolt / smoke bomb / shadow-step). Drawn procedurally and
+## styled to the dark-fantasy palette; binds to the player's PlayerStats.
 
-@export var heart_size: float = 16.0
-@export var heart_spacing: float = 19.0
-@export var origin := Vector2(12.0, 12.0)
-@export var heart_full := Color(0.82, 0.17, 0.22)
-@export var heart_empty := Color(0.2, 0.09, 0.12)
-@export var shadow_fill := Color(0.42, 0.84, 0.88)
-@export var shadow_bg := Color(0.12, 0.14, 0.2)
+@export var heart_size: float = 17.0
+@export var heart_spacing: float = 20.0
+@export var origin := Vector2(13.0, 13.0)
+
+# Heart palette (gothic blood).
+@export var heart_bright := Color(0.86, 0.21, 0.25)
+@export var heart_shade := Color(0.5, 0.1, 0.13)
+@export var heart_outline := Color(0.06, 0.02, 0.03)
+@export var heart_empty := Color(0.17, 0.08, 0.1)
+@export var heart_glint := Color(0.98, 0.78, 0.78, 0.85)
+
+# Shadow-energy bar palette (cold).
+@export var energy_bright := Color(0.55, 0.92, 0.95)
+@export var energy_deep := Color(0.18, 0.5, 0.62)
+@export var energy_bg := Color(0.07, 0.09, 0.14)
+@export var energy_frame := Color(0.02, 0.03, 0.06)
+@export var energy_sheen := Color(0.8, 0.98, 1.0, 0.6)
 
 var _cur_halves := 8
 var _max_halves := 8
@@ -47,21 +58,25 @@ func _draw() -> void:
 	for i in hearts:
 		var halves := clampi(_cur_halves - i * 2, 0, 2)
 		_draw_heart(origin + Vector2(i * heart_spacing, 0.0), heart_size, halves)
+	_draw_energy_bar(origin.y + heart_size * 0.78 + 9.0, hearts)
 
-	# Shadow bar under the hearts.
-	var bar_y := origin.y + heart_size * 0.75 + 6.0
-	var bar_w := maxf(64.0, hearts * heart_spacing - 4.0)
-	draw_rect(Rect2(origin.x, bar_y, bar_w, 4.0), shadow_bg)
-	var frac := (_shadow / _shadow_max) if _shadow_max > 0.0 else 0.0
-	draw_rect(Rect2(origin.x, bar_y, bar_w * frac, 4.0), shadow_fill)
 
+# --- Hearts ---------------------------------------------------------------
 
 func _draw_heart(c: Vector2, s: float, halves: int) -> void:
-	_heart_shape(c, s, heart_empty)            # empty base
+	# Dark outline (a larger heart behind), then the fill.
+	_heart_shape(c + Vector2(0.0, s * 0.05), s * 1.18, heart_outline)
+	if halves == 0:
+		_heart_shape(c, s, heart_empty)
+		return
 	if halves >= 2:
-		_heart_shape(c, s, heart_full)         # full
-	elif halves == 1:
-		_heart_left_half(c, s, heart_full)     # half
+		_heart_shape(c, s, heart_bright)
+		_heart_lower_shade(c, s)
+		draw_circle(c + Vector2(-s * 0.24, -s * 0.16), s * 0.1, heart_glint)
+	else:
+		_heart_shape(c, s, heart_empty)          # right side reads empty
+		_heart_left_half(c, s, heart_bright)
+		draw_circle(c + Vector2(-s * 0.24, -s * 0.16), s * 0.09, heart_glint)
 
 
 func _heart_shape(c: Vector2, s: float, col: Color) -> void:
@@ -73,9 +88,42 @@ func _heart_shape(c: Vector2, s: float, col: Color) -> void:
 		c + Vector2(0.0, s * 0.55)]), col)
 
 
+func _heart_lower_shade(c: Vector2, s: float) -> void:
+	draw_colored_polygon(PackedVector2Array([
+		c + Vector2(-s * 0.3, s * 0.16),
+		c + Vector2(s * 0.3, s * 0.16),
+		c + Vector2(0.0, s * 0.55)]), heart_shade)
+
+
 func _heart_left_half(c: Vector2, s: float, col: Color) -> void:
 	draw_circle(c + Vector2(-s * 0.22, -s * 0.08), s * 0.27, col)
 	draw_colored_polygon(PackedVector2Array([
 		c + Vector2(-s * 0.46, 0.02 * s),
 		c + Vector2(0.0, 0.02 * s),
 		c + Vector2(0.0, s * 0.55)]), col)
+
+
+# --- Shadow-energy bar ----------------------------------------------------
+
+func _draw_energy_bar(y: float, hearts: int) -> void:
+	var frac := clampf(_shadow / _shadow_max, 0.0, 1.0) if _shadow_max > 0.0 else 0.0
+	var h := 7.0
+	var cy := y + h * 0.5
+
+	# Orb sigil at the left — signals "energy / magic".
+	var orb := Vector2(origin.x + 5.0, cy)
+	draw_circle(orb, 6.0, energy_frame)
+	draw_circle(orb, 4.6, energy_deep)
+	draw_circle(orb, 4.6 * frac, energy_bright)  # orb "fills" with the bar
+	draw_circle(orb + Vector2(-1.4, -1.4), 1.4, energy_sheen)
+
+	# Bar.
+	var bx := origin.x + 15.0
+	var bw := maxf(60.0, hearts * heart_spacing - 18.0)
+	draw_rect(Rect2(bx - 1.0, y - 1.0, bw + 2.0, h + 2.0), energy_frame)   # frame
+	draw_rect(Rect2(bx, y, bw, h), energy_bg)                              # track
+	var fw := bw * frac
+	if fw > 0.0:
+		draw_rect(Rect2(bx, y, fw, h), energy_deep)                       # base fill
+		draw_rect(Rect2(bx, y, fw, h * 0.5), energy_bright)               # bright top
+		draw_rect(Rect2(bx, y, fw, 1.0), energy_sheen)                    # sheen line
