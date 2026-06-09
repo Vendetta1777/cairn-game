@@ -29,8 +29,8 @@ class_name PlayerAnimator
 @export var swing_duration: float = 0.2       ## procedural swing length (no attack frame on the sheet)
 @export var swing_lunge: float = 7.0          ## forward thrust px
 @export var swing_dip: float = 2.0            ## small dip into the swing
-@export var swing_thrust := Vector2(0.2, 0.12) ## scale punch (wide, short)
-@export var swing_lean_deg: float = 15.0      ## lean into the swing arc
+@export var swing_thrust := Vector2(0.22, 0.14) ## scale punch (wide, short)
+@export var swing_windup: float = 0.5         ## how far she pulls back before striking (no tilt)
 
 # Controller state -> animation name that exists in player_frames.tres.
 const STATE_ANIM := {
@@ -61,7 +61,6 @@ var _state := "idle"
 var _trail_t := 0.0
 var _attack_t := 0.0
 var _attack_facing := 1
-var _swing_sign := 1.0
 var _attack_mult := 1.0
 
 
@@ -88,8 +87,19 @@ func _ready() -> void:
 func _on_attacked(step: int) -> void:
 	_attack_t = swing_duration
 	_attack_facing = _controller.get_facing() if _controller else 1
-	_swing_sign = -1.0 if step == 1 else 1.0
-	_attack_mult = 1.4 if step == 2 else 1.0
+	_attack_mult = 1.35 if step == 2 else 1.0   # finisher lunges harder
+
+
+## Swing motion over p in [0,1], normalized: a quick wind-back to -windup, a
+## snappy strike to +1, then a smooth recover to 0. (smoothstep eases.)
+func _swing_curve(p: float) -> float:
+	if p < 0.18:
+		return -swing_windup * (p / 0.18)
+	elif p < 0.46:
+		var q := (p - 0.18) / 0.28
+		return lerpf(-swing_windup, 1.0, q * q * (3.0 - 2.0 * q))
+	var r := (p - 0.46) / 0.54
+	return lerpf(1.0, 0.0, r * r * (3.0 - 2.0 * r))
 
 
 func _process(delta: float) -> void:
@@ -115,22 +125,22 @@ func _process(delta: float) -> void:
 	_cur_scale = _cur_scale.lerp(target_scale, t)
 	_cur_pos = _cur_pos.lerp(target_pos, t)
 
-	# Attack swing: a quick forward lunge + thrust + lean, additive on the base,
-	# so the body reads as swinging even though the sheet has no attack frame.
+	# Attack swing (NO tilt): wind back -> snap forward into the strike -> recover,
+	# plus a forward scale-thrust. Sells a swing even though the sheet has no
+	# attack frame. Additive on the eased base.
 	var atk_off := Vector2.ZERO
 	var atk_scale := Vector2.ONE
-	var atk_rot := 0.0
 	if _attack_t > 0.0:
 		_attack_t = maxf(0.0, _attack_t - delta)
 		var p := clampf(1.0 - _attack_t / swing_duration, 0.0, 1.0)
-		var s := sin(p * PI)   # 0 -> 1 -> 0 over the swing
-		atk_off = Vector2(_attack_facing * swing_lunge * _attack_mult * s, swing_dip * s)
-		atk_scale = Vector2(1.0 + swing_thrust.x * s, 1.0 - swing_thrust.y * s)
-		atk_rot = _attack_facing * deg_to_rad(swing_lean_deg) * _swing_sign * s
+		var c := _swing_curve(p)          # -windup .. +1 .. 0
+		var fwd := maxf(c, 0.0)
+		atk_off = Vector2(_attack_facing * swing_lunge * _attack_mult * c, swing_dip * fwd)
+		atk_scale = Vector2(1.0 + swing_thrust.x * fwd, 1.0 - swing_thrust.y * fwd)
 
 	_sprite.scale = _cur_scale * atk_scale
 	_sprite.position = _cur_pos + atk_off
-	_sprite.rotation = atk_rot
+	_sprite.rotation = 0.0
 
 	# Dash leaves a fading shadow afterimage trail.
 	if _state == "dash":
