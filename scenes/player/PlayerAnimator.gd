@@ -20,6 +20,11 @@ class_name PlayerAnimator
 @export var dash_stretch := Vector2(1.4, 0.55) ## long + squashed: head ducks low
 @export var dash_drop: float = 9.0            ## sink the whole body low to the ground
 
+@export_group("Dash trail")
+@export var trail_interval: float = 0.022     ## seconds between afterimages
+@export var trail_color := Color(0.5, 0.85, 1.0, 0.5)  ## cold shadow ghost
+@export var trail_fade: float = 0.3           ## ghost fade-out time
+
 # Controller state -> animation name that exists in player_frames.tres.
 const STATE_ANIM := {
 	"idle":   "idle",
@@ -44,6 +49,7 @@ var _base_scale := Vector2.ONE
 var _base_pos := Vector2.ZERO
 var _flash := Color.WHITE
 var _state := "idle"
+var _trail_t := 0.0
 
 
 func _ready() -> void:
@@ -82,9 +88,38 @@ func _process(delta: float) -> void:
 	_sprite.scale = _sprite.scale.lerp(target_scale, t)
 	_sprite.position = _sprite.position.lerp(target_pos, t)
 
+	# Dash leaves a fading shadow afterimage trail.
+	if _state == "dash":
+		_trail_t -= delta
+		if _trail_t <= 0.0:
+			_spawn_ghost()
+			_trail_t = trail_interval
+	else:
+		_trail_t = 0.0
+
 	# Hit/dash flash eases back to white.
 	_flash = _flash.lerp(Color.WHITE, 1.0 - exp(-flash_fade_speed * delta))
 	_sprite.modulate = _flash
+
+
+## One frozen, fading copy of the current frame — the dash trail.
+func _spawn_ghost() -> void:
+	if _sprite.sprite_frames == null:
+		return
+	var tex := _sprite.sprite_frames.get_frame_texture(_sprite.animation, _sprite.frame)
+	if tex == null:
+		return
+	var ghost := Sprite2D.new()
+	ghost.texture = tex
+	ghost.global_position = _sprite.global_position
+	ghost.scale = _sprite.scale
+	ghost.flip_h = _sprite.flip_h
+	ghost.modulate = trail_color
+	var host: Node = _controller.get_parent() if _controller else get_parent()
+	host.add_child(ghost)
+	var tw := ghost.create_tween()
+	tw.tween_property(ghost, "modulate:a", 0.0, trail_fade)
+	tw.tween_callback(ghost.queue_free)
 
 
 func _on_state_changed(new_state: String) -> void:

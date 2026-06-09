@@ -14,8 +14,8 @@ signal attacked
 
 @export var attack_cooldown: float = 0.32  ## min seconds between swings
 @export var damage: int = 1
-@export var slash_offset: float = 18.0     ## how far in front the slash appears
-@export var slash_height: float = -11.0    ## raise the slash to mid-body
+@export var slash_offset: float = 12.0     ## how far in front the slash appears
+@export var slash_height: float = -3.0     ## centre the slash on the body
 
 const SLASH := preload("res://scenes/fx/Slash.tscn")
 const HIT_SPARK := preload("res://scenes/fx/HitSpark.tscn")
@@ -53,8 +53,9 @@ func _do_attack() -> void:
 	var parent: Node = _controller.get_parent()
 
 	# Slash VFX in front of the player (flipped to face the swing direction).
+	# (slash art's default arc faces left, so flip it when facing right)
 	var slash_pos: Vector2 = _controller.global_position + Vector2(facing * slash_offset, slash_height)
-	_spawn_vfx(SLASH, parent, slash_pos, facing < 0)
+	_spawn_vfx(SLASH, parent, slash_pos, facing > 0)
 
 	if not _hitbox:
 		return
