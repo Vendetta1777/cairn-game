@@ -3,19 +3,21 @@ class_name PlayerAnimator
 ## Cairn — Player animation driver (GDD Section 4).
 ##
 ## Drives the AnimatedSprite2D player rig from the controller's state string:
-##   - plays the matching animation (idle/run/jump/attack/crouch/hurt)
-##   - flips horizontally to face movement
+##   - plays the matching animation (idle/run/jump/dash/crouch/hurt)
+##   - flips horizontally to face movement (flip_h, independent of scale)
+##   - DASH gets a horizontal speed-stretch so it reads as a burst, not a slide
 ##   - brief modulate flashes (cyan on dash, red on hurt) for readable juice
 ##
-## The controller emits states from its full list; we map them onto the
-## animations we actually have art for (fall reuses jump, dash reuses run,
-## crawl reuses crouch, dead reuses hurt) so nothing ever plays a missing clip.
+## Scale work is layered on top of the sprite's authored base scale (set in the
+## scene), so resizing the character there doesn't break the dash stretch.
 
 @export var controller_path: NodePath = NodePath("..")
 @export var sprite_path: NodePath = NodePath("../Sprite")
 
 @export_group("Feel")
-@export var flash_fade_speed: float = 9.0   ## how fast modulate returns to white
+@export var flash_fade_speed: float = 9.0     ## how fast modulate returns to white
+@export var scale_follow_speed: float = 22.0  ## how fast the dash stretch eases
+@export var dash_stretch := Vector2(1.3, 0.82)
 
 # Controller state -> animation name that exists in player_frames.tres.
 const STATE_ANIM := {
@@ -23,7 +25,7 @@ const STATE_ANIM := {
 	"run":    "run",
 	"jump":   "jump",
 	"fall":   "jump",
-	"dash":   "run",
+	"dash":   "dash",
 	"crouch": "crouch",
 	"crawl":  "crouch",
 	"hurt":   "hurt",
@@ -37,6 +39,7 @@ const FLASH_HURT := Color(1.0, 0.5, 0.5)
 var _controller
 var _sprite: AnimatedSprite2D
 
+var _base_scale := Vector2.ONE
 var _flash := Color.WHITE
 var _state := "idle"
 
@@ -44,6 +47,8 @@ var _state := "idle"
 func _ready() -> void:
 	_controller = get_node_or_null(controller_path)
 	_sprite = get_node_or_null(sprite_path) as AnimatedSprite2D
+	if _sprite:
+		_base_scale = _sprite.scale.abs()
 	if _controller:
 		_state = _controller.get_current_state()
 		_controller.state_changed.connect(_on_state_changed)
@@ -54,10 +59,18 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if not _sprite:
 		return
-	# Face movement direction.
+
+	# Face movement direction (flip_h leaves scale free for the stretch).
 	if _controller and _controller.get_facing() != 0:
 		_sprite.flip_h = _controller.get_facing() < 0
-	# Ease the hit/dash flash back to white.
+
+	# Dash stretch eases in/out on top of the authored base scale.
+	var target_scale := _base_scale
+	if _state == "dash":
+		target_scale = _base_scale * dash_stretch
+	_sprite.scale = _sprite.scale.lerp(target_scale, 1.0 - exp(-scale_follow_speed * delta))
+
+	# Hit/dash flash eases back to white.
 	_flash = _flash.lerp(Color.WHITE, 1.0 - exp(-flash_fade_speed * delta))
 	_sprite.modulate = _flash
 

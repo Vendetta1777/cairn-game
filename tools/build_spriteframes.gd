@@ -15,6 +15,7 @@ const ANIMS := {
 	"idle":   {"cells": [[0,0],[1,0],[0,1],[1,1]], "fps": 5.0,  "loop": true},
 	"run":    {"cells": [[0,3],[1,3],[2,3],[3,3],[4,3],[5,3],[6,3],[7,3]], "fps": 12.0, "loop": true},
 	"jump":   {"cells": [[0,5],[1,5],[2,5],[3,5]], "fps": 8.0,  "loop": false},
+	"dash":   {"cells": [[4,8]], "fps": 1.0,  "loop": true},
 	"crouch": {"cells": [[2,4],[3,4]], "fps": 5.0,  "loop": true},
 	"hurt":   {"cells": [[0,6],[1,6],[2,6]], "fps": 9.0,  "loop": false},
 }

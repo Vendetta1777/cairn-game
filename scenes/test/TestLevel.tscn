@@ -95,7 +95,7 @@ texture = SubResource("tex_glow")
 texture_scale = 0.7
 
 [node name="Floor" type="StaticBody2D" parent="."]
-position = Vector2(256, 150)
+position = Vector2(256, 165)
 
 [node name="Col" type="CollisionShape2D" parent="Floor"]
 shape = SubResource("shape_floor")
