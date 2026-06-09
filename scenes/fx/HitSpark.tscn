@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/fx/OneShotVFX.gd" id="1_vfx"]
+[ext_resource type="SpriteFrames" path="res://scenes/fx/fx_frames.tres" id="2_frames"]
+
+[node name="HitSpark" type="AnimatedSprite2D"]
+scale = Vector2(0.9, 0.9)
+sprite_frames = ExtResource("2_frames")
+animation = &"hit"
+script = ExtResource("1_vfx")

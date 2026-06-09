@@ -7,7 +7,8 @@ Cairn uses third-party art assets as placeholders/foundation. Credit where due, 
 |---|---|---|---|---|
 | `assets/sprites/player/hooded.png` | Player (the hooded assassin) — idle/run/jump/crouch/hurt | `AnimationSheet_Character.png` (itch.io download) | **TBD — confirm** | ⚠️ source/author not yet recorded; identify the pack + verify its license before release |
 | `assets/environment/caverns/*` | The underground cave (parallax layers + terrain) | GothicVania "Caverns" | **Ansimuz** | CC0 / free for commercial use |
-| `assets/sprites/enemies/bat/*` | Enemy (the "Fly") — for the upcoming test dummy | DarkFantasyEnemies (FREE) | (itch.io free pack) | verify pack license |
+| `assets/sprites/enemies/bat/*` | Enemy (the "Fly") test dummy | DarkFantasyEnemies (FREE) | (itch.io free pack) | verify pack license |
+| `assets/fx/slash.png`, `assets/fx/hit.png` | Attack slash + hit spark VFX | GothicVania "Explosions and Magic" | **Ansimuz** | CC0 / free for commercial use |
 
 ## Notes
 - Sources were downloaded by the project owner from itch.io.

@@ -14,6 +14,11 @@ signal attacked
 
 @export var attack_cooldown: float = 0.32  ## min seconds between swings
 @export var damage: int = 1
+@export var slash_offset: float = 18.0     ## how far in front the slash appears
+@export var slash_height: float = -11.0    ## raise the slash to mid-body
+
+const SLASH := preload("res://scenes/fx/Slash.tscn")
+const HIT_SPARK := preload("res://scenes/fx/HitSpark.tscn")
 
 var _cooldown := 0.0
 var _controller
@@ -44,6 +49,13 @@ func _process(delta: float) -> void:
 func _do_attack() -> void:
 	_cooldown = attack_cooldown
 	attacked.emit()
+	var facing: int = _controller.get_facing()
+	var parent: Node = _controller.get_parent()
+
+	# Slash VFX in front of the player (flipped to face the swing direction).
+	var slash_pos: Vector2 = _controller.global_position + Vector2(facing * slash_offset, slash_height)
+	_spawn_vfx(SLASH, parent, slash_pos, facing < 0)
+
 	if not _hitbox:
 		return
 	var already := {}
@@ -52,3 +64,13 @@ func _do_attack() -> void:
 		if body and body.has_method("take_damage") and not already.has(body):
 			already[body] = true
 			body.take_damage(damage, _controller.global_position)
+			_spawn_vfx(HIT_SPARK, parent, body.global_position, false)
+
+
+# Inlined (rather than a static on OneShotVFX) to avoid a parse-time dependency
+# on that global class name not being registered yet.
+func _spawn_vfx(packed: PackedScene, parent: Node, at: Vector2, flip: bool) -> void:
+	var fx: AnimatedSprite2D = packed.instantiate()
+	parent.add_child(fx)
+	fx.global_position = at
+	fx.flip_h = flip
