@@ -16,8 +16,10 @@ class_name PlayerAnimator
 
 @export_group("Feel")
 @export var flash_fade_speed: float = 9.0     ## how fast modulate returns to white
-@export var scale_follow_speed: float = 22.0  ## how fast the dash stretch eases
-@export var dash_stretch := Vector2(1.3, 0.82)
+@export var scale_follow_speed: float = 26.0  ## how fast the dash stretch eases
+@export var dash_stretch := Vector2(1.45, 0.7)  ## flat + long: a low comic dash
+@export var dash_lean_deg: float = 26.0       ## forward lean into the dash direction
+@export var dash_drop: float = 5.0            ## sink low to the ground while dashing
 
 # Controller state -> animation name that exists in player_frames.tres.
 const STATE_ANIM := {
@@ -40,6 +42,7 @@ var _controller
 var _sprite: AnimatedSprite2D
 
 var _base_scale := Vector2.ONE
+var _base_pos := Vector2.ZERO
 var _flash := Color.WHITE
 var _state := "idle"
 
@@ -49,6 +52,7 @@ func _ready() -> void:
 	_sprite = get_node_or_null(sprite_path) as AnimatedSprite2D
 	if _sprite:
 		_base_scale = _sprite.scale.abs()
+		_base_pos = _sprite.position
 	if _controller:
 		_state = _controller.get_current_state()
 		_controller.state_changed.connect(_on_state_changed)
@@ -60,15 +64,26 @@ func _process(delta: float) -> void:
 	if not _sprite:
 		return
 
-	# Face movement direction (flip_h leaves scale free for the stretch).
+	# Face movement direction (flip_h leaves scale/rotation free for the lean).
+	var facing := 1
 	if _controller and _controller.get_facing() != 0:
-		_sprite.flip_h = _controller.get_facing() < 0
+		facing = _controller.get_facing()
+		_sprite.flip_h = facing < 0
 
-	# Dash stretch eases in/out on top of the authored base scale.
+	# Dash: flatten + lean forward + sink low (a low comic dash you can later
+	# slide under things with). Everything eases on top of the authored base.
 	var target_scale := _base_scale
+	var target_rot := 0.0
+	var target_pos := _base_pos
 	if _state == "dash":
 		target_scale = _base_scale * dash_stretch
-	_sprite.scale = _sprite.scale.lerp(target_scale, 1.0 - exp(-scale_follow_speed * delta))
+		target_rot = deg_to_rad(dash_lean_deg) * facing
+		target_pos = _base_pos + Vector2(0, dash_drop)
+
+	var t := 1.0 - exp(-scale_follow_speed * delta)
+	_sprite.scale = _sprite.scale.lerp(target_scale, t)
+	_sprite.rotation = lerp_angle(_sprite.rotation, target_rot, t)
+	_sprite.position = _sprite.position.lerp(target_pos, t)
 
 	# Hit/dash flash eases back to white.
 	_flash = _flash.lerp(Color.WHITE, 1.0 - exp(-flash_fade_speed * delta))
