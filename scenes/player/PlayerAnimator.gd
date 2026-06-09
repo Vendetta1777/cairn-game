@@ -30,12 +30,15 @@ const STATE_COLORS := {
 	"dead":   Color(0.35, 0.30, 0.35),
 }
 
-var _controller: PlayerController
+# Untyped on purpose: avoids a parse-time dependency on PlayerController's
+# global class name (which isn't guaranteed registered when this script first
+# loads). Methods/signals resolve dynamically at runtime instead.
+var _controller
 var _sprite: Node2D
 
 
 func _ready() -> void:
-	_controller = get_node_or_null(controller_path) as PlayerController
+	_controller = get_node_or_null(controller_path)
 	_sprite = get_node_or_null(sprite_path) as Node2D
 	if _controller:
 		_controller.state_changed.connect(play_state)
