@@ -13,6 +13,7 @@ signal died
 
 var health: int
 var _dead := false
+var _stagger_timer := 0.0
 
 @onready var _sprite: AnimatedSprite2D = get_node_or_null("Sprite")
 @onready var _hurtbox: Area2D = get_node_or_null("Hurtbox")
@@ -21,6 +22,25 @@ var _dead := false
 func _ready() -> void:
 	health = max_health
 	_play(idle_anim)
+
+
+func _process(delta: float) -> void:
+	if _stagger_timer > 0.0:
+		_stagger_timer = maxf(0.0, _stagger_timer - delta)
+
+
+## Knocked back and stunned (e.g. by a parry). Subclasses pause their AI while
+## is_staggered() is true and let the knockback velocity play out.
+func stagger(from_position: Vector2, force: float = 230.0, duration: float = 0.9) -> void:
+	if _dead:
+		return
+	_stagger_timer = duration
+	velocity = (global_position - from_position).normalized() * force
+	_play(&"hurt")
+
+
+func is_staggered() -> bool:
+	return _stagger_timer > 0.0
 
 
 ## Called by the player's attack hitbox.

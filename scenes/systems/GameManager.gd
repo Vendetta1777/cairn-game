@@ -32,3 +32,12 @@ func hitstop(duration: float) -> void:
 	await get_tree().create_timer(duration, true, false, true).timeout
 	Engine.time_scale = 1.0
 
+
+## Brief slow-motion (e.g. on a successful parry). Real-time timer so it restores.
+func slowmo(scale: float, duration: float) -> void:
+	if duration <= 0.0:
+		return
+	Engine.time_scale = clampf(scale, 0.05, 1.0)
+	await get_tree().create_timer(duration, true, false, true).timeout
+	Engine.time_scale = 1.0
+

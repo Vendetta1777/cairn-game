@@ -137,6 +137,11 @@ func _play(state: String) -> void:
 		_sprite.play(anim)
 
 
+## Tint flash (e.g. white on a parry); eases back to normal automatically.
+func flash(color: Color) -> void:
+	_flash = color
+
+
 ## Seam for combat (M3): let attacks request a one-shot animation.
 func play_oneshot(anim: String) -> void:
 	if _sprite and _sprite.sprite_frames.has_animation(anim):

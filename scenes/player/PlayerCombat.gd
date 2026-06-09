@@ -33,6 +33,8 @@ func _ready() -> void:
 	# Hitbox stays live so overlaps are always tracked; damage only on input.
 	if _hitbox:
 		_hitbox.monitoring = true
+	if _controller.has_signal("parried"):
+		_controller.parried.connect(_on_parried)
 
 
 func _process(delta: float) -> void:
@@ -51,6 +53,10 @@ func _process(delta: float) -> void:
 
 func _do_attack() -> void:
 	_cooldown = attack_cooldown
+	# Pressing attack also opens the parry window (GDD: parry = attack on the
+	# enemy's strike). If an enemy hits you in the next few frames, it's parried.
+	if _controller.has_method("open_parry_window"):
+		_controller.open_parry_window()
 	# Advance the combo if still within the window, else restart at 0.
 	_combo = (_combo + 1) % 3 if _combo_timer > 0.0 else 0
 	_combo_timer = combo_window
@@ -82,6 +88,15 @@ func _do_attack() -> void:
 		if _camera and _camera.has_method("add_trauma"):
 			_camera.add_trauma(0.5 if is_finisher else 0.32)
 		GameManager.hitstop(0.07 if is_finisher else 0.045)
+
+
+## A successful parry: a bright burst + extra shake (the rest — slow-mo, shadow
+## refill, enemy stagger — is handled in PlayerController._do_parry).
+func _on_parried(_attacker: Node) -> void:
+	var parent: Node = _controller.get_parent()
+	_spawn_vfx(HIT_SPARK, parent, _controller.global_position + Vector2(0, -8), false, false, 1.6)
+	if _camera and _camera.has_method("add_trauma"):
+		_camera.add_trauma(0.4)
 
 
 # Inlined (not a static on OneShotVFX) to avoid a parse-time dependency on that

@@ -50,6 +50,7 @@ class_name PlayerController
 @export var hurt_invuln_time: float = 0.8     ## i-frames after taking a hit
 @export var hurt_stun_time: float = 0.22      ## brief loss of control (knockback)
 @export var knockback_force: float = 200.0
+@export var parry_window_time: float = 0.14   ## GDD: tight window — press attack on the enemy's strike
 
 # --- Signals (the animator and stealth systems listen to these) ---
 signal state_changed(new_state: String)
@@ -57,6 +58,7 @@ signal jumped
 signal dashed
 signal landed
 signal hurt(amount: int)
+signal parried(attacker: Node)
 
 # --- Internal state ---
 var _facing: int = 1                          ## 1 = right, -1 = left (for attacks/animation flip)
@@ -70,6 +72,7 @@ var _was_on_floor: bool = false
 var _current_state: String = "idle"
 var _hurt_iframes: float = 0.0
 var _hurt_stun: float = 0.0
+var _parry_window: float = 0.0
 
 # Cached frame->seconds conversions (computed in _ready from the physics tick).
 var _coyote_time: float
@@ -130,6 +133,7 @@ func _update_timers(delta: float) -> void:
 
 	_hurt_iframes = maxf(0.0, _hurt_iframes - delta)
 	_hurt_stun = maxf(0.0, _hurt_stun - delta)
+	_parry_window = maxf(0.0, _parry_window - delta)
 
 
 func _handle_buffered_jump_input() -> void:
@@ -264,6 +268,39 @@ func take_damage(amount: int = 1, from_position: Vector2 = Vector2.ZERO) -> void
 	if cam and cam.has_method("add_trauma"):
 		cam.add_trauma(0.6)
 	GameManager.hitstop(0.09)
+
+
+## Enemies call this when an attack connects with the player. If the parry window
+## is open it becomes a parry; otherwise it's normal damage (or ignored in iframes).
+func receive_attack(attacker: Node = null, amount: int = 1) -> void:
+	if _parry_window > 0.0:
+		_do_parry(attacker)
+		return
+	var from := global_position
+	if attacker and is_instance_valid(attacker):
+		from = attacker.global_position
+	take_damage(amount, from)
+
+## Opens the parry window — PlayerCombat calls this on every attack press.
+func open_parry_window() -> void:
+	_parry_window = parry_window_time
+
+func _do_parry(attacker: Node) -> void:
+	_parry_window = 0.0
+	# GDD: full shadow-energy refill, brief slow-mo, enemy staggered.
+	var stats := get_node_or_null("Stats")
+	if stats:
+		stats.refill_shadow()
+	GameManager.slowmo(0.25, 0.18)
+	var cam := get_node_or_null("Camera")
+	if cam and cam.has_method("add_trauma"):
+		cam.add_trauma(0.45)
+	var anim := get_node_or_null("Animator")
+	if anim and anim.has_method("flash"):
+		anim.flash(Color(1.0, 1.0, 1.0))   # white parry flash
+	if attacker and is_instance_valid(attacker) and attacker.has_method("stagger"):
+		attacker.stagger(global_position)
+	parried.emit(attacker)
 
 ## 1 = facing right, -1 = facing left.
 func get_facing() -> int:

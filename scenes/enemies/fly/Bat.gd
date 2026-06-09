@@ -39,6 +39,11 @@ func _physics_process(delta: float) -> void:
 	if is_dead():
 		velocity = Vector2.ZERO
 		return
+	# Staggered (e.g. parried): let the knockback play out, no AI.
+	if is_staggered():
+		velocity = velocity.move_toward(Vector2.ZERO, 500.0 * delta)
+		move_and_slide()
+		return
 	if _cooldown > 0.0:
 		_cooldown -= delta
 	_state_time += delta
@@ -77,7 +82,8 @@ func _on_touch(area: Area2D) -> void:
 	if _state != DIVE:
 		return
 	var body := area.get_parent()
-	if body and body.is_in_group("player") and body.has_method("take_damage"):
-		body.take_damage(contact_damage, global_position)
+	if body and body.is_in_group("player") and body.has_method("receive_attack"):
+		# Routes through the player's parry/iframe handling.
+		body.receive_attack(self, contact_damage)
 		_cooldown = dive_cooldown
 		_enter(RECOVER)
