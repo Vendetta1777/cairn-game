@@ -17,9 +17,8 @@ class_name PlayerAnimator
 @export_group("Feel")
 @export var flash_fade_speed: float = 9.0     ## how fast modulate returns to white
 @export var scale_follow_speed: float = 26.0  ## how fast the dash stretch eases
-@export var dash_stretch := Vector2(1.45, 0.7)  ## flat + long: a low comic dash
-@export var dash_lean_deg: float = 26.0       ## forward lean into the dash direction
-@export var dash_drop: float = 5.0            ## sink low to the ground while dashing
+@export var dash_stretch := Vector2(1.4, 0.55) ## long + squashed: head ducks low
+@export var dash_drop: float = 9.0            ## sink the whole body low to the ground
 
 # Controller state -> animation name that exists in player_frames.tres.
 const STATE_ANIM := {
@@ -70,19 +69,17 @@ func _process(delta: float) -> void:
 		facing = _controller.get_facing()
 		_sprite.flip_h = facing < 0
 
-	# Dash: flatten + lean forward + sink low (a low comic dash you can later
-	# slide under things with). Everything eases on top of the authored base.
+	# Dash: NO tilt — just duck low. The sprite squashes (head drops) and the
+	# whole body sinks toward the ground, staying upright and facing forward.
+	# Sets up sliding under obstacles/enemies later. Eases on the authored base.
 	var target_scale := _base_scale
-	var target_rot := 0.0
 	var target_pos := _base_pos
 	if _state == "dash":
 		target_scale = _base_scale * dash_stretch
-		target_rot = deg_to_rad(dash_lean_deg) * facing
 		target_pos = _base_pos + Vector2(0, dash_drop)
 
 	var t := 1.0 - exp(-scale_follow_speed * delta)
 	_sprite.scale = _sprite.scale.lerp(target_scale, t)
-	_sprite.rotation = lerp_angle(_sprite.rotation, target_rot, t)
 	_sprite.position = _sprite.position.lerp(target_pos, t)
 
 	# Hit/dash flash eases back to white.
