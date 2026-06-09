@@ -9,6 +9,7 @@ Cairn uses third-party art assets as placeholders/foundation. Credit where due, 
 | `assets/environment/caverns/*` | The underground cave (parallax layers + terrain) | GothicVania "Caverns" | **Ansimuz** | CC0 / free for commercial use |
 | `assets/sprites/enemies/bat/*` | Enemy (the "Fly") test dummy | DarkFantasyEnemies (FREE) | (itch.io free pack) | verify pack license |
 | `assets/fx/slash.png`, `assets/fx/hit.png` | Attack slash + hit spark VFX | GothicVania "Explosions and Magic" | **Ansimuz** | CC0 / free for commercial use |
+| `assets/fx/dagger.png` | Thrown-dagger projectile | GothicVania "Terrible Knight" projectiles | **Ansimuz** | CC0 / free for commercial use |
 
 ## Notes
 - Sources were downloaded by the project owner from itch.io.

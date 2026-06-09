@@ -8,33 +8,43 @@ class_name PlayerCombat
 ## screen-shake, and a brief hit-stop for impact. (Parry / ranged are later M3.)
 
 signal attacked(combo_step: int)
+signal daggers_changed(count: int)
 
 @export var attack_cooldown: float = 0.28  ## min seconds between swings
 @export var damage: int = 1
 @export var combo_window: float = 0.55     ## chain if you re-press within this
 @export var slash_offset: float = 12.0
 @export var slash_height: float = -3.0
+@export var max_daggers: int = 3           ## GDD: 3 throwable charges
+@export var shadow_bolt_cost: float = 20.0 ## GDD: shadow bolt costs 20 energy
 
 const SLASH := preload("res://scenes/fx/Slash.tscn")
 const HIT_SPARK := preload("res://scenes/fx/HitSpark.tscn")
+const DAGGER := preload("res://scenes/fx/Dagger.tscn")
+const SHADOW_BOLT := preload("res://scenes/fx/ShadowBolt.tscn")
 
 var _cooldown := 0.0
 var _combo := 0
 var _combo_timer := 0.0
+var _daggers := 3
 var _controller
 var _hitbox: Area2D
 var _camera
+var _stats
 
 
 func _ready() -> void:
 	_controller = get_parent()
 	_hitbox = get_node_or_null("../Hitbox")
 	_camera = get_node_or_null("../Camera")
+	_stats = get_node_or_null("../Stats")
 	# Hitbox stays live so overlaps are always tracked; damage only on input.
 	if _hitbox:
 		_hitbox.monitoring = true
 	if _controller.has_signal("parried"):
 		_controller.parried.connect(_on_parried)
+	_daggers = max_daggers
+	call_deferred("emit_signal", "daggers_changed", _daggers)
 
 
 func _process(delta: float) -> void:
@@ -49,6 +59,10 @@ func _process(delta: float) -> void:
 
 	if Input.is_action_just_pressed("attack") and _cooldown <= 0.0:
 		_do_attack()
+	if Input.is_action_just_pressed("throw"):
+		_throw_dagger()
+	if Input.is_action_just_pressed("ability"):
+		_cast_shadow_bolt()
 
 
 func _do_attack() -> void:
@@ -90,13 +104,43 @@ func _do_attack() -> void:
 		GameManager.hitstop(0.07 if is_finisher else 0.045)
 
 
-## A successful parry: a bright burst + extra shake (the rest — slow-mo, shadow
-## refill, enemy stagger — is handled in PlayerController._do_parry).
+## A successful parry: a bright burst + extra shake + refilled daggers (the rest
+## — slow-mo, shadow refill, enemy stagger — is in PlayerController._do_parry).
 func _on_parried(_attacker: Node) -> void:
 	var parent: Node = _controller.get_parent()
 	_spawn_vfx(HIT_SPARK, parent, _controller.global_position + Vector2(0, -8), false, false, 1.6)
 	if _camera and _camera.has_method("add_trauma"):
 		_camera.add_trauma(0.4)
+	_daggers = max_daggers
+	daggers_changed.emit(_daggers)
+
+
+func _throw_dagger() -> void:
+	if _daggers <= 0:
+		return
+	_daggers -= 1
+	daggers_changed.emit(_daggers)
+	_launch(DAGGER)
+
+
+func _cast_shadow_bolt() -> void:
+	if _stats == null or not _stats.spend_shadow(shadow_bolt_cost):
+		return   # not enough shadow energy
+	_launch(SHADOW_BOLT)
+
+
+## Spawn a projectile scene at the player's front, aimed at the facing direction.
+func _launch(packed: PackedScene) -> void:
+	var facing: int = _controller.get_facing()
+	var proj := packed.instantiate()
+	if proj.has_method("setup"):
+		proj.setup(facing)
+	_controller.get_parent().add_child(proj)
+	proj.global_position = _controller.global_position + Vector2(facing * 12.0, -8.0)
+
+
+func get_dagger_count() -> int:
+	return _daggers
 
 
 # Inlined (not a static on OneShotVFX) to avoid a parse-time dependency on that

@@ -31,10 +31,16 @@ class_name HUD
 @export var energy_sheen := Color(0.9, 1.0, 1.0, 0.7)
 @export var energy_glow := Color(0.4, 0.85, 0.95, 0.16)
 
+@export var dagger_steel := Color(0.72, 0.77, 0.84)
+@export var dagger_handle := Color(0.4, 0.72, 0.86)
+@export var dagger_used := Color(0.22, 0.24, 0.3)
+
 var _cur_halves := 8
 var _max_halves := 8
 var _shadow := 50.0
 var _shadow_max := 50.0
+var _daggers := 3
+var _dagger_max := 3
 var _time := 0.0
 
 
@@ -48,6 +54,15 @@ func _ready() -> void:
 		stats.shadow_changed.connect(_on_shadow)
 		_on_health(stats.health, stats.max_health)
 		_on_shadow(stats.shadow, stats.max_shadow)
+	var combat := player.get_node_or_null("Combat")
+	if combat and combat.has_signal("daggers_changed"):
+		combat.daggers_changed.connect(_on_daggers)
+		_dagger_max = combat.max_daggers
+		_daggers = combat.get_dagger_count()
+
+
+func _on_daggers(count: int) -> void:
+	_daggers = count
 
 
 func _process(delta: float) -> void:
@@ -75,6 +90,11 @@ func _draw() -> void:
 		var beat := _heartbeat(low) if (is_last_filled or low) else 1.0
 		_draw_heart(origin + Vector2(i * heart_spacing, 0.0), heart_size * beat, halves, low)
 	_draw_energy_bar(origin.y + heart_size * 0.82 + 11.0, hearts)
+
+	# Throwable-dagger pips, to the right of the hearts.
+	var dx := origin.x + hearts * heart_spacing + 4.0
+	for i in _dagger_max:
+		_draw_dagger(Vector2(dx + i * 9.0, origin.y - 1.0), i < _daggers)
 
 
 # --- Hearts ---------------------------------------------------------------
@@ -133,6 +153,16 @@ func _heart_shape(c: Vector2, s: float, col: Color) -> void:
 		c + Vector2(-s * 0.46, 0.02 * s),
 		c + Vector2(s * 0.46, 0.02 * s),
 		c + Vector2(0.0, s * 0.55)]), col)
+
+
+func _draw_dagger(c: Vector2, available: bool) -> void:
+	var blade := dagger_steel if available else dagger_used
+	var grip := dagger_handle if available else dagger_used
+	draw_colored_polygon(PackedVector2Array([   # tip
+		c + Vector2(-1.5, -6.0), c + Vector2(1.5, -6.0), c + Vector2(0.0, -9.0)]), blade)
+	draw_rect(Rect2(c.x - 1.5, c.y - 6.0, 3.0, 9.0), blade)   # blade
+	draw_rect(Rect2(c.x - 3.5, c.y + 3.0, 7.0, 1.6), blade)   # guard
+	draw_rect(Rect2(c.x - 1.0, c.y + 4.6, 2.0, 3.2), grip)    # handle
 
 
 # --- Shadow-energy bar ----------------------------------------------------
