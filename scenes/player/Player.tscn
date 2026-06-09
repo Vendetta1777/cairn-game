@@ -7,7 +7,7 @@
 [ext_resource type="SpriteFrames" path="res://scenes/player/player_frames.tres" id="5_frames"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
-size = Vector2(16, 34)
+size = Vector2(18, 30)
 
 [sub_resource type="Gradient" id="grad_glow"]
 offsets = PackedFloat32Array(0, 1)
@@ -35,7 +35,8 @@ texture = SubResource("tex_glow")
 texture_scale = 1.7
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
-position = Vector2(0, -21)
+position = Vector2(0, 4)
+scale = Vector2(2, 2)
 sprite_frames = ExtResource("5_frames")
 animation = &"idle"
 autoplay = "idle"

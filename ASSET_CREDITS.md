@@ -5,7 +5,7 @@ Cairn uses third-party art assets as placeholders/foundation. Credit where due, 
 
 | Asset (in repo) | Used for | Source pack | Author | License notes |
 |---|---|---|---|---|
-| `assets/sprites/player/*` | Player (the assassin) — idle/run/jump/attack/crouch/hurt | GothicVania "Terrible Knight" | **Ansimuz** | GothicVania sets are released CC0 / free for commercial use |
+| `assets/sprites/player/hooded.png` | Player (the hooded assassin) — idle/run/jump/crouch/hurt | `AnimationSheet_Character.png` (itch.io download) | **TBD — confirm** | ⚠️ source/author not yet recorded; identify the pack + verify its license before release |
 | `assets/environment/caverns/*` | The underground cave (parallax layers + terrain) | GothicVania "Caverns" | **Ansimuz** | CC0 / free for commercial use |
 | `assets/sprites/enemies/bat/*` | Enemy (the "Fly") — for the upcoming test dummy | DarkFantasyEnemies (FREE) | (itch.io free pack) | verify pack license |
 
