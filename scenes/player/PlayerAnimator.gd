@@ -2,25 +2,24 @@ extends Node2D
 class_name PlayerAnimator
 ## Cairn — Player animation driver (GDD Section 4).
 ##
-## Until we have sprite sheets (the real M2 art task), this drives the
-## placeholder Polygon2D with PROCEDURAL squash-and-stretch + a per-state tint,
-## so movement has real game-feel and reads clearly:
-##   - jump  -> stretch tall/thin       - land  -> hard squash that springs back
-##   - fall  -> slight stretch          - dash  -> stretch wide/flat
-##   - crouch/crawl -> squash down       - idle/run -> subtle breathing bob
+## Drives the layered-Polygon2D assassin rig (the "Sprite" container) with:
+##   - PROCEDURAL squash-and-stretch for game feel:
+##       jump -> stretch tall/thin   land -> hard squash that springs back
+##       fall -> slight stretch      dash -> stretch wide/flat
+##       crouch/crawl -> squash down  idle/run -> subtle breathing bob
+##   - facing flip (folded into scale.x)
+##   - brief modulate flashes (cyan on dash, red on hurt) for readable juice
 ##
-## THE SEAM (M2 with art): keep these state strings, but in play_state() call
-##   anim_tree.get("parameters/playback").travel(state)
-## on a real AnimationTree instead of setting tint/stretch. Nothing else changes.
-##
-## Facing is folded into scale.x here (we own the sprite's scale entirely), so
-## there's no separate flip node to fight with.
+## THE SEAM (M2 with real sprite art): keep these state strings, but swap the
+## body of _process()/_on_state_changed() to drive an AnimationTree on a
+## Sprite2D/AnimatedSprite2D — controller + signals stay identical.
 
 @export var controller_path: NodePath = NodePath("..")
 @export var sprite_path: NodePath = NodePath("../Sprite")
 
 @export_group("Feel")
 @export var stretch_follow_speed: float = 14.0  ## how fast scale eases to its target
+@export var flash_fade_speed: float = 9.0       ## how fast modulate returns to white
 @export var bob_amount: float = 0.04            ## idle/run breathing depth
 @export var land_squash: Vector2 = Vector2(1.35, 0.65)
 @export var jump_pop: Vector2 = Vector2(0.7, 1.3)
@@ -38,23 +37,15 @@ const STATE_STRETCH := {
 	"dead":   Vector2(1.3, 0.6),
 }
 
-const STATE_COLORS := {
-	"idle":   Color(0.65, 0.70, 0.80),
-	"run":    Color(0.55, 0.80, 0.65),
-	"jump":   Color(0.80, 0.80, 0.50),
-	"fall":   Color(0.80, 0.65, 0.45),
-	"dash":   Color(0.55, 0.75, 0.95),
-	"crouch": Color(0.50, 0.55, 0.65),
-	"crawl":  Color(0.45, 0.55, 0.60),
-	"hurt":   Color(0.90, 0.35, 0.35),
-	"dead":   Color(0.35, 0.30, 0.35),
-}
+const FLASH_DASH := Color(0.7, 0.95, 1.0)   ## cold cyan pop
+const FLASH_HURT := Color(1.0, 0.5, 0.5)    ## red sting
 
 # Untyped: avoids a parse-time dependency on PlayerController's global class name.
 var _controller
 var _sprite: Node2D
 
 var _stretch := Vector2.ONE       ## current eased stretch
+var _flash := Color.WHITE         ## current modulate, eases back to white
 var _bob_time := 0.0
 var _state := "idle"
 
@@ -65,11 +56,11 @@ func _ready() -> void:
 	if _controller:
 		_state = _controller.get_current_state()
 		_controller.state_changed.connect(_on_state_changed)
-		# Transient pops keyed off movement events.
 		_controller.jumped.connect(func(): _stretch = jump_pop)
 		_controller.landed.connect(func(): _stretch = land_squash)
-		_controller.dashed.connect(func(): _stretch = Vector2(1.5, 0.6))
-	_apply_color(_state)
+		_controller.dashed.connect(func():
+			_stretch = Vector2(1.5, 0.6)
+			_flash = FLASH_DASH)
 
 
 func _process(delta: float) -> void:
@@ -83,25 +74,21 @@ func _process(delta: float) -> void:
 		var bob := sin(_bob_time) * bob_amount
 		target += Vector2(-bob, bob)  # squash/stretch conserves rough volume
 
-	# Critically-damped-ish ease toward target (frame-rate independent).
+	# Frame-rate-independent ease toward targets.
 	var t := 1.0 - exp(-stretch_follow_speed * delta)
 	_stretch = _stretch.lerp(target, t)
+	_flash = _flash.lerp(Color.WHITE, 1.0 - exp(-flash_fade_speed * delta))
 
-	# Fold facing into x so the sprite mirrors with movement direction.
-	var facing := 1
-	if _controller:
-		facing = _controller.get_facing()
+	# Fold facing into x so the figure mirrors with movement direction.
+	var facing: int = _controller.get_facing() if _controller else 1
 	_sprite.scale = Vector2(_stretch.x * facing, _stretch.y)
+	_sprite.modulate = _flash
 
 
 func _on_state_changed(new_state: String) -> void:
 	_state = new_state
-	_apply_color(new_state)
-
-
-func _apply_color(state: String) -> void:
-	if _sprite is Polygon2D and STATE_COLORS.has(state):
-		(_sprite as Polygon2D).color = STATE_COLORS[state]
+	if new_state == "hurt":
+		_flash = FLASH_HURT
 
 
 ## THE SEAM for M2 art — swap the body for anim_tree travel(state).

@@ -14,9 +14,39 @@ script = ExtResource("1_ctrl")
 [node name="Collision" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_player")
 
-[node name="Sprite" type="Polygon2D" parent="."]
-color = Color(0.65, 0.7, 0.8, 1)
-polygon = PackedVector2Array(-8, -16, 8, -16, 8, 16, -8, 16)
+[node name="Sprite" type="Node2D" parent="."]
+
+[node name="Cloak" type="Polygon2D" parent="Sprite"]
+color = Color(0.078, 0.086, 0.114, 1)
+polygon = PackedVector2Array(-7, 16, 7, 16, 6, 8, 5, 0, 4, -5, -4, -5, -5, 0, -6, 8)
+
+[node name="CloakDrape" type="Polygon2D" parent="Sprite"]
+color = Color(0.125, 0.141, 0.184, 1)
+polygon = PackedVector2Array(-2, 16, 2, 16, 3, 4, 1, -4, -1, -4, -3, 4)
+
+[node name="Hood" type="Polygon2D" parent="Sprite"]
+color = Color(0.094, 0.106, 0.137, 1)
+polygon = PackedVector2Array(-4, -3, 4, -3, 4, -11, 0, -16, -4, -11)
+
+[node name="Scarf" type="Polygon2D" parent="Sprite"]
+color = Color(0.541, 0.184, 0.2, 1)
+polygon = PackedVector2Array(-3, -5, 4, -5, 4, -3, -3, -3)
+
+[node name="Mask" type="Polygon2D" parent="Sprite"]
+color = Color(0.702, 0.678, 0.616, 1)
+polygon = PackedVector2Array(1, -11, 4, -11, 4, -6, 1, -6)
+
+[node name="Eye" type="Polygon2D" parent="Sprite"]
+color = Color(0.455, 0.839, 0.796, 1)
+polygon = PackedVector2Array(2.5, -10, 4, -10, 4, -8.5, 2.5, -8.5)
+
+[node name="DaggerGuard" type="Polygon2D" parent="Sprite"]
+color = Color(0.6, 0.635, 0.698, 1)
+polygon = PackedVector2Array(5, 0, 8, 0, 8, 1.5, 5, 1.5)
+
+[node name="DaggerBlade" type="Polygon2D" parent="Sprite"]
+color = Color(0.6, 0.635, 0.698, 1)
+polygon = PackedVector2Array(6, 1.5, 7, 1.5, 6.5, 9, 6, 9)
 
 [node name="Stats" type="Node" parent="."]
 script = ExtResource("2_stats")
