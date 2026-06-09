@@ -5,7 +5,7 @@ extends SceneTree
 
 # name -> [file, frame_w, frame_h, count, fps]
 const ANIMS := {
-	"slash": ["res://assets/fx/slash.png", 65, 40, 5, 24.0],
+	"slash": ["res://assets/fx/slash_up.png", 52, 56, 5, 24.0],  # upward (down->up) swing
 	"hit":   ["res://assets/fx/hit.png",   31, 32, 3, 18.0],
 }
 

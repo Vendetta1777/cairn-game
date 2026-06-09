@@ -42,7 +42,7 @@ texture = SubResource("tex_glow")
 texture_scale = 1.4
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
-position = Vector2(0, -1)
+position = Vector2(0, 2)
 scale = Vector2(1.15, 1.15)
 sprite_frames = ExtResource("5_frames")
 animation = &"idle"

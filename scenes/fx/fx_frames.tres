@@ -1,7 +1,7 @@
 [gd_resource type="SpriteFrames" format=3]
 
 [ext_resource type="Texture2D" path="res://assets/fx/hit.png" id="1_hynjn"]
-[ext_resource type="Texture2D" path="res://assets/fx/slash.png" id="2_12iq3"]
+[ext_resource type="Texture2D" path="res://assets/fx/slash_up.png" id="2_12iq3"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_fycbe"]
 atlas = ExtResource("1_hynjn")
@@ -17,23 +17,23 @@ region = Rect2(62, 0, 31, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_8ln2g"]
 atlas = ExtResource("2_12iq3")
-region = Rect2(0, 0, 65, 40)
+region = Rect2(0, 0, 52, 56)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_aaajx"]
 atlas = ExtResource("2_12iq3")
-region = Rect2(65, 0, 65, 40)
+region = Rect2(52, 0, 52, 56)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_8ldmf"]
 atlas = ExtResource("2_12iq3")
-region = Rect2(130, 0, 65, 40)
+region = Rect2(104, 0, 52, 56)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_qhe31"]
 atlas = ExtResource("2_12iq3")
-region = Rect2(195, 0, 65, 40)
+region = Rect2(156, 0, 52, 56)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_66gpx"]
 atlas = ExtResource("2_12iq3")
-region = Rect2(260, 0, 65, 40)
+region = Rect2(208, 0, 52, 56)
 
 [resource]
 animations = [{
