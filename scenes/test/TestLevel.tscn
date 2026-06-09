@@ -1,10 +1,11 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="1_player"]
 [ext_resource type="Texture2D" path="res://assets/environment/caverns/background.png" id="2_bg"]
 [ext_resource type="Texture2D" path="res://assets/environment/caverns/back-walls.png" id="3_walls"]
 [ext_resource type="Texture2D" path="res://assets/environment/caverns/foreground.png" id="4_fg"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/fly/Bat.tscn" id="5_bat"]
+[ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="6_hud"]
 
 [sub_resource type="RectangleShape2D" id="shape_floor"]
 size = Vector2(512, 60)
@@ -181,13 +182,14 @@ texture = SubResource("tex_vig")
 stretch_mode = 0
 mouse_filter = 2
 
+[node name="HUD" parent="." instance=ExtResource("6_hud")]
+
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="Controls" type="Label" parent="UI"]
 offset_left = 8.0
-offset_top = 8.0
-offset_right = 420.0
-offset_bottom = 80.0
-theme_override_colors/font_color = Color(0.55, 0.58, 0.7, 1)
-text = "CAIRN — The deep remembers.
-A/D move   Space jump   Shift dash   Ctrl crouch"
+offset_top = 246.0
+offset_right = 472.0
+offset_bottom = 268.0
+theme_override_colors/font_color = Color(0.5, 0.53, 0.64, 1)
+text = "A/D move   Space jump   Shift dash   Ctrl crouch   J attack"

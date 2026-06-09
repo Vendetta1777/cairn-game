@@ -21,3 +21,14 @@ func toggle_pause() -> void:
 	is_paused = not is_paused
 	get_tree().paused = is_paused
 	game_paused.emit(is_paused)
+
+
+## Combat juice: freeze everything for a beat on impact, then resume. Runs on a
+## real-time timer so it works even though time_scale is 0.
+func hitstop(duration: float) -> void:
+	if duration <= 0.0:
+		return
+	Engine.time_scale = 0.0
+	await get_tree().create_timer(duration, true, false, true).timeout
+	Engine.time_scale = 1.0
+

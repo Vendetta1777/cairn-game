@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scenes/enemies/fly/Bat.gd" id="1_bat"]
 [ext_resource type="SpriteFrames" path="res://scenes/enemies/fly/bat_frames.tres" id="2_frames"]
@@ -9,10 +9,14 @@ radius = 10.0
 [sub_resource type="CircleShape2D" id="hurt_shape"]
 radius = 13.0
 
+[sub_resource type="CircleShape2D" id="touch_shape"]
+radius = 15.0
+
 [node name="Bat" type="CharacterBody2D" groups=["enemy"]]
 collision_layer = 0
 collision_mask = 0
 script = ExtResource("1_bat")
+max_health = 1
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 scale = Vector2(0.7, 0.7)
@@ -30,3 +34,10 @@ monitoring = false
 
 [node name="Col" type="CollisionShape2D" parent="Hurtbox"]
 shape = SubResource("hurt_shape")
+
+[node name="Touch" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="Col" type="CollisionShape2D" parent="Touch"]
+shape = SubResource("touch_shape")

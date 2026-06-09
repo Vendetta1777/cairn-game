@@ -46,11 +46,17 @@ class_name PlayerController
 @export var can_swim: bool = false            ## Area 3
 @export var can_grapple: bool = false         ## Area 5
 
+@export_group("Damage")
+@export var hurt_invuln_time: float = 0.8     ## i-frames after taking a hit
+@export var hurt_stun_time: float = 0.22      ## brief loss of control (knockback)
+@export var knockback_force: float = 200.0
+
 # --- Signals (the animator and stealth systems listen to these) ---
 signal state_changed(new_state: String)
 signal jumped
 signal dashed
 signal landed
+signal hurt(amount: int)
 
 # --- Internal state ---
 var _facing: int = 1                          ## 1 = right, -1 = left (for attacks/animation flip)
@@ -62,6 +68,8 @@ var _is_dashing: bool = false
 var _is_crouching: bool = false
 var _was_on_floor: bool = false
 var _current_state: String = "idle"
+var _hurt_iframes: float = 0.0
+var _hurt_stun: float = 0.0
 
 # Cached frame->seconds conversions (computed in _ready from the physics tick).
 var _coyote_time: float
@@ -84,8 +92,17 @@ func _physics_process(delta: float) -> void:
 		_update_state()
 		return
 
-	_handle_buffered_jump_input()
 	_apply_gravity(delta)
+
+	# During hurt-stun the player has no control — the knockback plays out.
+	if _hurt_stun > 0.0:
+		velocity.x = move_toward(velocity.x, 0.0, ground_decel * 0.5 * delta)
+		move_and_slide()
+		_post_move()
+		_update_state()
+		return
+
+	_handle_buffered_jump_input()
 	_handle_jump()
 	_handle_dash_start()
 	_handle_crouch()
@@ -110,6 +127,9 @@ func _update_timers(delta: float) -> void:
 
 	if _dash_cooldown_timer > 0.0:
 		_dash_cooldown_timer = maxf(0.0, _dash_cooldown_timer - delta)
+
+	_hurt_iframes = maxf(0.0, _hurt_iframes - delta)
+	_hurt_stun = maxf(0.0, _hurt_stun - delta)
 
 
 func _handle_buffered_jump_input() -> void:
@@ -204,6 +224,8 @@ func _update_state() -> void:
 
 
 func _resolve_state() -> String:
+	if _hurt_stun > 0.0:
+		return "hurt"
 	if _is_dashing:
 		return "dash"
 	if not is_on_floor():
@@ -217,9 +239,31 @@ func _resolve_state() -> String:
 
 # --- Public API (used by stealth / combat / animator) ---------------------
 
-## True while dashing — dash grants i-frames per the GDD.
+## True while dashing (GDD i-frames) or during post-hit invulnerability.
 func is_invincible() -> bool:
-	return _is_dashing
+	return _is_dashing or _hurt_iframes > 0.0
+
+## Take a hit (amount in half-hearts). Ignored while invincible. Enemies call this.
+func take_damage(amount: int = 1, from_position: Vector2 = Vector2.ZERO) -> void:
+	if is_invincible():
+		return
+	var stats := get_node_or_null("Stats")
+	if stats:
+		stats.take_damage(amount)
+	_hurt_iframes = hurt_invuln_time
+	_hurt_stun = hurt_stun_time
+	# Knock back away from the damage source.
+	var dir := signf(global_position.x - from_position.x)
+	if dir == 0.0:
+		dir = -float(_facing)
+	velocity.x = dir * knockback_force
+	velocity.y = -110.0
+	hurt.emit(amount)
+	# Juice: a solid shake + brief freeze when YOU get hit.
+	var cam := get_node_or_null("Camera")
+	if cam and cam.has_method("add_trauma"):
+		cam.add_trauma(0.6)
+	GameManager.hitstop(0.09)
 
 ## 1 = facing right, -1 = facing left.
 func get_facing() -> int:

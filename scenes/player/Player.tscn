@@ -1,10 +1,11 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scenes/player/PlayerController.gd" id="1_ctrl"]
 [ext_resource type="Script" path="res://scenes/player/PlayerStats.gd" id="2_stats"]
 [ext_resource type="Script" path="res://scenes/player/PlayerCombat.gd" id="3_combat"]
 [ext_resource type="Script" path="res://scenes/player/PlayerAnimator.gd" id="4_anim"]
 [ext_resource type="SpriteFrames" path="res://scenes/player/player_frames.tres" id="5_frames"]
+[ext_resource type="Script" path="res://scenes/systems/CameraController.gd" id="6_cam"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
 size = Vector2(15, 26)
@@ -23,6 +24,9 @@ fill_to = Vector2(0.5, 0)
 
 [sub_resource type="RectangleShape2D" id="shape_hitbox"]
 size = Vector2(24, 26)
+
+[sub_resource type="RectangleShape2D" id="shape_hurtbox"]
+size = Vector2(14, 26)
 
 [node name="Player" type="CharacterBody2D" groups=["player"]]
 script = ExtResource("1_ctrl")
@@ -52,6 +56,16 @@ collision_mask = 4
 [node name="Col" type="CollisionShape2D" parent="Hitbox"]
 shape = SubResource("shape_hitbox")
 
+[node name="Hurtbox" type="Area2D" parent="."]
+position = Vector2(0, -12)
+collision_layer = 2
+collision_mask = 0
+monitorable = true
+monitoring = false
+
+[node name="Col" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("shape_hurtbox")
+
 [node name="Stats" type="Node" parent="."]
 script = ExtResource("2_stats")
 
@@ -64,3 +78,4 @@ script = ExtResource("4_anim")
 [node name="Camera" type="Camera2D" parent="."]
 position_smoothing_enabled = true
 position_smoothing_speed = 8.0
+script = ExtResource("6_cam")
