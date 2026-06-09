@@ -25,6 +25,13 @@ class_name PlayerAnimator
 @export var trail_color := Color(0.5, 0.85, 1.0, 0.5)  ## cold shadow ghost
 @export var trail_fade: float = 0.3           ## ghost fade-out time
 
+@export_group("Attack swing")
+@export var swing_duration: float = 0.2       ## procedural swing length (no attack frame on the sheet)
+@export var swing_lunge: float = 7.0          ## forward thrust px
+@export var swing_dip: float = 2.0            ## small dip into the swing
+@export var swing_thrust := Vector2(0.2, 0.12) ## scale punch (wide, short)
+@export var swing_lean_deg: float = 15.0      ## lean into the swing arc
+
 # Controller state -> animation name that exists in player_frames.tres.
 const STATE_ANIM := {
 	"idle":   "idle",
@@ -47,9 +54,15 @@ var _sprite: AnimatedSprite2D
 
 var _base_scale := Vector2.ONE
 var _base_pos := Vector2.ZERO
+var _cur_scale := Vector2.ONE
+var _cur_pos := Vector2.ZERO
 var _flash := Color.WHITE
 var _state := "idle"
 var _trail_t := 0.0
+var _attack_t := 0.0
+var _attack_facing := 1
+var _swing_sign := 1.0
+var _attack_mult := 1.0
 
 
 func _ready() -> void:
@@ -58,11 +71,25 @@ func _ready() -> void:
 	if _sprite:
 		_base_scale = _sprite.scale.abs()
 		_base_pos = _sprite.position
+		_cur_scale = _base_scale
+		_cur_pos = _base_pos
 	if _controller:
 		_state = _controller.get_current_state()
 		_controller.state_changed.connect(_on_state_changed)
 		_controller.dashed.connect(func(): _flash = FLASH_DASH)
+	var combat := get_node_or_null("../Combat")
+	if combat and combat.has_signal("attacked"):
+		combat.attacked.connect(_on_attacked)
 	_play(_state)
+
+
+## Procedural swing — kicks off on each attack (the combo middle hit swings the
+## opposite way; the finisher lunges harder).
+func _on_attacked(step: int) -> void:
+	_attack_t = swing_duration
+	_attack_facing = _controller.get_facing() if _controller else 1
+	_swing_sign = -1.0 if step == 1 else 1.0
+	_attack_mult = 1.4 if step == 2 else 1.0
 
 
 func _process(delta: float) -> void:
@@ -78,15 +105,32 @@ func _process(delta: float) -> void:
 	# Dash: NO tilt — just duck low. The sprite squashes (head drops) and the
 	# whole body sinks toward the ground, staying upright and facing forward.
 	# Sets up sliding under obstacles/enemies later. Eases on the authored base.
+	# Eased base (dash duck/stretch) kept separate from the transient swing.
 	var target_scale := _base_scale
 	var target_pos := _base_pos
 	if _state == "dash":
 		target_scale = _base_scale * dash_stretch
 		target_pos = _base_pos + Vector2(0, dash_drop)
-
 	var t := 1.0 - exp(-scale_follow_speed * delta)
-	_sprite.scale = _sprite.scale.lerp(target_scale, t)
-	_sprite.position = _sprite.position.lerp(target_pos, t)
+	_cur_scale = _cur_scale.lerp(target_scale, t)
+	_cur_pos = _cur_pos.lerp(target_pos, t)
+
+	# Attack swing: a quick forward lunge + thrust + lean, additive on the base,
+	# so the body reads as swinging even though the sheet has no attack frame.
+	var atk_off := Vector2.ZERO
+	var atk_scale := Vector2.ONE
+	var atk_rot := 0.0
+	if _attack_t > 0.0:
+		_attack_t = maxf(0.0, _attack_t - delta)
+		var p := clampf(1.0 - _attack_t / swing_duration, 0.0, 1.0)
+		var s := sin(p * PI)   # 0 -> 1 -> 0 over the swing
+		atk_off = Vector2(_attack_facing * swing_lunge * _attack_mult * s, swing_dip * s)
+		atk_scale = Vector2(1.0 + swing_thrust.x * s, 1.0 - swing_thrust.y * s)
+		atk_rot = _attack_facing * deg_to_rad(swing_lean_deg) * _swing_sign * s
+
+	_sprite.scale = _cur_scale * atk_scale
+	_sprite.position = _cur_pos + atk_off
+	_sprite.rotation = atk_rot
 
 	# Dash leaves a fading shadow afterimage trail.
 	if _state == "dash":
