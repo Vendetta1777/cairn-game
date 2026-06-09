@@ -80,10 +80,26 @@ func _do_attack() -> void:
 	var parent: Node = _controller.get_parent()
 	var is_finisher := _combo == 2
 	var slash_scale := 1.3 if is_finisher else 1.0
-	var flip_v := _combo == 1   # middle hit reverses the arc direction
 
-	var slash_pos: Vector2 = _controller.global_position + Vector2(facing * slash_offset, slash_height)
-	_spawn_vfx(SLASH, parent, slash_pos, facing > 0, flip_v, slash_scale)
+	# Directional slash (rotate the flat crescent): in the air = uppercut UP,
+	# crouching = slash DOWN, otherwise a forward sweep.
+	var state: String = _controller.get_current_state()
+	var pos: Vector2
+	var fh := facing > 0
+	var fv := false
+	var rot := 0.0
+	if state == "jump" or state == "fall":
+		rot = -PI / 2.0
+		pos = _controller.global_position + Vector2(facing * 10.0, 4.0)
+		fh = false
+	elif state == "crouch" or state == "crawl":
+		rot = PI / 2.0
+		pos = _controller.global_position + Vector2(facing * 10.0, 60.0)
+		fh = false
+	else:
+		fv = _combo == 1   # ground combo: middle hit reverses the arc
+		pos = _controller.global_position + Vector2(facing * slash_offset, slash_height)
+	_spawn_vfx(SLASH, parent, pos, fh, fv, slash_scale, rot)
 
 	if not _hitbox:
 		return
@@ -146,10 +162,11 @@ func get_dagger_count() -> int:
 # Inlined (not a static on OneShotVFX) to avoid a parse-time dependency on that
 # global class name not being registered yet.
 func _spawn_vfx(packed: PackedScene, parent: Node, at: Vector2, flip_h: bool,
-		flip_v := false, scale_mult := 1.0) -> void:
+		flip_v := false, scale_mult := 1.0, rot := 0.0) -> void:
 	var fx: AnimatedSprite2D = packed.instantiate()
 	parent.add_child(fx)
 	fx.global_position = at
 	fx.flip_h = flip_h
 	fx.flip_v = flip_v
 	fx.scale *= scale_mult
+	fx.rotation = rot
