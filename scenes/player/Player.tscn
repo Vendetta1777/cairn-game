@@ -1,12 +1,13 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scenes/player/PlayerController.gd" id="1_ctrl"]
 [ext_resource type="Script" path="res://scenes/player/PlayerStats.gd" id="2_stats"]
 [ext_resource type="Script" path="res://scenes/player/PlayerCombat.gd" id="3_combat"]
 [ext_resource type="Script" path="res://scenes/player/PlayerAnimator.gd" id="4_anim"]
+[ext_resource type="SpriteFrames" path="res://scenes/player/player_frames.tres" id="5_frames"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
-size = Vector2(14, 30)
+size = Vector2(16, 34)
 
 [sub_resource type="Gradient" id="grad_glow"]
 offsets = PackedFloat32Array(0, 1)
@@ -27,45 +28,17 @@ script = ExtResource("1_ctrl")
 shape = SubResource("RectangleShape2D_player")
 
 [node name="Glow" type="PointLight2D" parent="."]
-position = Vector2(2, -8)
+position = Vector2(0, -12)
 color = Color(0.55, 0.86, 0.95, 1)
-energy = 0.95
+energy = 0.9
 texture = SubResource("tex_glow")
-texture_scale = 1.6
+texture_scale = 1.7
 
-[node name="Sprite" type="Node2D" parent="."]
-
-[node name="Cloak" type="Polygon2D" parent="Sprite"]
-color = Color(0.078, 0.086, 0.114, 1)
-polygon = PackedVector2Array(-7, 16, 7, 16, 6, 8, 5, 0, 4, -5, -4, -5, -5, 0, -6, 8)
-
-[node name="CloakDrape" type="Polygon2D" parent="Sprite"]
-color = Color(0.125, 0.141, 0.184, 1)
-polygon = PackedVector2Array(-2, 16, 2, 16, 3, 4, 1, -4, -1, -4, -3, 4)
-
-[node name="Hood" type="Polygon2D" parent="Sprite"]
-color = Color(0.094, 0.106, 0.137, 1)
-polygon = PackedVector2Array(-4, -3, 4, -3, 4, -11, 0, -16, -4, -11)
-
-[node name="Scarf" type="Polygon2D" parent="Sprite"]
-color = Color(0.541, 0.184, 0.2, 1)
-polygon = PackedVector2Array(-3, -5, 4, -5, 4, -3, -3, -3)
-
-[node name="Mask" type="Polygon2D" parent="Sprite"]
-color = Color(0.702, 0.678, 0.616, 1)
-polygon = PackedVector2Array(1, -11, 4, -11, 4, -6, 1, -6)
-
-[node name="Eye" type="Polygon2D" parent="Sprite"]
-color = Color(0.455, 0.839, 0.796, 1)
-polygon = PackedVector2Array(2.5, -10, 4, -10, 4, -8.5, 2.5, -8.5)
-
-[node name="DaggerGuard" type="Polygon2D" parent="Sprite"]
-color = Color(0.6, 0.635, 0.698, 1)
-polygon = PackedVector2Array(5, 0, 8, 0, 8, 1.5, 5, 1.5)
-
-[node name="DaggerBlade" type="Polygon2D" parent="Sprite"]
-color = Color(0.6, 0.635, 0.698, 1)
-polygon = PackedVector2Array(6, 1.5, 7, 1.5, 6.5, 9, 6, 9)
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -21)
+sprite_frames = ExtResource("5_frames")
+animation = &"idle"
+autoplay = "idle"
 
 [node name="Stats" type="Node" parent="."]
 script = ExtResource("2_stats")

@@ -1,22 +1,25 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="1_player"]
+[ext_resource type="Texture2D" path="res://assets/environment/caverns/background.png" id="2_bg"]
+[ext_resource type="Texture2D" path="res://assets/environment/caverns/back-walls.png" id="3_walls"]
+[ext_resource type="Texture2D" path="res://assets/environment/caverns/foreground.png" id="4_fg"]
 
 [sub_resource type="RectangleShape2D" id="shape_floor"]
-size = Vector2(480, 40)
+size = Vector2(512, 60)
+
+[sub_resource type="RectangleShape2D" id="shape_wall"]
+size = Vector2(20, 288)
 
 [sub_resource type="RectangleShape2D" id="shape_platform"]
 size = Vector2(120, 16)
 
-[sub_resource type="RectangleShape2D" id="shape_wall"]
-size = Vector2(16, 270)
-
-[sub_resource type="Gradient" id="grad_moss"]
+[sub_resource type="Gradient" id="grad_glow"]
 offsets = PackedFloat32Array(0, 1)
 colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
 
-[sub_resource type="GradientTexture2D" id="tex_moss"]
-gradient = SubResource("grad_moss")
+[sub_resource type="GradientTexture2D" id="tex_glow"]
+gradient = SubResource("grad_glow")
 width = 128
 height = 128
 fill = 1
@@ -26,143 +29,59 @@ fill_to = Vector2(0.5, 0)
 [node name="TestLevel" type="Node2D"]
 
 [node name="Mood" type="CanvasModulate" parent="."]
-color = Color(0.34, 0.38, 0.5, 1)
+color = Color(0.72, 0.74, 0.88, 1)
 
-[node name="BG" type="CanvasLayer" parent="."]
-layer = -100
+[node name="Background" type="Sprite2D" parent="."]
+texture_repeat = 1
+centered = false
+texture = ExtResource("2_bg")
+region_enabled = true
+region_rect = Rect2(0, 0, 512, 288)
 
-[node name="Sky" type="ColorRect" parent="BG"]
-offset_right = 480.0
-offset_bottom = 270.0
-color = Color(0.024, 0.027, 0.043, 1)
+[node name="BackWalls" type="Sprite2D" parent="."]
+centered = false
+texture = ExtResource("3_walls")
 
-[node name="Backdrop" type="Node2D" parent="."]
+[node name="Foreground" type="Sprite2D" parent="."]
+centered = false
+texture = ExtResource("4_fg")
 
-[node name="FarPillars" type="Polygon2D" parent="Backdrop"]
-color = Color(0.043, 0.051, 0.078, 1)
-polygon = PackedVector2Array(0, 270, 0, 150, 40, 150, 60, 90, 90, 150, 140, 150, 160, 70, 190, 150, 250, 150, 270, 100, 300, 150, 360, 150, 380, 60, 410, 150, 480, 150, 480, 270)
-
-[node name="Stalactites" type="Polygon2D" parent="Backdrop"]
-color = Color(0.055, 0.063, 0.09, 1)
-polygon = PackedVector2Array(0, 0, 480, 0, 480, 18, 440, 18, 420, 64, 400, 18, 320, 18, 300, 52, 280, 18, 200, 18, 180, 72, 160, 18, 80, 18, 60, 46, 40, 18, 0, 18)
-
-[node name="CaveDecor" type="Node2D" parent="."]
-
-[node name="Stalagmite1" type="Polygon2D" parent="CaveDecor"]
-color = Color(0.063, 0.075, 0.106, 1)
-polygon = PackedVector2Array(28, 230, 60, 230, 44, 194)
-
-[node name="Stalagmite2" type="Polygon2D" parent="CaveDecor"]
-color = Color(0.063, 0.075, 0.106, 1)
-polygon = PackedVector2Array(408, 230, 446, 230, 427, 188)
-
-[node name="Stalagmite3" type="Polygon2D" parent="CaveDecor"]
-color = Color(0.051, 0.063, 0.09, 1)
-polygon = PackedVector2Array(214, 230, 238, 230, 226, 205)
-
-[node name="LeftWall" type="StaticBody2D" parent="."]
-position = Vector2(8, 135)
-
-[node name="Col" type="CollisionShape2D" parent="LeftWall"]
-shape = SubResource("shape_wall")
-
-[node name="Body" type="Polygon2D" parent="LeftWall"]
-color = Color(0.063, 0.075, 0.106, 1)
-polygon = PackedVector2Array(-8, -135, 8, -135, 8, 135, -8, 135)
-
-[node name="Lip" type="Polygon2D" parent="LeftWall"]
-color = Color(0.106, 0.125, 0.169, 1)
-polygon = PackedVector2Array(6, -135, 8, -135, 8, 135, 6, 135)
-
-[node name="RightWall" type="StaticBody2D" parent="."]
-position = Vector2(472, 135)
-
-[node name="Col" type="CollisionShape2D" parent="RightWall"]
-shape = SubResource("shape_wall")
-
-[node name="Body" type="Polygon2D" parent="RightWall"]
-color = Color(0.063, 0.075, 0.106, 1)
-polygon = PackedVector2Array(-8, -135, 8, -135, 8, 135, -8, 135)
-
-[node name="Lip" type="Polygon2D" parent="RightWall"]
-color = Color(0.106, 0.125, 0.169, 1)
-polygon = PackedVector2Array(-8, -135, -6, -135, -6, 135, -8, 135)
+[node name="ShrineLight" type="PointLight2D" parent="."]
+position = Vector2(256, 110)
+color = Color(0.95, 0.5, 0.65, 1)
+energy = 1.1
+texture = SubResource("tex_glow")
+texture_scale = 1.0
 
 [node name="Floor" type="StaticBody2D" parent="."]
-position = Vector2(240, 250)
+position = Vector2(256, 150)
 
 [node name="Col" type="CollisionShape2D" parent="Floor"]
 shape = SubResource("shape_floor")
 
-[node name="Body" type="Polygon2D" parent="Floor"]
-color = Color(0.086, 0.102, 0.149, 1)
-polygon = PackedVector2Array(-240, -20, 240, -20, 240, 20, -240, 20)
+[node name="LeftWall" type="StaticBody2D" parent="."]
+position = Vector2(6, 144)
 
-[node name="Lip" type="Polygon2D" parent="Floor"]
-color = Color(0.18, 0.208, 0.278, 1)
-polygon = PackedVector2Array(-240, -20, 240, -20, 240, -16, -240, -16)
+[node name="Col" type="CollisionShape2D" parent="LeftWall"]
+shape = SubResource("shape_wall")
 
-[node name="Moss" type="Polygon2D" parent="Floor"]
-color = Color(0.455, 0.839, 0.796, 0.8)
-polygon = PackedVector2Array(-182, -20, -172, -20, -172, -18, -182, -18)
+[node name="RightWall" type="StaticBody2D" parent="."]
+position = Vector2(506, 144)
 
-[node name="MossLight" type="PointLight2D" parent="Floor"]
-position = Vector2(-177, -18)
-color = Color(0.32, 0.82, 0.74, 1)
-energy = 0.7
-texture = SubResource("tex_moss")
-texture_scale = 0.9
-
-[node name="PlatformA" type="StaticBody2D" parent="."]
-position = Vector2(320, 185)
-
-[node name="Col" type="CollisionShape2D" parent="PlatformA"]
-shape = SubResource("shape_platform")
-
-[node name="Body" type="Polygon2D" parent="PlatformA"]
-color = Color(0.086, 0.102, 0.149, 1)
-polygon = PackedVector2Array(-60, -8, 60, -8, 60, 8, -60, 8)
-
-[node name="Lip" type="Polygon2D" parent="PlatformA"]
-color = Color(0.18, 0.208, 0.278, 1)
-polygon = PackedVector2Array(-60, -8, 60, -8, 60, -6, -60, -6)
-
-[node name="Moss" type="Polygon2D" parent="PlatformA"]
-color = Color(0.455, 0.839, 0.796, 0.8)
-polygon = PackedVector2Array(48, -8, 56, -8, 56, -6, 48, -6)
-
-[node name="MossLight" type="PointLight2D" parent="PlatformA"]
-position = Vector2(52, -7)
-color = Color(0.32, 0.82, 0.74, 1)
-energy = 0.6
-texture = SubResource("tex_moss")
-texture_scale = 0.8
-
-[node name="PlatformB" type="StaticBody2D" parent="."]
-position = Vector2(140, 135)
-
-[node name="Col" type="CollisionShape2D" parent="PlatformB"]
-shape = SubResource("shape_platform")
-
-[node name="Body" type="Polygon2D" parent="PlatformB"]
-color = Color(0.086, 0.102, 0.149, 1)
-polygon = PackedVector2Array(-60, -8, 60, -8, 60, 8, -60, 8)
-
-[node name="Lip" type="Polygon2D" parent="PlatformB"]
-color = Color(0.18, 0.208, 0.278, 1)
-polygon = PackedVector2Array(-60, -8, 60, -8, 60, -6, -60, -6)
+[node name="Col" type="CollisionShape2D" parent="RightWall"]
+shape = SubResource("shape_wall")
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
-position = Vector2(120, 150)
+position = Vector2(120, 100)
 
 [node name="Dust" type="CPUParticles2D" parent="."]
-position = Vector2(240, 24)
-amount = 48
+position = Vector2(256, 20)
+amount = 40
 lifetime = 9.0
 preprocess = 5.0
 lifetime_randomness = 0.4
 emission_shape = 3
-emission_rect_extents = Vector2(230, 6)
+emission_rect_extents = Vector2(250, 6)
 direction = Vector2(0, 1)
 spread = 25.0
 gravity = Vector2(0, 5)
@@ -170,24 +89,7 @@ initial_velocity_min = 2.0
 initial_velocity_max = 7.0
 scale_amount_min = 0.5
 scale_amount_max = 1.6
-color = Color(0.7, 0.74, 0.85, 0.18)
-
-[node name="Spores" type="CPUParticles2D" parent="."]
-position = Vector2(240, 232)
-amount = 16
-lifetime = 11.0
-preprocess = 6.0
-lifetime_randomness = 0.5
-emission_shape = 3
-emission_rect_extents = Vector2(220, 10)
-direction = Vector2(0, -1)
-spread = 20.0
-gravity = Vector2(0, -4)
-initial_velocity_min = 1.0
-initial_velocity_max = 5.0
-scale_amount_min = 0.4
-scale_amount_max = 1.3
-color = Color(0.455, 0.839, 0.796, 0.55)
+color = Color(0.7, 0.74, 0.85, 0.16)
 
 [node name="UI" type="CanvasLayer" parent="."]
 
@@ -196,6 +98,6 @@ offset_left = 8.0
 offset_top = 8.0
 offset_right = 420.0
 offset_bottom = 80.0
-theme_override_colors/font_color = Color(0.4, 0.44, 0.55, 1)
+theme_override_colors/font_color = Color(0.55, 0.58, 0.7, 1)
 text = "CAIRN — The deep remembers.
-Move: A/D   Jump: Space (hold = higher)   Dash: Shift   Crouch: Ctrl"
+A/D move   Space jump   Shift dash   Ctrl crouch"
