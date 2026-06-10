@@ -110,12 +110,31 @@ func _setup_player() -> void:
 	if _player == null:
 		return
 	_spawn = _player.global_position
+	var stats = _player.get_node_or_null("Stats")
+	if stats:
+		stats.died.connect(_on_player_died)
 	var cam = _player.get_node_or_null("Camera")
 	if cam:
 		cam.limit_left = int(bounds.position.x)
 		cam.limit_top = int(bounds.position.y)
 		cam.limit_right = int(bounds.end.x)
 		cam.limit_bottom = int(bounds.end.y)
+
+
+## Health hit 0 -> die: respawn at the checkpoint (or start) with full health.
+func _on_player_died() -> void:
+	if _player == null:
+		return
+	_player.global_position = GameManager.get_respawn(_spawn)
+	_player.velocity = Vector2.ZERO
+	var stats = _player.get_node_or_null("Stats")
+	if stats:
+		stats.heal(stats.max_health)   # full refill
+		stats.refill_shadow()
+	GameManager.hitstop(0.16)
+	var cam = _player.get_node_or_null("Camera")
+	if cam and cam.has_method("add_trauma"):
+		cam.add_trauma(0.7)
 
 
 func _physics_process(_delta: float) -> void:
