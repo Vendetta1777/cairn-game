@@ -8,6 +8,7 @@ class_name PlayerStats
 
 signal health_changed(current_halves: int, max_halves: int)
 signal shadow_changed(current: float, maximum: float)
+signal shards_changed(total: int)
 signal died
 
 const HALVES_PER_HEART := 2
@@ -33,6 +34,7 @@ func _ready() -> void:
 func _broadcast() -> void:
 	health_changed.emit(health, max_health)
 	shadow_changed.emit(shadow, max_shadow)
+	shards_changed.emit(shards)
 
 
 ## amount is in half-hearts (1 = half a heart).
@@ -56,6 +58,19 @@ func add_heart(count: int = 1) -> void:
 	max_health = max_hearts * HALVES_PER_HEART
 	health = min(max_health, health + count * HALVES_PER_HEART)
 	health_changed.emit(health, max_health)
+
+
+func add_shards(count: int) -> void:
+	shards += count
+	shards_changed.emit(shards)
+
+
+func spend_shards(count: int) -> bool:
+	if shards < count:
+		return false
+	shards -= count
+	shards_changed.emit(shards)
+	return true
 
 
 func spend_shadow(amount: float) -> bool:

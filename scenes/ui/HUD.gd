@@ -41,6 +41,7 @@ var _shadow := 50.0
 var _shadow_max := 50.0
 var _daggers := 3
 var _dagger_max := 3
+var _shards := 0
 var _time := 0.0
 
 
@@ -52,8 +53,10 @@ func _ready() -> void:
 	if stats:
 		stats.health_changed.connect(_on_health)
 		stats.shadow_changed.connect(_on_shadow)
+		stats.shards_changed.connect(_on_shards)
 		_on_health(stats.health, stats.max_health)
 		_on_shadow(stats.shadow, stats.max_shadow)
+		_shards = stats.shards
 	var combat := player.get_node_or_null("Combat")
 	if combat and combat.has_signal("daggers_changed"):
 		combat.daggers_changed.connect(_on_daggers)
@@ -63,6 +66,10 @@ func _ready() -> void:
 
 func _on_daggers(count: int) -> void:
 	_daggers = count
+
+
+func _on_shards(total: int) -> void:
+	_shards = total
 
 
 func _process(delta: float) -> void:
@@ -95,6 +102,17 @@ func _draw() -> void:
 	var dx := origin.x + hearts * heart_spacing + 4.0
 	for i in _dagger_max:
 		_draw_dagger(Vector2(dx + i * 9.0, origin.y - 1.0), i < _daggers)
+
+	# Shards (currency) — a small crystal + count, under the energy bar.
+	var sd := Vector2(origin.x + 4.0, origin.y + heart_size * 0.82 + 26.0)
+	draw_colored_polygon(PackedVector2Array([
+		sd + Vector2(0, -5), sd + Vector2(4, -1), sd + Vector2(0, 5), sd + Vector2(-4, -1)]),
+		Color(0.55, 0.85, 0.95))
+	draw_colored_polygon(PackedVector2Array([
+		sd + Vector2(0, -5), sd + Vector2(0, 5), sd + Vector2(-4, -1)]),
+		Color(0.35, 0.62, 0.78))
+	draw_string(ThemeDB.fallback_font, sd + Vector2(9, 4), "x%d" % _shards,
+		HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color(0.78, 0.86, 0.95))
 
 
 # --- Hearts ---------------------------------------------------------------

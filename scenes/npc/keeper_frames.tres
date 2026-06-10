@@ -1,0 +1,39 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/npc/keeper.png" id="1_lcigd"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qucg8"]
+atlas = ExtResource("1_lcigd")
+region = Rect2(0, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_d0cxr"]
+atlas = ExtResource("1_lcigd")
+region = Rect2(48, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l2v82"]
+atlas = ExtResource("1_lcigd")
+region = Rect2(96, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1ysyn"]
+atlas = ExtResource("1_lcigd")
+region = Rect2(144, 0, 48, 48)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qucg8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_d0cxr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_l2v82")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1ysyn")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 4.0
+}]

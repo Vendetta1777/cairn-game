@@ -10,6 +10,7 @@ signal died
 
 @export var max_health: int = 3
 @export var idle_anim: StringName = &"idle_fly"
+@export var shard_drop: int = 1   ## Shards awarded to the player on death
 
 var health: int
 var _dead := false
@@ -58,6 +59,13 @@ func take_damage(amount: int, _from: Vector2 = Vector2.ZERO) -> void:
 func _die() -> void:
 	_dead = true
 	died.emit()
+	# Drop Shards to the player.
+	if shard_drop > 0:
+		var player := get_tree().get_first_node_in_group("player")
+		if player:
+			var stats = player.get_node_or_null("Stats")
+			if stats and stats.has_method("add_shards"):
+				stats.add_shards(shard_drop)
 	if _hurtbox:
 		_hurtbox.set_deferred("monitorable", false)
 	set_deferred("velocity", Vector2.ZERO)
