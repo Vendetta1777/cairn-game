@@ -89,9 +89,9 @@ func _setup_player() -> void:
 
 
 func _physics_process(_delta: float) -> void:
-	# Fell into a pit -> respawn at the start, minus one heart.
+	# Fell into a pit -> respawn at the last checkpoint (or start), minus a heart.
 	if _player and _player.global_position.y > bounds.end.y + 30.0:
-		_player.global_position = _spawn
+		_player.global_position = GameManager.get_respawn(_spawn)
 		_player.velocity = Vector2.ZERO
 		var stats = _player.get_node_or_null("Stats")
 		if stats:

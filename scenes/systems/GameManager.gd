@@ -8,8 +8,24 @@ extends Node
 ## Registered as the "GameManager" autoload in project.godot.
 
 signal game_paused(is_paused: bool)
+signal checkpoint_set(position: Vector2)
 
 var is_paused: bool = false
+
+## Active respawn point (a Remnant Stone). Unset until the player touches one.
+var has_checkpoint: bool = false
+var checkpoint_position: Vector2 = Vector2.ZERO
+
+
+## Called by a Remnant Stone when the player activates it.
+func set_checkpoint(position: Vector2) -> void:
+	has_checkpoint = true
+	checkpoint_position = position
+	checkpoint_set.emit(position)
+
+## Where the player should respawn — the last checkpoint, or the given fallback.
+func get_respawn(fallback: Vector2) -> Vector2:
+	return checkpoint_position if has_checkpoint else fallback
 
 
 func _unhandled_input(event: InputEvent) -> void:

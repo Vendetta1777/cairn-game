@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1Terrain.gd" id="1_terrain"]
 [ext_resource type="Texture2D" path="res://assets/environment/caverns/background.png" id="2_bg"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" path="res://scenes/enemies/fly/Bat.tscn" id="5_bat"]
 [ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="6_hud"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/crawler/Crawler.tscn" id="7_crawler"]
+[ext_resource type="PackedScene" path="res://scenes/world/RemnantStone.tscn" id="8_stone"]
 
 [sub_resource type="Gradient" id="grad_light"]
 offsets = PackedFloat32Array(0, 1)
@@ -95,22 +96,8 @@ energy = 0.5
 texture = SubResource("tex_light")
 texture_scale = 0.8
 
-[node name="RemnantStone" type="Polygon2D" parent="Decor"]
+[node name="RemnantStone" parent="Decor" instance=ExtResource("8_stone")]
 position = Vector2(1363, 200)
-color = Color(0.16, 0.13, 0.2, 1)
-polygon = PackedVector2Array(-7, 0, 7, 0, 5, -30, -5, -30)
-
-[node name="RemnantGlow" type="Polygon2D" parent="Decor"]
-position = Vector2(1363, 200)
-color = Color(0.55, 0.35, 0.62, 1)
-polygon = PackedVector2Array(-4, -30, 4, -30, 2, -38, -2, -38)
-
-[node name="RemnantLight" type="PointLight2D" parent="Decor"]
-position = Vector2(1363, 178)
-color = Color(0.7, 0.45, 0.78, 1)
-energy = 1.0
-texture = SubResource("tex_light")
-texture_scale = 0.9
 
 [node name="Player" parent="." instance=ExtResource("4_player")]
 position = Vector2(50, 215)
