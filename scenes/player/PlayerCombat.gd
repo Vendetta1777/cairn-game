@@ -58,7 +58,7 @@ func _process(delta: float) -> void:
 	if _hitbox and _controller:
 		var f: int = _controller.get_facing()
 		if Input.is_action_pressed("move_up"):
-			_hitbox.position = Vector2(f * 4.0, -26.0)
+			_hitbox.position = Vector2(f * 4.0, -19.0)
 		elif Input.is_action_pressed("move_down"):
 			_hitbox.position = Vector2(f * 4.0, 20.0)
 		else:
@@ -96,7 +96,7 @@ func _do_attack() -> void:
 	var rot := 0.0
 	if Input.is_action_pressed("move_up"):
 		rot = -PI / 2.0
-		pos = _controller.global_position + Vector2(facing * 4.0, -85.0)
+		pos = _controller.global_position + Vector2(facing * 4.0, -66.0)
 		fh = false
 	elif Input.is_action_pressed("move_down"):
 		rot = PI / 2.0
