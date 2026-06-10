@@ -15,6 +15,8 @@ Cairn uses third-party art assets as placeholders/foundation. Credit where due, 
 | `assets/sprites/npc/keeper.png` | The Keeper NPC | GothicVania "death" reaper | **Ansimuz** | CC0 / free for commercial use |
 | `assets/decor/torch.png` | Animated wall torch | Bitcrawl Free Roguelike | (itch.io) | verify pack license |
 | `assets/decor/crystal*.png`, `rock*.png`, `web.png` | Cave crystals / rocks / cobwebs | Free Top-Down Pixel Art Cave Objects | (itch.io) | verify pack license |
+| `assets/decor/torch.png`, dungeon enemy/prop sheets | Animated torch + props | Bitcrawl / craftpix dungeon packs | (itch.io) | verify pack license |
+| `assets/fonts/silkscreen.ttf` | UI / dialogue pixel font | Silkscreen by Jason Kottke | **OFL** (open font license, free) |
 
 ## Notes
 - Sources were downloaded by the project owner from itch.io.

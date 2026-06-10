@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scenes/ui/DialogueBox.gd" id="1_dlg"]
+[ext_resource type="FontFile" path="res://assets/fonts/silkscreen.ttf" id="2_font"]
 
 [node name="DialogueBox" type="CanvasLayer"]
 layer = 20
@@ -11,20 +12,27 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -66.0
+offset_top = -70.0
 grow_horizontal = 2
 grow_vertical = 0
-color = Color(0.02, 0.02, 0.05, 0.62)
+color = Color(0.02, 0.02, 0.05, 0.66)
+
+[node name="Accent" type="ColorRect" parent="Band"]
+anchor_right = 1.0
+offset_bottom = 1.0
+color = Color(0.4, 0.45, 0.6, 0.5)
 
 [node name="Label" type="Label" parent="Band"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 18.0
+offset_left = 16.0
 offset_top = 8.0
-offset_right = -18.0
+offset_right = -16.0
 offset_bottom = -16.0
-theme_override_colors/font_color = Color(0.85, 0.87, 0.94, 1)
+theme_override_colors/font_color = Color(0.88, 0.9, 0.96, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 8
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
@@ -35,10 +43,12 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -64.0
-offset_top = -16.0
+offset_left = -54.0
+offset_top = -14.0
 offset_right = -6.0
 offset_bottom = -2.0
 theme_override_colors/font_color = Color(0.5, 0.55, 0.66, 1)
-text = "E ▸"
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 8
+text = "E >"
 horizontal_alignment = 2

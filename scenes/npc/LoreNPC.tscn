@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scenes/npc/LoreNPC.gd" id="1_lore"]
-[ext_resource type="SpriteFrames" path="res://scenes/npc/keeper_frames.tres" id="2_frames"]
+[ext_resource type="SpriteFrames" path="res://scenes/player/player_frames.tres" id="2_frames"]
 
 [sub_resource type="Gradient" id="grad"]
 offsets = PackedFloat32Array(0, 1)
@@ -16,33 +16,33 @@ fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(0.5, 0)
 
 [sub_resource type="CircleShape2D" id="det"]
-radius = 30.0
+radius = 32.0
 
 [node name="LoreNPC" type="Node2D"]
 script = ExtResource("1_lore")
-lines = PackedStringArray("You move. After a hundred years of stillness... something finally moves.", "This was Cairn. A kingdom that chose the deep, long before the surface forgot us.", "Then came the Silencing. In one breath, all of it stopped — everything but me, and now you.", "I am only a fragment of who I was. A shade, clinging to the stone.", "Follow the cairns downward, stranger. The stones remember the way.", "Find what silenced us... and decide whether Cairn deserves to wake, or to rest.")
+lines = PackedStringArray("Stranger. You wake with no name, no master - only that blade, and the dark.", "You stand in Cairn. Once, a kingdom thrived here, deep beneath a sun it had learned to fear.", "We carved a world from the stone - halls, courts, a king upon a throne none now remember building.", "Then came the Silencing. In a single breath, a hundred years ago, all of it simply stopped. Mid-step. Mid-word.", "Everything but me. And now, you. The only things that still move in the deep.", "Are you the cause of our stillness? The cure? Or something Cairn made at the end, as a last hope? Even the stones do not say.", "I am only a fragment now - a shade of the watcher I was. I cannot follow you down, but I can point the way.", "Descend. Past the warrens, the flooded vaults, the iron and the dark. Find the Pale Sovereign upon the throne.", "And when you stand before what silenced us... decide. Whether Cairn is buried for good, or wakes once more.")
 
 [node name="Light" type="PointLight2D" parent="."]
-position = Vector2(0, -18)
-color = Color(0.5, 0.78, 0.95, 1)
-energy = 1.0
+position = Vector2(0, -16)
+color = Color(0.45, 0.62, 0.85, 1)
+energy = 0.9
 texture = SubResource("tex")
-texture_scale = 1.0
+texture_scale = 1.1
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
-position = Vector2(0, -16)
-scale = Vector2(0.9, 0.9)
-modulate = Color(0.62, 0.84, 1, 0.85)
+position = Vector2(0, -14)
+scale = Vector2(1.15, 1.15)
+modulate = Color(0.42, 0.66, 1.0, 0.7)
 sprite_frames = ExtResource("2_frames")
 animation = &"idle"
 autoplay = "idle"
 
 [node name="Prompt" type="Label" parent="."]
 offset_left = -24.0
-offset_top = -54.0
+offset_top = -56.0
 offset_right = 24.0
-offset_bottom = -38.0
-theme_override_colors/font_color = Color(0.6, 0.85, 0.98, 1)
+offset_bottom = -40.0
+theme_override_colors/font_color = Color(0.6, 0.78, 0.98, 1)
 text = "E"
 horizontal_alignment = 1
 
