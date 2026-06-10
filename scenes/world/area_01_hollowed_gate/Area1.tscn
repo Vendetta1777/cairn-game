@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1Terrain.gd" id="1_terrain"]
 [ext_resource type="Texture2D" path="res://assets/environment/caverns/background.png" id="2_bg"]
@@ -11,6 +11,8 @@
 [ext_resource type="PackedScene" path="res://scenes/npc/Keeper.tscn" id="9_keeper"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/brute/Brute.tscn" id="10_brute"]
 [ext_resource type="Script" path="res://scenes/decor/Decor.gd" id="11_decor"]
+[ext_resource type="Script" path="res://scenes/decor/BgDetail.gd" id="12_bgdetail"]
+[ext_resource type="Script" path="res://scenes/decor/Foreground.gd" id="13_foreground"]
 
 [sub_resource type="Gradient" id="grad_light"]
 offsets = PackedFloat32Array(0, 1)
@@ -56,6 +58,9 @@ centered = false
 texture = ExtResource("3_walls")
 region_enabled = true
 region_rect = Rect2(0, 0, 1440, 288)
+
+[node name="BgDetail" type="Node2D" parent="."]
+script = ExtResource("12_bgdetail")
 
 [node name="Terrain" type="Node2D" parent="."]
 script = ExtResource("1_terrain")
@@ -151,6 +156,26 @@ initial_velocity_max = 7.0
 scale_amount_min = 0.5
 scale_amount_max = 1.6
 color = Color(0.72, 0.76, 0.88, 0.16)
+
+[node name="Spores" type="CPUParticles2D" parent="."]
+position = Vector2(720, 240)
+amount = 60
+lifetime = 11.0
+preprocess = 6.0
+lifetime_randomness = 0.5
+emission_shape = 3
+emission_rect_extents = Vector2(700, 40)
+direction = Vector2(0, -1)
+spread = 22.0
+gravity = Vector2(0, -4)
+initial_velocity_min = 2.0
+initial_velocity_max = 7.0
+scale_amount_min = 0.4
+scale_amount_max = 1.3
+color = Color(0.4, 0.85, 0.78, 0.5)
+
+[node name="Foreground" type="Node2D" parent="."]
+script = ExtResource("13_foreground")
 
 [node name="Vignette" type="CanvasLayer" parent="."]
 layer = 5
