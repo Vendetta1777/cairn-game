@@ -1,0 +1,37 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scenes/enemies/crawler/Crawler.gd" id="1_crawler"]
+[ext_resource type="SpriteFrames" path="res://scenes/enemies/crawler/crawler_frames.tres" id="2_frames"]
+
+[sub_resource type="RectangleShape2D" id="body_shape"]
+size = Vector2(16, 26)
+
+[sub_resource type="CapsuleShape2D" id="hurt_shape"]
+radius = 10.0
+height = 26.0
+
+[node name="Crawler" type="CharacterBody2D" groups=["enemy"]]
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("1_crawler")
+max_health = 3
+idle_anim = &"idle"
+
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -11)
+scale = Vector2(0.8, 0.8)
+sprite_frames = ExtResource("2_frames")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="Body" type="CollisionShape2D" parent="."]
+shape = SubResource("body_shape")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+position = Vector2(0, -10)
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Col" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("hurt_shape")
