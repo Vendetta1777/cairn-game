@@ -57,6 +57,12 @@ const TERRAIN: Array[Rect2] = [
 	Rect2(2398, 212, 96, 16),     # cross pit 2
 	Rect2(2560, 208, 120, 16),    # final stretch
 	Rect2(2680, 216, 106, 36),    # raised step to the checkpoint
+	# higher platforms — reached by chaining off a lower one (verticality you
+	# can't reach from the floor, but can from the platform beneath)
+	Rect2(470, 170, 100, 16),     # up from the 330 platform
+	Rect2(1180, 165, 110, 16),    # bats vantage, up from the 1060 platform
+	Rect2(2280, 168, 110, 16),    # crawler climb, up from the 2150 platform
+	Rect2(2430, 128, 100, 16),    # higher still, up from the 2280 platform
 ]
 
 const OBJECTS: Array[Rect2] = [

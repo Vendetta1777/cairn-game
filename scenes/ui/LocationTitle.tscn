@@ -17,23 +17,23 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Sub" type="Label" parent="Center"]
-offset_left = -120.0
-offset_top = -56.0
-offset_right = 120.0
-offset_bottom = -42.0
+offset_left = -240.0
+offset_top = -112.0
+offset_right = 240.0
+offset_bottom = -84.0
 theme_override_colors/font_color = Color(0.55, 0.62, 0.78, 1)
 theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 8
+theme_override_font_sizes/font_size = 16
 text = "CAIRN"
 horizontal_alignment = 1
 
 [node name="Title" type="Label" parent="Center"]
-offset_left = -200.0
-offset_top = -40.0
-offset_right = 200.0
-offset_bottom = -10.0
+offset_left = -400.0
+offset_top = -80.0
+offset_right = 400.0
+offset_bottom = -20.0
 theme_override_colors/font_color = Color(0.92, 0.94, 1, 1)
 theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 32
 text = "THE HOLLOWED GATE"
 horizontal_alignment = 1

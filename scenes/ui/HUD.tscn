@@ -4,6 +4,7 @@
 
 [node name="HUD" type="CanvasLayer"]
 layer = 10
+scale = Vector2(2, 2)
 
 [node name="Hearts" type="Control" parent="."]
 anchors_preset = 15
