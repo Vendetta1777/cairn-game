@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3]
+[gd_scene load_steps=23 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1Terrain.gd" id="1_terrain"]
 [ext_resource type="Texture2D" path="res://assets/environment/caverns/background.png" id="2_bg"]
@@ -16,6 +16,8 @@
 [ext_resource type="Script" path="res://scenes/decor/Fireflies.gd" id="14_fireflies"]
 [ext_resource type="Script" path="res://scenes/decor/CeilingVines.gd" id="15_ceilvines"]
 [ext_resource type="Script" path="res://scenes/decor/BgArchitecture.gd" id="16_arch"]
+[ext_resource type="PackedScene" path="res://scenes/npc/LoreNPC.tscn" id="17_lore"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DialogueBox.tscn" id="18_dlg"]
 
 [sub_resource type="Gradient" id="grad_light"]
 offsets = PackedFloat32Array(0, 1)
@@ -106,11 +108,14 @@ position = Vector2(1363, 200)
 [node name="Keeper" parent="Decor" instance=ExtResource("9_keeper")]
 position = Vector2(1090, 252)
 
+[node name="LoreNPC" parent="Decor" instance=ExtResource("17_lore")]
+position = Vector2(110, 252)
+
 [node name="Player" parent="." instance=ExtResource("4_player")]
 position = Vector2(50, 215)
 
 [node name="Bat1" parent="." instance=ExtResource("5_bat")]
-position = Vector2(480, 150)
+position = Vector2(640, 120)
 
 [node name="Bat2" parent="." instance=ExtResource("5_bat")]
 position = Vector2(660, 110)
@@ -122,7 +127,7 @@ position = Vector2(1010, 108)
 position = Vector2(1250, 92)
 
 [node name="Crawler1" parent="." instance=ExtResource("7_crawler")]
-position = Vector2(230, 232)
+position = Vector2(800, 232)
 
 [node name="Crawler2" parent="." instance=ExtResource("7_crawler")]
 position = Vector2(1010, 232)
@@ -214,3 +219,5 @@ stretch_mode = 0
 mouse_filter = 2
 
 [node name="HUD" parent="." instance=ExtResource("6_hud")]
+
+[node name="DialogueBox" parent="." instance=ExtResource("18_dlg")]

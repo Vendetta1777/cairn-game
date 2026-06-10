@@ -243,45 +243,58 @@ func _draw_stone(r: Rect2) -> void:
 	draw_rect(Rect2(body.end.x - 1.5, body.position.y, 1.5, vis_h), STONE_DEEP)
 
 
-## A solid rocky ceiling: chunky rock band, bumpy mossy underside, and
-## stalactites hanging across (you can't go up there, so it's a proper roof).
-const CEIL_BOTTOM := 34.0
+## Organic cave ceiling — the underside UNDULATES (curves down and back up) like a
+## real cave roof, instead of a straight line. Shared so vines hang from the curve.
+func ceiling_y(x: float) -> float:
+	return 42.0 + sin(x * 0.013) * 11.0 + sin(x * 0.029 + 1.0) * 6.0 + sin(x * 0.061 + 2.0) * 3.0
+
 
 func _draw_ceiling() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 99
 	var w := bounds.size.x
 
-	# Rock band.
-	draw_rect(Rect2(0, 0, w, CEIL_BOTTOM), ROCK_A)
-	draw_rect(Rect2(0, 0, w, CEIL_BOTTOM * 0.4), ROCK_B)
-	draw_rect(Rect2(0, CEIL_BOTTOM * 0.62, w, CEIL_BOTTOM * 0.38), STONE_DEEP)
-	# Rock volume + speckle texture.
-	for i in int(w / 14.0):
-		draw_circle(Vector2(rng.randf() * w, rng.randf() * CEIL_BOTTOM),
-			rng.randf_range(3.0, 7.0), STONE_DEEP if rng.randf() > 0.55 else ROCK_B)
+	# Filled rock with a wavy bottom edge.
+	var pts := PackedVector2Array([Vector2(0, 0), Vector2(w, 0)])
+	var x := w
+	while x >= 0.0:
+		pts.append(Vector2(x, ceiling_y(x)))
+		x -= 6.0
+	draw_colored_polygon(pts, ROCK_A)
+	# Lighter upper band (follows the curve, thinner).
+	var pts2 := PackedVector2Array([Vector2(0, 0), Vector2(w, 0)])
+	x = w
+	while x >= 0.0:
+		pts2.append(Vector2(x, ceiling_y(x) * 0.45))
+		x -= 6.0
+	draw_colored_polygon(pts2, ROCK_B)
+	# Texture blobs inside the rock.
+	for i in int(w / 13.0):
+		var bx := rng.randf() * w
+		var by := rng.randf() * (ceiling_y(bx) - 4.0)
+		draw_circle(Vector2(bx, by), rng.randf_range(3.0, 7.0), STONE_DEEP if rng.randf() > 0.55 else ROCK_B)
 
-	# Bumpy underside rim + moss tufts hanging down.
-	var x := 0.0
+	# Bumpy rim, moss tufts, and stalactites following the curve.
+	x = 0.0
 	while x < w:
-		draw_circle(Vector2(x, CEIL_BOTTOM - 1.5), rng.randf_range(2.6, 4.2), RIM)
+		draw_circle(Vector2(x, ceiling_y(x) - 1.0), rng.randf_range(2.6, 4.2), RIM)
 		x += 4.6
 	x = 14.0
 	while x < w - 6.0:
-		draw_rect(Rect2(x - 4.0, CEIL_BOTTOM - 2.0, 9.0, 3.0), MOSS_D)
-		draw_rect(Rect2(x - 2.0, CEIL_BOTTOM, 5.0, 2.0), MOSS_L)
+		var cy := ceiling_y(x)
+		draw_rect(Rect2(x - 4.0, cy - 2.0, 9.0, 3.0), MOSS_D)
+		draw_rect(Rect2(x - 2.0, cy, 5.0, 2.0), MOSS_L)
 		x += rng.randf_range(70.0, 130.0)
-
-	# Stalactites hanging across, varied sizes.
 	x = 18.0
 	while x < w - 18.0:
 		if rng.randf() > 0.32:
+			var cy := ceiling_y(x)
 			var sw := rng.randf_range(5.0, 14.0)
 			var slen := rng.randf_range(10.0, 48.0)
 			draw_colored_polygon(PackedVector2Array([
-				Vector2(x - sw, CEIL_BOTTOM), Vector2(x + sw, CEIL_BOTTOM), Vector2(x, CEIL_BOTTOM + slen)]), STAL)
+				Vector2(x - sw, cy), Vector2(x + sw, cy), Vector2(x, cy + slen)]), STAL)
 			draw_colored_polygon(PackedVector2Array([
-				Vector2(x - sw * 0.4, CEIL_BOTTOM), Vector2(x + sw * 0.2, CEIL_BOTTOM), Vector2(x, CEIL_BOTTOM + slen * 0.65)]), STAL_HI)
+				Vector2(x - sw * 0.4, cy), Vector2(x + sw * 0.2, cy), Vector2(x, cy + slen * 0.65)]), STAL_HI)
 		x += rng.randf_range(20.0, 38.0)
 
 

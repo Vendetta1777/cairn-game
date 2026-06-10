@@ -29,9 +29,16 @@ var _near: Array = []
 var _worms: Array = []
 var _banners: Array = []
 var _t := 0.0
+var _terrain
+
+
+func _hy(x: float) -> float:
+	# Hang point follows the cave ceiling curve.
+	return _terrain.ceiling_y(x) if _terrain else CEIL
 
 
 func _ready() -> void:
+	_terrain = get_node_or_null("../Terrain")
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 5
 	var x := 22.0
@@ -61,7 +68,7 @@ func _process(delta: float) -> void:
 	queue_redraw()
 	for g in _worms:
 		var sx: float = sin(_t * 1.1 + g["ph"]) * 7.0
-		g["light"].position = Vector2(g["x"] + sx, CEIL + g["len"])
+		g["light"].position = Vector2(g["x"] + sx, _hy(g["x"]) + g["len"])
 		g["light"].energy = 0.55 + 0.25 * (0.5 + 0.5 * sin(_t * 2.5 + g["ph"]))
 
 
@@ -73,9 +80,10 @@ func _draw() -> void:
 	for b in _banners:
 		_banner(b)
 	for g in _worms:
+		var top: float = _hy(g["x"])
 		var sx: float = sin(_t * 1.1 + g["ph"]) * 7.0
-		var endp := Vector2(g["x"] + sx, CEIL + g["len"])
-		draw_line(Vector2(g["x"], CEIL), endp, THREAD, 1.0)
+		var endp := Vector2(g["x"] + sx, top + g["len"])
+		draw_line(Vector2(g["x"], top), endp, THREAD, 1.0)
 		var pulse: float = 0.5 + 0.5 * sin(_t * 2.5 + g["ph"])
 		draw_circle(endp, 4.5, Color(ORB.r, ORB.g, ORB.b, 0.35 * pulse))
 		draw_circle(endp, 2.2, ORB)
@@ -85,11 +93,12 @@ func _draw() -> void:
 func _vine(v: Dictionary, col: Color, leaf: Color, width: float, speed: float) -> void:
 	var n := int(v["len"] / 8.0)
 	var vx: float = v["x"]
-	var seg := Vector2(vx, CEIL)
+	var top: float = _hy(vx)
+	var seg := Vector2(vx, top)
 	for i in n:
 		var depth: float = float(i + 1) / float(maxi(n, 1))
 		var sx: float = sin(_t * speed + v["ph"] + depth * 2.5) * v["sway"] * depth
-		var nxt := Vector2(vx + sx, CEIL + float(i + 1) * 8.0)
+		var nxt := Vector2(vx + sx, top + float(i + 1) * 8.0)
 		draw_line(seg, nxt, col, width)
 		if i % 2 == 0 and width > 1.0:
 			var side := 2.6 if i % 4 == 0 else -2.6
@@ -101,7 +110,7 @@ func _vine(v: Dictionary, col: Color, leaf: Color, width: float, speed: float) -
 
 func _banner(b: Dictionary) -> void:
 	var bx: float = b["x"]
-	var top := CEIL
+	var top: float = _hy(bx)
 	var hw := 9.0
 	var h: float = b["h"]
 	var sway: float = sin(_t * 0.8 + b["ph"]) * 4.0
