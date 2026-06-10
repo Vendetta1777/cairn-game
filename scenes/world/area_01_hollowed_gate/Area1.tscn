@@ -83,21 +83,21 @@ script = ExtResource("11_decor")
 [node name="Decor" type="Node2D" parent="."]
 
 [node name="Moss1" type="PointLight2D" parent="Decor"]
-position = Vector2(1100, 188)
+position = Vector2(1100, 210)
 color = Color(0.32, 0.78, 0.74, 1)
 energy = 0.55
 texture = SubResource("tex_light")
 texture_scale = 0.8
 
 [node name="Moss2" type="PointLight2D" parent="Decor"]
-position = Vector2(2030, 200)
+position = Vector2(2030, 212)
 color = Color(0.32, 0.78, 0.74, 1)
 energy = 0.5
 texture = SubResource("tex_light")
 texture_scale = 0.75
 
 [node name="Moss3" type="PointLight2D" parent="Decor"]
-position = Vector2(2560, 176)
+position = Vector2(2560, 208)
 color = Color(0.32, 0.78, 0.74, 1)
 energy = 0.5
 texture = SubResource("tex_light")
@@ -111,11 +111,6 @@ position = Vector2(1700, 252)
 
 [node name="LoreNPC" parent="Decor" instance=ExtResource("17_lore")]
 position = Vector2(110, 252)
-
-[node name="LoreNPC2" parent="Decor" instance=ExtResource("17_lore")]
-position = Vector2(560, 252)
-reveals_location = false
-lines = PackedStringArray("Strange, to see one walk in still armed. You will need that blade - strike, and the dark gives ground.", "Mind which way you face. Aim your strike up, down, or ahead; things here come from every side.", "And when a foe lunges - strike at the very instant it does. Turn the blow aside, and the shadow rewards you.", "The standing stones remember you. Touch one, and death only sends you back to where you last knelt.", "Some of us still linger, and still trade. Bring what the fallen leave behind, and we can make you stronger.")
 
 [node name="Player" parent="." instance=ExtResource("4_player")]
 position = Vector2(50, 215)

@@ -18,14 +18,14 @@ const TEX_WEB := preload("res://assets/decor/web.png")
 const TORCHES := [
 	Vector2(130, 252),    # intro entrance
 	Vector2(700, 252),    # intro
-	Vector2(1380, 158),   # bats platform
+	Vector2(1380, 202),   # bats platform
 	Vector2(1700, 252),   # by the NPC
-	Vector2(2150, 168),   # crawler climb
-	Vector2(2620, 200),   # near the checkpoint
+	Vector2(2150, 208),   # crawler climb
+	Vector2(2620, 252),   # near the checkpoint
 ]
 const CRYSTALS := [
-	Vector2(70, 252), Vector2(640, 150), Vector2(1060, 188),
-	Vector2(1620, 184), Vector2(2150, 168), Vector2(2680, 200),
+	Vector2(70, 252), Vector2(640, 206), Vector2(1060, 210),
+	Vector2(1620, 210), Vector2(2150, 208), Vector2(2680, 216),
 ]
 const ROCKS := [
 	Vector2(400, 252), Vector2(430, 252), Vector2(1150, 252),

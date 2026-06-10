@@ -46,17 +46,17 @@ const TERRAIN: Array[Rect2] = [
 	Rect2(14, 252, 1900, 36),     # x14..1914  (intro + bats + NPC, NO pits)
 	Rect2(2000, 252, 360, 36),    # x2000..2360 (pit before)
 	Rect2(2440, 252, 346, 36),    # x2440..2786 (pit before; checkpoint)
-	# spaced platforms
-	Rect2(330, 176, 120, 16),     # intro (decorative, reachable)
-	Rect2(640, 150, 130, 16),     # intro
-	Rect2(1060, 188, 130, 16),    # bats
-	Rect2(1320, 158, 130, 16),    # bats
-	Rect2(1620, 184, 120, 16),    # NPC area
-	Rect2(1958, 198, 96, 16),     # cross pit 1
-	Rect2(2150, 168, 120, 16),    # crawler climb
-	Rect2(2398, 198, 96, 16),     # cross pit 2
-	Rect2(2560, 176, 120, 16),    # final stretch
-	Rect2(2680, 200, 106, 52),    # raised step to the checkpoint
+	# spaced platforms — kept within jump reach of the floor (~40-50px up)
+	Rect2(330, 212, 120, 16),     # intro (decorative, reachable)
+	Rect2(640, 206, 130, 16),     # intro
+	Rect2(1060, 210, 130, 16),    # bats
+	Rect2(1320, 202, 130, 16),    # bats
+	Rect2(1620, 210, 120, 16),    # NPC area
+	Rect2(1958, 212, 96, 16),     # cross pit 1
+	Rect2(2150, 208, 120, 16),    # crawler climb
+	Rect2(2398, 212, 96, 16),     # cross pit 2
+	Rect2(2560, 208, 120, 16),    # final stretch
+	Rect2(2680, 216, 106, 36),    # raised step to the checkpoint
 ]
 
 const OBJECTS: Array[Rect2] = [
