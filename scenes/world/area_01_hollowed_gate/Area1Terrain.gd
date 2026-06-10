@@ -243,24 +243,22 @@ func _draw_stone(r: Rect2) -> void:
 	draw_rect(Rect2(body.end.x - 1.5, body.position.y, 1.5, vis_h), STONE_DEEP)
 
 
-## Stalactites + hanging vines across the ceiling.
+## Sparse, dark stalactites — the top stays mostly empty so the eye goes to the
+## play space, not a crowded ceiling. Clustered, not evenly spread.
 func _draw_ceiling() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 99
-	var x := 24.0
-	while x < bounds.size.x - 24.0:
-		var w := rng.randf_range(7.0, 16.0)
-		var slen := rng.randf_range(16.0, 58.0)
-		draw_colored_polygon(PackedVector2Array([
-			Vector2(x - w, 14.0), Vector2(x + w, 14.0), Vector2(x, 14.0 + slen)]), STAL)
-		draw_colored_polygon(PackedVector2Array([
-			Vector2(x - w * 0.4, 14.0), Vector2(x + w * 0.2, 14.0), Vector2(x, 14.0 + slen * 0.7)]), STAL_HI)
-		if rng.randf() > 0.6:
-			var vx := x + rng.randf_range(-6.0, 6.0)
-			var vlen := rng.randf_range(14.0, 40.0)
-			draw_line(Vector2(vx, 16.0), Vector2(vx + rng.randf_range(-3.0, 3.0), 16.0 + vlen), MOSS_D, 1.0)
-			draw_circle(Vector2(vx, 16.0 + vlen), 1.6, MOSS_L)
-		x += rng.randf_range(26.0, 48.0)
+	# A few clusters of stalactites rather than a wall of them.
+	for cluster_x in [120.0, 470.0, 900.0, 1300.0]:
+		var count := rng.randi_range(2, 4)
+		for i in count:
+			var x: float = cluster_x + rng.randf_range(-40.0, 40.0)
+			var w := rng.randf_range(6.0, 13.0)
+			var slen := rng.randf_range(12.0, 40.0)
+			draw_colored_polygon(PackedVector2Array([
+				Vector2(x - w, 14.0), Vector2(x + w, 14.0), Vector2(x, 14.0 + slen)]), STAL)
+			draw_colored_polygon(PackedVector2Array([
+				Vector2(x - w * 0.4, 14.0), Vector2(x + w * 0.2, 14.0), Vector2(x, 14.0 + slen * 0.65)]), STAL_HI)
 
 
 func _draw_crate(r: Rect2) -> void:

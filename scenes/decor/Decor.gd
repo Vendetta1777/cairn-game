@@ -13,23 +13,25 @@ const TEX_CRYSTAL := [
 const TEX_ROCK := preload("res://assets/decor/rock1.png")
 const TEX_WEB := preload("res://assets/decor/web.png")
 
-# (x, surface_y) — surface_y is the top of the platform/floor the prop rests on.
+# (x, surface_y). Curated: torches light the PATH at key landing spots; crystals
+# mark a few landmarks; rocks cluster at platform bases. Less, but purposeful.
 const TORCHES := [
-	Vector2(110, 252), Vector2(700, 252), Vector2(1390, 252),
-	Vector2(360, 196), Vector2(200, 200), Vector2(700, 140),
-	Vector2(1030, 160), Vector2(560, 178),
+	Vector2(110, 252),    # start, lights the entrance
+	Vector2(700, 140),    # the high mid platform
+	Vector2(1030, 160),   # the climb
+	Vector2(1340, 200),   # near the checkpoint
 ]
 const CRYSTALS := [
-	Vector2(70, 252), Vector2(450, 252), Vector2(850, 252), Vector2(1360, 252),
-	Vector2(595, 178), Vector2(1000, 160), Vector2(1210, 124), Vector2(180, 200),
+	Vector2(70, 252), Vector2(595, 178), Vector2(1210, 124), Vector2(905, 200),
 ]
 const ROCKS := [
-	Vector2(290, 252), Vector2(315, 252), Vector2(520, 252), Vector2(990, 252),
-	Vector2(1370, 252), Vector2(905, 200), Vector2(1185, 124), Vector2(660, 140),
+	Vector2(300, 252), Vector2(325, 252), Vector2(660, 140), Vector2(990, 252),
 ]
-const WEBS := [40.0, 440.0, 720.0, 960.0, 1400.0]   # x positions, hang from ceiling
+const WEBS := [40.0, 720.0, 1400.0]   # corners only
 
 var _light_tex: GradientTexture2D
+var _crystal_lights: Array = []
+var _t := 0.0
 
 
 func _ready() -> void:
@@ -55,8 +57,16 @@ func _crystal_cluster(x: float, sy: float) -> void:
 	l.color = Color(0.32, 0.82, 0.76)
 	l.energy = 0.6
 	l.texture = _light_tex
-	l.texture_scale = 0.75
+	l.texture_scale = 0.8
 	add_child(l)
+	_crystal_lights.append(l)
+
+
+func _process(delta: float) -> void:
+	# Crystals breathe — a slow energy pulse.
+	_t += delta
+	for i in _crystal_lights.size():
+		_crystal_lights[i].energy = 0.55 + 0.18 * sin(_t * 1.6 + i * 1.3)
 
 
 ## Place a sprite so its BOTTOM rests on surface_y (no floating).

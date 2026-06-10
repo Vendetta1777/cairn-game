@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1Terrain.gd" id="1_terrain"]
 [ext_resource type="Texture2D" path="res://assets/environment/caverns/background.png" id="2_bg"]
@@ -13,6 +13,7 @@
 [ext_resource type="Script" path="res://scenes/decor/Decor.gd" id="11_decor"]
 [ext_resource type="Script" path="res://scenes/decor/BgDetail.gd" id="12_bgdetail"]
 [ext_resource type="Script" path="res://scenes/decor/Foreground.gd" id="13_foreground"]
+[ext_resource type="Script" path="res://scenes/decor/Fireflies.gd" id="14_fireflies"]
 
 [sub_resource type="Gradient" id="grad_light"]
 offsets = PackedFloat32Array(0, 1)
@@ -41,7 +42,7 @@ fill_to = Vector2(0.5, 0)
 [node name="Area1" type="Node2D"]
 
 [node name="Mood" type="CanvasModulate" parent="."]
-color = Color(0.7, 0.72, 0.86, 1)
+color = Color(0.56, 0.58, 0.74, 1)
 
 [node name="Background" type="Node2D" parent="."]
 
@@ -69,22 +70,6 @@ script = ExtResource("1_terrain")
 script = ExtResource("11_decor")
 
 [node name="Decor" type="Node2D" parent="."]
-
-[node name="Stal1" type="Polygon2D" parent="Decor"]
-color = Color(0.07, 0.08, 0.11, 1)
-polygon = PackedVector2Array(180, 14, 210, 14, 196, 46)
-
-[node name="Stal2" type="Polygon2D" parent="Decor"]
-color = Color(0.07, 0.08, 0.11, 1)
-polygon = PackedVector2Array(470, 14, 504, 14, 488, 52)
-
-[node name="Stal3" type="Polygon2D" parent="Decor"]
-color = Color(0.07, 0.08, 0.11, 1)
-polygon = PackedVector2Array(820, 14, 850, 14, 836, 44)
-
-[node name="Stal4" type="Polygon2D" parent="Decor"]
-color = Color(0.07, 0.08, 0.11, 1)
-polygon = PackedVector2Array(1180, 14, 1214, 14, 1198, 50)
 
 [node name="Moss1" type="PointLight2D" parent="Decor"]
 position = Vector2(226, 198)
@@ -173,6 +158,39 @@ initial_velocity_max = 7.0
 scale_amount_min = 0.4
 scale_amount_max = 1.3
 color = Color(0.4, 0.85, 0.78, 0.5)
+
+[node name="Fireflies" type="Node2D" parent="."]
+script = ExtResource("14_fireflies")
+
+[node name="DripA" type="CPUParticles2D" parent="."]
+position = Vector2(124, 40)
+amount = 4
+lifetime = 1.9
+lifetime_randomness = 0.6
+emission_shape = 3
+emission_rect_extents = Vector2(28, 2)
+direction = Vector2(0, 1)
+gravity = Vector2(0, 130)
+initial_velocity_min = 3.0
+initial_velocity_max = 8.0
+scale_amount_min = 0.5
+scale_amount_max = 1.0
+color = Color(0.5, 0.72, 0.92, 0.6)
+
+[node name="DripB" type="CPUParticles2D" parent="."]
+position = Vector2(905, 36)
+amount = 3
+lifetime = 2.1
+lifetime_randomness = 0.6
+emission_shape = 3
+emission_rect_extents = Vector2(30, 2)
+direction = Vector2(0, 1)
+gravity = Vector2(0, 130)
+initial_velocity_min = 3.0
+initial_velocity_max = 8.0
+scale_amount_min = 0.5
+scale_amount_max = 1.0
+color = Color(0.5, 0.72, 0.92, 0.6)
 
 [node name="Foreground" type="Node2D" parent="."]
 script = ExtResource("13_foreground")
