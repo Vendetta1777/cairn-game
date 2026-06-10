@@ -54,8 +54,15 @@ func _process(delta: float) -> void:
 		_combo_timer -= delta
 		if _combo_timer <= 0.0:
 			_combo = 0
+	# Aim the hitbox by held direction: W=up, S=down, else forward (A/D facing).
 	if _hitbox and _controller:
-		_hitbox.position.x = absf(_hitbox.position.x) * _controller.get_facing()
+		var f: int = _controller.get_facing()
+		if Input.is_action_pressed("move_up"):
+			_hitbox.position = Vector2(f * 4.0, -26.0)
+		elif Input.is_action_pressed("move_down"):
+			_hitbox.position = Vector2(f * 4.0, 20.0)
+		else:
+			_hitbox.position = Vector2(f * 16.0, -12.0)
 
 	if Input.is_action_just_pressed("attack") and _cooldown <= 0.0:
 		_do_attack()
@@ -81,20 +88,19 @@ func _do_attack() -> void:
 	var is_finisher := _combo == 2
 	var slash_scale := 1.3 if is_finisher else 1.0
 
-	# Directional slash (rotate the flat crescent): in the air = uppercut UP,
-	# crouching = slash DOWN, otherwise a forward sweep.
-	var state: String = _controller.get_current_state()
+	# Directional slash by held input (rotate the flat crescent): W = up,
+	# S = down, otherwise a forward sweep — independent of movement state.
 	var pos: Vector2
 	var fh := facing > 0
 	var fv := false
 	var rot := 0.0
-	if state == "jump" or state == "fall":
+	if Input.is_action_pressed("move_up"):
 		rot = -PI / 2.0
-		pos = _controller.global_position + Vector2(facing * 10.0, 4.0)
+		pos = _controller.global_position + Vector2(facing * 4.0, -85.0)
 		fh = false
-	elif state == "crouch" or state == "crawl":
+	elif Input.is_action_pressed("move_down"):
 		rot = PI / 2.0
-		pos = _controller.global_position + Vector2(facing * 10.0, 60.0)
+		pos = _controller.global_position + Vector2(facing * 4.0, 60.0)
 		fh = false
 	else:
 		fv = _combo == 1   # ground combo: middle hit reverses the arc
