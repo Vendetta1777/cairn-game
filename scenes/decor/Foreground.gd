@@ -18,20 +18,9 @@ func _draw() -> void:
 	var w := bounds.size.x
 	var h := bounds.size.y
 
-	# Dark gradient over the empty top — nothing important is up there.
-	for i in 30:
-		var a := 0.72 * (1.0 - float(i) / 30.0)
-		draw_rect(Rect2(0.0, i * 2.0, w, 2.0), Color(TOP_DARK.r, TOP_DARK.g, TOP_DARK.b, a))
-
-	# Subtle near-black rock framing in the top corners.
-	for corner in [Vector2(0.0, 0.0), Vector2(w, 0.0)]:
-		for i in 6:
-			draw_circle(corner + Vector2(rng.randf_range(-26.0, 26.0), rng.randf_range(0.0, 44.0)),
-				rng.randf_range(18.0, 36.0), FG_ROCK)
-
-	# A couple of foreground vines, off to the sides.
-	for fx in [w * 0.12, w * 0.88]:
-		_vine(Vector2(fx, 14.0), rng.randf_range(60.0, 110.0), rng)
+	# A couple of foreground vines hanging from the ceiling, off to the sides.
+	for fx in [w * 0.1, w * 0.9]:
+		_vine(Vector2(fx, 34.0), rng.randf_range(70.0, 120.0), rng)
 
 	# Faint fog along the bottom.
 	draw_rect(Rect2(0.0, h - 38.0, w, 38.0), FOG)

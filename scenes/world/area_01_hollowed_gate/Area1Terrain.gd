@@ -243,22 +243,46 @@ func _draw_stone(r: Rect2) -> void:
 	draw_rect(Rect2(body.end.x - 1.5, body.position.y, 1.5, vis_h), STONE_DEEP)
 
 
-## Sparse, dark stalactites — the top stays mostly empty so the eye goes to the
-## play space, not a crowded ceiling. Clustered, not evenly spread.
+## A solid rocky ceiling: chunky rock band, bumpy mossy underside, and
+## stalactites hanging across (you can't go up there, so it's a proper roof).
+const CEIL_BOTTOM := 34.0
+
 func _draw_ceiling() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 99
-	# A few clusters of stalactites rather than a wall of them.
-	for cluster_x in [120.0, 470.0, 900.0, 1300.0]:
-		var count := rng.randi_range(2, 4)
-		for i in count:
-			var x: float = cluster_x + rng.randf_range(-40.0, 40.0)
-			var w := rng.randf_range(6.0, 13.0)
-			var slen := rng.randf_range(12.0, 40.0)
+	var w := bounds.size.x
+
+	# Rock band.
+	draw_rect(Rect2(0, 0, w, CEIL_BOTTOM), ROCK_A)
+	draw_rect(Rect2(0, 0, w, CEIL_BOTTOM * 0.4), ROCK_B)
+	draw_rect(Rect2(0, CEIL_BOTTOM * 0.62, w, CEIL_BOTTOM * 0.38), STONE_DEEP)
+	# Rock volume + speckle texture.
+	for i in int(w / 14.0):
+		draw_circle(Vector2(rng.randf() * w, rng.randf() * CEIL_BOTTOM),
+			rng.randf_range(3.0, 7.0), STONE_DEEP if rng.randf() > 0.55 else ROCK_B)
+
+	# Bumpy underside rim + moss tufts hanging down.
+	var x := 0.0
+	while x < w:
+		draw_circle(Vector2(x, CEIL_BOTTOM - 1.5), rng.randf_range(2.6, 4.2), RIM)
+		x += 4.6
+	x = 14.0
+	while x < w - 6.0:
+		draw_rect(Rect2(x - 4.0, CEIL_BOTTOM - 2.0, 9.0, 3.0), MOSS_D)
+		draw_rect(Rect2(x - 2.0, CEIL_BOTTOM, 5.0, 2.0), MOSS_L)
+		x += rng.randf_range(70.0, 130.0)
+
+	# Stalactites hanging across, varied sizes.
+	x = 18.0
+	while x < w - 18.0:
+		if rng.randf() > 0.32:
+			var sw := rng.randf_range(5.0, 14.0)
+			var slen := rng.randf_range(10.0, 48.0)
 			draw_colored_polygon(PackedVector2Array([
-				Vector2(x - w, 14.0), Vector2(x + w, 14.0), Vector2(x, 14.0 + slen)]), STAL)
+				Vector2(x - sw, CEIL_BOTTOM), Vector2(x + sw, CEIL_BOTTOM), Vector2(x, CEIL_BOTTOM + slen)]), STAL)
 			draw_colored_polygon(PackedVector2Array([
-				Vector2(x - w * 0.4, 14.0), Vector2(x + w * 0.2, 14.0), Vector2(x, 14.0 + slen * 0.65)]), STAL_HI)
+				Vector2(x - sw * 0.4, CEIL_BOTTOM), Vector2(x + sw * 0.2, CEIL_BOTTOM), Vector2(x, CEIL_BOTTOM + slen * 0.65)]), STAL_HI)
+		x += rng.randf_range(20.0, 38.0)
 
 
 func _draw_crate(r: Rect2) -> void:
