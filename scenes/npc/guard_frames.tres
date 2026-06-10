@@ -1,0 +1,39 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/npc/guard_idle.png" id="1_gb3d2"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ib6kv"]
+atlas = ExtResource("1_gb3d2")
+region = Rect2(0, 0, 128, 96)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_itlyk"]
+atlas = ExtResource("1_gb3d2")
+region = Rect2(128, 0, 128, 96)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dh81w"]
+atlas = ExtResource("1_gb3d2")
+region = Rect2(256, 0, 128, 96)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w5ykw"]
+atlas = ExtResource("1_gb3d2")
+region = Rect2(384, 0, 128, 96)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ib6kv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_itlyk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dh81w")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w5ykw")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 6.0
+}]

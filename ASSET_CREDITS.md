@@ -12,7 +12,8 @@ Cairn uses third-party art assets as placeholders/foundation. Credit where due, 
 | `assets/fx/dagger.png` | Thrown-dagger projectile | GothicVania "Terrible Knight" projectiles | **Ansimuz** | CC0 / free for commercial use |
 | `assets/sprites/enemies/crawler/*` | Crawler (ground imp) | imp_axe_demon | (itch.io) | verify pack license |
 | `assets/sprites/enemies/brute/*` | Brute (ogre) | GothicVania Ogre | **Ansimuz** | CC0 / free for commercial use |
-| `assets/sprites/npc/keeper.png` | The Keeper NPC | GothicVania "death" reaper | **Ansimuz** | CC0 / free for commercial use |
+| `assets/sprites/npc/keeper.png` | The Keeper NPC (heart upgrades) | GothicVania "death" reaper | **Ansimuz** | CC0 / free for commercial use |
+| `assets/sprites/npc/guard_idle.png` | Lore NPC (spectral Cairn guard) | GothicVania "Terrible Knight" idle | **Ansimuz** | CC0 / free for commercial use |
 | `assets/decor/torch.png` | Animated wall torch | Bitcrawl Free Roguelike | (itch.io) | verify pack license |
 | `assets/decor/crystal*.png`, `rock*.png`, `web.png` | Cave crystals / rocks / cobwebs | Free Top-Down Pixel Art Cave Objects | (itch.io) | verify pack license |
 | `assets/decor/torch.png`, dungeon enemy/prop sheets | Animated torch + props | Bitcrawl / craftpix dungeon packs | (itch.io) | verify pack license |
