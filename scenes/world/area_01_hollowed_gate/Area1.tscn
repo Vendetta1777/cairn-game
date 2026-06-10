@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1Terrain.gd" id="1_terrain"]
 [ext_resource type="Texture2D" path="res://assets/environment/caverns/background.png" id="2_bg"]
@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/RemnantStone.tscn" id="8_stone"]
 [ext_resource type="PackedScene" path="res://scenes/npc/Keeper.tscn" id="9_keeper"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/brute/Brute.tscn" id="10_brute"]
+[ext_resource type="Script" path="res://scenes/decor/Decor.gd" id="11_decor"]
 
 [sub_resource type="Gradient" id="grad_light"]
 offsets = PackedFloat32Array(0, 1)
@@ -58,6 +59,9 @@ region_rect = Rect2(0, 0, 1440, 288)
 
 [node name="Terrain" type="Node2D" parent="."]
 script = ExtResource("1_terrain")
+
+[node name="Props" type="Node2D" parent="."]
+script = ExtResource("11_decor")
 
 [node name="Decor" type="Node2D" parent="."]
 

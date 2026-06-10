@@ -1,0 +1,39 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/decor/torch.png" id="1_1867m"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j4dg2"]
+atlas = ExtResource("1_1867m")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0ra13"]
+atlas = ExtResource("1_1867m")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dsfo2"]
+atlas = ExtResource("1_1867m")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_feoi8"]
+atlas = ExtResource("1_1867m")
+region = Rect2(48, 0, 16, 16)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j4dg2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0ra13")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dsfo2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_feoi8")
+}],
+"loop": true,
+"name": &"burn",
+"speed": 10.0
+}]
