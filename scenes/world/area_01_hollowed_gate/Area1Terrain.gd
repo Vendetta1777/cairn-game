@@ -17,6 +17,17 @@ const STONE_EDGE := Color(0.05, 0.055, 0.085)
 const SPECK_LIGHT := Color(0.24, 0.27, 0.35)
 const SPECK_DARK := Color(0.05, 0.05, 0.08)
 const MOSS := Color(0.4, 0.82, 0.74)
+# Richer stone/rock palette.
+const ROCK_A := Color(0.12, 0.14, 0.19)
+const ROCK_B := Color(0.16, 0.185, 0.245)
+const STONE_DEEP := Color(0.045, 0.052, 0.08)
+const RIM := Color(0.3, 0.35, 0.46)
+const RIM_HI := Color(0.42, 0.48, 0.6)
+const MOSS_D := Color(0.22, 0.46, 0.4)
+const MOSS_L := Color(0.42, 0.8, 0.62)
+const ROOT := Color(0.07, 0.11, 0.09)
+const STAL := Color(0.1, 0.115, 0.16)
+const STAL_HI := Color(0.2, 0.23, 0.31)
 const CRATE := Color(0.3, 0.21, 0.13)
 const CRATE_DK := Color(0.2, 0.13, 0.08)
 const CRATE_LIP := Color(0.46, 0.34, 0.21)
@@ -152,12 +163,15 @@ func _physics_process(_delta: float) -> void:
 func _draw() -> void:
 	for r in TERRAIN:
 		_draw_stone(r)
-	for spot in MOSS_SPOTS:
-		_draw_moss(spot)
+	_draw_ceiling()
 	for r in OBJECTS:
 		_draw_crate(r)
 	for r in HAZARDS:
 		_draw_spikes(r)
+
+
+func _is_ceiling(r: Rect2) -> bool:
+	return r.position.y <= 0.0 and r.size.x > 400.0
 
 
 func _draw_spikes(r: Rect2) -> void:
@@ -172,45 +186,81 @@ func _draw_spikes(r: Rect2) -> void:
 		x += 8.0
 
 
+## A platform/floor as a chunky rock ledge: layered body, bumpy rock rim, moss
+## on top, hanging roots underneath. Thin platforms get a deeper visual body.
 func _draw_stone(r: Rect2) -> void:
-	# Vertical gradient body (top lighter -> bottom darker).
-	var h := r.size.y
-	draw_rect(r, STONE_MID)
-	draw_rect(Rect2(r.position.x, r.position.y, r.size.x, h * 0.45), STONE_TOP)
-	draw_rect(Rect2(r.position.x, r.position.y + h * 0.7, r.size.x, h * 0.3), STONE_LOW)
-
-	# Deterministic speckle texture + cracks (seeded by position so it's stable).
 	var rng := RandomNumberGenerator.new()
 	rng.seed = int(r.position.x * 7.0 + r.position.y * 13.0 + 1.0)
-	var count := int(clampf(r.size.x * r.size.y / 90.0, 4.0, 60.0))
-	for i in count:
-		var px := r.position.x + rng.randf() * r.size.x
-		var py := r.position.y + rng.randf() * r.size.y
-		var c := SPECK_LIGHT if rng.randf() > 0.5 else SPECK_DARK
-		draw_rect(Rect2(px, py, 1.0, 1.0), c)
-	var cracks := int(clampf(r.size.x / 90.0, 1.0, 5.0))
-	for i in cracks:
-		var sx := r.position.x + rng.randf() * r.size.x
-		var sy := r.position.y + 4.0 + rng.randf() * (r.size.y - 6.0)
-		var seg := Vector2(sx, sy)
-		for j in 3:
-			var nxt := seg + Vector2(rng.randf_range(-6.0, 6.0), rng.randf_range(2.0, 6.0))
-			draw_line(seg, nxt, STONE_EDGE, 1.0)
+	var vis_h: float = maxf(r.size.y, 30.0)
+	var body := Rect2(r.position.x, r.position.y, r.size.x, vis_h)
+
+	draw_rect(body, ROCK_A)
+	draw_rect(Rect2(body.position.x, body.position.y, body.size.x, vis_h * 0.42), ROCK_B)
+	draw_rect(Rect2(body.position.x, body.position.y + vis_h * 0.74, body.size.x, vis_h * 0.26), STONE_DEEP)
+
+	var blobs := int(clampf(r.size.x * vis_h / 240.0, 3.0, 60.0))
+	for i in blobs:
+		var bx := body.position.x + rng.randf() * r.size.x
+		var by := r.position.y + 5.0 + rng.randf() * (vis_h - 7.0)
+		draw_circle(Vector2(bx, by), rng.randf_range(3.0, 7.0), STONE_DEEP if rng.randf() > 0.55 else ROCK_B)
+	for i in blobs:
+		var px := body.position.x + rng.randf() * r.size.x
+		var py := r.position.y + rng.randf() * vis_h
+		draw_rect(Rect2(px, py, 1.0, 1.0), SPECK_LIGHT if rng.randf() > 0.55 else SPECK_DARK)
+
+	if _is_ceiling(r):
+		return
+
+	# Bumpy rock rim along the top.
+	var x := r.position.x
+	while x < r.end.x:
+		var rr := rng.randf_range(2.6, 4.2)
+		draw_circle(Vector2(x, r.position.y + 1.5), rr, RIM)
+		draw_circle(Vector2(x, r.position.y + 0.5), rr * 0.55, RIM_HI)
+		x += 4.6
+
+	# Moss/grass tufts over the front edge.
+	x = r.position.x + 6.0 + rng.randf() * 12.0
+	while x < r.end.x - 4.0:
+		draw_rect(Rect2(x - 4.0, r.position.y - 1.0, 9.0, 3.0), MOSS_D)
+		draw_rect(Rect2(x - 2.0, r.position.y - 2.0, 5.0, 2.0), MOSS_L)
+		draw_line(Vector2(x - 1.0, r.position.y - 1.0), Vector2(x - 2.0, r.position.y - 6.0), MOSS_L, 1.0)
+		draw_line(Vector2(x + 2.0, r.position.y - 1.0), Vector2(x + 2.0, r.position.y - 5.0), MOSS_D, 1.0)
+		x += rng.randf_range(46.0, 90.0)
+
+	# Roots hanging from the underside.
+	x = r.position.x + 10.0 + rng.randf() * 14.0
+	while x < r.end.x - 6.0:
+		var seg := Vector2(x, body.position.y + vis_h - 1.0)
+		var rlen := rng.randf_range(6.0, 13.0)
+		for j in 2:
+			var nxt := seg + Vector2(rng.randf_range(-2.5, 2.5), rlen * 0.5)
+			draw_line(seg, nxt, ROOT, rng.randf_range(1.0, 2.0))
 			seg = nxt
+		x += rng.randf_range(34.0, 72.0)
 
-	# Lit top edge + face band, dark side bevels + bottom shadow.
-	draw_rect(Rect2(r.position.x, r.position.y, r.size.x, 2.0), STONE_LIP)
-	draw_rect(Rect2(r.position.x, r.position.y + 2.0, r.size.x, 2.0), STONE_FACE)
-	draw_rect(Rect2(r.position.x, r.position.y, 1.5, r.size.y), STONE_EDGE)
-	draw_rect(Rect2(r.end.x - 1.5, r.position.y, 1.5, r.size.y), STONE_EDGE)
-	draw_rect(Rect2(r.position.x, r.end.y - 2.0, r.size.x, 2.0), STONE_EDGE)
+	draw_rect(Rect2(body.position.x, body.position.y, 1.5, vis_h), STONE_DEEP)
+	draw_rect(Rect2(body.end.x - 1.5, body.position.y, 1.5, vis_h), STONE_DEEP)
 
 
-func _draw_moss(top_center: Vector2) -> void:
-	# A little clump of glowing moss on a ledge edge.
-	draw_rect(Rect2(top_center.x - 5.0, top_center.y - 1.0, 10.0, 2.0), MOSS)
-	draw_rect(Rect2(top_center.x - 3.0, top_center.y - 3.0, 2.0, 2.0), MOSS * Color(1, 1, 1, 0.7))
-	draw_rect(Rect2(top_center.x + 2.0, top_center.y - 2.0, 2.0, 1.0), MOSS * Color(1, 1, 1, 0.7))
+## Stalactites + hanging vines across the ceiling.
+func _draw_ceiling() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 99
+	var x := 24.0
+	while x < bounds.size.x - 24.0:
+		var w := rng.randf_range(7.0, 16.0)
+		var slen := rng.randf_range(16.0, 58.0)
+		draw_colored_polygon(PackedVector2Array([
+			Vector2(x - w, 14.0), Vector2(x + w, 14.0), Vector2(x, 14.0 + slen)]), STAL)
+		draw_colored_polygon(PackedVector2Array([
+			Vector2(x - w * 0.4, 14.0), Vector2(x + w * 0.2, 14.0), Vector2(x, 14.0 + slen * 0.7)]), STAL_HI)
+		if rng.randf() > 0.6:
+			var vx := x + rng.randf_range(-6.0, 6.0)
+			var vlen := rng.randf_range(14.0, 40.0)
+			draw_line(Vector2(vx, 16.0), Vector2(vx + rng.randf_range(-3.0, 3.0), 16.0 + vlen), MOSS_D, 1.0)
+			draw_circle(Vector2(vx, 16.0 + vlen), 1.6, MOSS_L)
+		x += rng.randf_range(26.0, 48.0)
 
 
 func _draw_crate(r: Rect2) -> void:
