@@ -48,6 +48,14 @@ const OBJECTS: Array[Rect2] = [
 	Rect2(902, 168, 30, 32),
 ]
 
+# Spike hazards (legacy defences) — damage the player on touch.
+const HAZARDS: Array[Rect2] = [
+	Rect2(600, 226, 56, 26),
+	Rect2(1044, 226, 56, 26),
+]
+const SPIKE := Color(0.56, 0.59, 0.68)
+const SPIKE_DK := Color(0.28, 0.3, 0.38)
+
 # Top edges that get a moss accent.
 const MOSS_SPOTS := [Vector2(226, 200), Vector2(596, 178), Vector2(1078, 160), Vector2(1240, 124)]
 
@@ -60,8 +68,30 @@ func _ready() -> void:
 		_make_body(r)
 	for r in OBJECTS:
 		_make_body(r)
+	for r in HAZARDS:
+		_make_hazard(r)
 	queue_redraw()
 	call_deferred("_setup_player")
+
+
+func _make_hazard(r: Rect2) -> void:
+	var a := Area2D.new()
+	a.collision_layer = 0
+	a.collision_mask = 2   # player hurtbox
+	var cs := CollisionShape2D.new()
+	var shape := RectangleShape2D.new()
+	shape.size = r.size
+	cs.shape = shape
+	cs.position = r.position + r.size * 0.5
+	a.add_child(cs)
+	add_child(a)
+	a.area_entered.connect(_on_hazard_touched)
+
+
+func _on_hazard_touched(area: Area2D) -> void:
+	var b := area.get_parent()
+	if b and b.is_in_group("player") and b.has_method("receive_attack"):
+		b.receive_attack(null, 1)   # half a heart, with i-frames
 
 
 func _make_body(r: Rect2) -> void:
@@ -107,6 +137,20 @@ func _draw() -> void:
 		_draw_moss(spot)
 	for r in OBJECTS:
 		_draw_crate(r)
+	for r in HAZARDS:
+		_draw_spikes(r)
+
+
+func _draw_spikes(r: Rect2) -> void:
+	# Short spikes at the bottom of the (taller, invisible) hazard zone.
+	var base_y := r.end.y
+	var tip_y := r.end.y - 11.0
+	var x := r.position.x
+	while x < r.end.x - 1.0:
+		draw_colored_polygon(PackedVector2Array([
+			Vector2(x, base_y), Vector2(x + 8.0, base_y), Vector2(x + 4.0, tip_y)]), SPIKE)
+		draw_line(Vector2(x + 4.0, tip_y), Vector2(x + 6.0, base_y), SPIKE_DK, 1.0)
+		x += 8.0
 
 
 func _draw_stone(r: Rect2) -> void:
