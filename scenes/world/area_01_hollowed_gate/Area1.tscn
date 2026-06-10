@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3]
+[gd_scene load_steps=24 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1Terrain.gd" id="1_terrain"]
 [ext_resource type="Texture2D" path="res://assets/environment/caverns/background.png" id="2_bg"]
@@ -18,6 +18,7 @@
 [ext_resource type="Script" path="res://scenes/decor/BgArchitecture.gd" id="16_arch"]
 [ext_resource type="PackedScene" path="res://scenes/npc/LoreNPC.tscn" id="17_lore"]
 [ext_resource type="PackedScene" path="res://scenes/ui/DialogueBox.tscn" id="18_dlg"]
+[ext_resource type="PackedScene" path="res://scenes/ui/LocationTitle.tscn" id="19_loc"]
 
 [sub_resource type="Gradient" id="grad_light"]
 offsets = PackedFloat32Array(0, 1)
@@ -221,3 +222,5 @@ mouse_filter = 2
 [node name="HUD" parent="." instance=ExtResource("6_hud")]
 
 [node name="DialogueBox" parent="." instance=ExtResource("18_dlg")]
+
+[node name="LocationTitle" parent="." instance=ExtResource("19_loc")]

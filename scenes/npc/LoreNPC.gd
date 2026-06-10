@@ -4,9 +4,12 @@ class_name LoreNPC
 ## up, press E to read each line in the dialogue band, looping when finished.
 
 @export var lines: PackedStringArray = [""]
+@export var location_name := "THE HOLLOWED GATE"
+@export var location_subtitle := "CAIRN"
 
 var _near := false
 var _idx := 0
+var _revealed := false
 var _box
 
 @onready var _prompt: Label = get_node_or_null("Prompt")
@@ -55,6 +58,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		var box = _box_ref()
 		if box == null:
 			return
+		# First time we talk: reveal where we are.
+		if not _revealed:
+			_revealed = true
+			var title = get_tree().get_first_node_in_group("location_title")
+			if title and title.has_method("reveal"):
+				title.reveal(location_name, location_subtitle)
 		if _idx < lines.size():
 			box.show_text(lines[_idx])
 			_idx += 1

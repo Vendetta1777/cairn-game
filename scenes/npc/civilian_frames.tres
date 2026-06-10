@@ -1,0 +1,67 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/npc/civilian.png" id="1_jd1a8"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ptpd6"]
+atlas = ExtResource("1_jd1a8")
+region = Rect2(0, 0, 39, 53)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7hh48"]
+atlas = ExtResource("1_jd1a8")
+region = Rect2(39, 0, 39, 53)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r3ngr"]
+atlas = ExtResource("1_jd1a8")
+region = Rect2(78, 0, 39, 53)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cbvr1"]
+atlas = ExtResource("1_jd1a8")
+region = Rect2(117, 0, 39, 53)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4yab6"]
+atlas = ExtResource("1_jd1a8")
+region = Rect2(156, 0, 39, 53)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_oru1a"]
+atlas = ExtResource("1_jd1a8")
+region = Rect2(195, 0, 39, 53)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4bt5l"]
+atlas = ExtResource("1_jd1a8")
+region = Rect2(234, 0, 39, 53)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vl8ds"]
+atlas = ExtResource("1_jd1a8")
+region = Rect2(273, 0, 39, 53)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ptpd6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7hh48")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r3ngr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cbvr1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4yab6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_oru1a")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4bt5l")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vl8ds")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 6.0
+}]

@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scenes/npc/LoreNPC.gd" id="1_lore"]
-[ext_resource type="SpriteFrames" path="res://scenes/npc/guard_frames.tres" id="2_frames"]
+[ext_resource type="SpriteFrames" path="res://scenes/npc/civilian_frames.tres" id="2_frames"]
 
 [sub_resource type="Gradient" id="grad"]
 offsets = PackedFloat32Array(0, 1)
@@ -30,9 +30,9 @@ texture = SubResource("tex")
 texture_scale = 1.1
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
-position = Vector2(0, -30)
-scale = Vector2(0.8, 0.8)
-modulate = Color(0.5, 0.68, 1.0, 0.74)
+position = Vector2(0, -19)
+scale = Vector2(0.78, 0.78)
+modulate = Color(0.56, 0.7, 1.0, 0.78)
 sprite_frames = ExtResource("2_frames")
 animation = &"idle"
 autoplay = "idle"
