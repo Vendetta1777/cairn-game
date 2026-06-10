@@ -6,6 +6,7 @@ class_name LoreNPC
 @export var lines: PackedStringArray = [""]
 @export var location_name := "THE HOLLOWED GATE"
 @export var location_subtitle := "CAIRN"
+@export var reveals_location := true
 
 var _near := false
 var _idx := 0
@@ -59,7 +60,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if box == null:
 			return
 		# First time we talk: reveal where we are.
-		if not _revealed:
+		if not _revealed and reveals_location:
 			_revealed = true
 			var title = get_tree().get_first_node_in_group("location_title")
 			if title and title.has_method("reveal"):

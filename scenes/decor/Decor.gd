@@ -16,18 +16,22 @@ const TEX_WEB := preload("res://assets/decor/web.png")
 # (x, surface_y). Curated: torches light the PATH at key landing spots; crystals
 # mark a few landmarks; rocks cluster at platform bases. Less, but purposeful.
 const TORCHES := [
-	Vector2(110, 252),    # start, lights the entrance
-	Vector2(700, 140),    # the high mid platform
-	Vector2(1030, 160),   # the climb
-	Vector2(1340, 200),   # near the checkpoint
+	Vector2(130, 252),    # intro entrance
+	Vector2(700, 252),    # intro
+	Vector2(1380, 158),   # bats platform
+	Vector2(1700, 252),   # by the NPC
+	Vector2(2150, 168),   # crawler climb
+	Vector2(2620, 200),   # near the checkpoint
 ]
 const CRYSTALS := [
-	Vector2(70, 252), Vector2(595, 178), Vector2(1210, 124), Vector2(905, 200),
+	Vector2(70, 252), Vector2(640, 150), Vector2(1060, 188),
+	Vector2(1620, 184), Vector2(2150, 168), Vector2(2680, 200),
 ]
 const ROCKS := [
-	Vector2(300, 252), Vector2(325, 252), Vector2(660, 140), Vector2(990, 252),
+	Vector2(400, 252), Vector2(430, 252), Vector2(1150, 252),
+	Vector2(2050, 252), Vector2(2510, 252),
 ]
-const WEBS := [40.0, 720.0, 1400.0]   # corners only
+const WEBS := [40.0, 1400.0, 2760.0]   # corners + a couple along the span
 
 var _light_tex: GradientTexture2D
 var _crystal_lights: Array = []

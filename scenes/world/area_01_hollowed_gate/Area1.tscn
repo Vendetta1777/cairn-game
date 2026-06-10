@@ -56,14 +56,14 @@ texture_repeat = 1
 centered = false
 texture = ExtResource("2_bg")
 region_enabled = true
-region_rect = Rect2(0, 0, 1440, 288)
+region_rect = Rect2(0, 0, 2800, 288)
 
 [node name="Walls" type="Sprite2D" parent="Background"]
 texture_repeat = 1
 centered = false
 texture = ExtResource("3_walls")
 region_enabled = true
-region_rect = Rect2(0, 0, 1440, 288)
+region_rect = Rect2(0, 0, 2800, 288)
 
 [node name="BgArchitecture" type="Node2D" parent="."]
 script = ExtResource("16_arch")
@@ -83,70 +83,75 @@ script = ExtResource("11_decor")
 [node name="Decor" type="Node2D" parent="."]
 
 [node name="Moss1" type="PointLight2D" parent="Decor"]
-position = Vector2(226, 198)
+position = Vector2(1100, 188)
 color = Color(0.32, 0.78, 0.74, 1)
 energy = 0.55
 texture = SubResource("tex_light")
 texture_scale = 0.8
 
 [node name="Moss2" type="PointLight2D" parent="Decor"]
-position = Vector2(596, 176)
+position = Vector2(2030, 200)
 color = Color(0.32, 0.78, 0.74, 1)
 energy = 0.5
 texture = SubResource("tex_light")
 texture_scale = 0.75
 
 [node name="Moss3" type="PointLight2D" parent="Decor"]
-position = Vector2(1078, 158)
+position = Vector2(2560, 176)
 color = Color(0.32, 0.78, 0.74, 1)
 energy = 0.5
 texture = SubResource("tex_light")
 texture_scale = 0.8
 
 [node name="RemnantStone" parent="Decor" instance=ExtResource("8_stone")]
-position = Vector2(1363, 200)
+position = Vector2(2720, 200)
 
 [node name="Keeper" parent="Decor" instance=ExtResource("9_keeper")]
-position = Vector2(1090, 252)
+position = Vector2(1700, 252)
 
 [node name="LoreNPC" parent="Decor" instance=ExtResource("17_lore")]
 position = Vector2(110, 252)
+
+[node name="LoreNPC2" parent="Decor" instance=ExtResource("17_lore")]
+position = Vector2(560, 252)
+reveals_location = false
+lines = PackedStringArray("Strange, to see one walk in still armed. You will need that blade - strike, and the dark gives ground.", "Mind which way you face. Aim your strike up, down, or ahead; things here come from every side.", "And when a foe lunges - strike at the very instant it does. Turn the blow aside, and the shadow rewards you.", "The standing stones remember you. Touch one, and death only sends you back to where you last knelt.", "Some of us still linger, and still trade. Bring what the fallen leave behind, and we can make you stronger.")
 
 [node name="Player" parent="." instance=ExtResource("4_player")]
 position = Vector2(50, 215)
 
 [node name="Bat1" parent="." instance=ExtResource("5_bat")]
-position = Vector2(640, 120)
+position = Vector2(1080, 140)
 
 [node name="Bat2" parent="." instance=ExtResource("5_bat")]
-position = Vector2(660, 110)
+position = Vector2(1300, 110)
 
 [node name="Bat3" parent="." instance=ExtResource("5_bat")]
-position = Vector2(1010, 108)
+position = Vector2(1420, 150)
 
 [node name="Bat4" parent="." instance=ExtResource("5_bat")]
-position = Vector2(1250, 92)
+position = Vector2(1180, 170)
 
 [node name="Crawler1" parent="." instance=ExtResource("7_crawler")]
-position = Vector2(800, 232)
+position = Vector2(2060, 232)
 
 [node name="Crawler2" parent="." instance=ExtResource("7_crawler")]
-position = Vector2(1010, 232)
+position = Vector2(2290, 232)
 
 [node name="Crawler3" parent="." instance=ExtResource("7_crawler")]
-position = Vector2(1200, 232)
+position = Vector2(2500, 232)
 
 [node name="Brute1" parent="." instance=ExtResource("10_brute")]
-position = Vector2(880, 225)
+position = Vector2(2650, 225)
 
 [node name="Dust" type="CPUParticles2D" parent="."]
-position = Vector2(720, 24)
+position = Vector2(1400, 24)
 amount = 70
 lifetime = 9.0
 preprocess = 5.0
 lifetime_randomness = 0.4
 emission_shape = 3
-emission_rect_extents = Vector2(700, 8)
+emission_rect_extents = Vector2(1380, 8)
 direction = Vector2(0, 1)
 spread = 25.0
 gravity = Vector2(0, 5)
@@ -157,13 +162,13 @@ scale_amount_max = 1.6
 color = Color(0.72, 0.76, 0.88, 0.16)
 
 [node name="Spores" type="CPUParticles2D" parent="."]
-position = Vector2(720, 240)
+position = Vector2(1400, 240)
 amount = 60
 lifetime = 11.0
 preprocess = 6.0
 lifetime_randomness = 0.5
 emission_shape = 3
-emission_rect_extents = Vector2(700, 40)
+emission_rect_extents = Vector2(1380, 40)
 direction = Vector2(0, -1)
 spread = 22.0
 gravity = Vector2(0, -4)
@@ -192,7 +197,7 @@ scale_amount_max = 1.0
 color = Color(0.5, 0.72, 0.92, 0.6)
 
 [node name="DripB" type="CPUParticles2D" parent="."]
-position = Vector2(905, 36)
+position = Vector2(1740, 36)
 amount = 3
 lifetime = 2.1
 lifetime_randomness = 0.6

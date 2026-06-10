@@ -6,7 +6,7 @@ extends Node2D
 ##   - crimson kingdom BANNERS, swaying (the deep was a civilisation)
 ## Redraws each frame so everything sways.
 
-@export var bounds := Rect2(0, 0, 1440, 288)
+@export var bounds := Rect2(0, 0, 2800, 288)
 
 const CEIL := 34.0
 const VINE_FAR := Color(0.08, 0.16, 0.11)
@@ -21,8 +21,8 @@ const CRIMSON_HI := Color(0.62, 0.19, 0.21)
 const TRIM := Color(0.72, 0.58, 0.3)
 const EMBLEM := Color(0.82, 0.7, 0.42)
 
-const WORM_SPOTS := [240.0, 620.0, 1000.0, 1340.0]
-const BANNER_SPOTS := [200.0, 720.0, 1240.0]
+const WORM_SPOTS := [300.0, 900.0, 1500.0, 2100.0, 2600.0]
+const BANNER_SPOTS := [400.0, 1200.0, 2000.0, 2700.0]
 
 var _far: Array = []
 var _near: Array = []

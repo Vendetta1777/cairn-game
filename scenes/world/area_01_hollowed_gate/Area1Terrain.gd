@@ -33,36 +33,41 @@ const CRATE_DK := Color(0.2, 0.13, 0.08)
 const CRATE_LIP := Color(0.46, 0.34, 0.21)
 const CRATE_BOLT := Color(0.55, 0.5, 0.42)
 
-@export var bounds := Rect2(0, 0, 1440, 288)
+@export var bounds := Rect2(0, 0, 2800, 288)
 @export var fall_damage_halves := 2   # one full heart when you fall in a pit
 
+# Paced left->right: a long SAFE intro floor (story, no pits/enemies), then
+# pits + platforming only once the player has learned the ropes.
 const TERRAIN: Array[Rect2] = [
-	Rect2(0, 0, 1440, 14),       # ceiling
-	Rect2(0, 0, 14, 288),        # left wall
-	Rect2(1426, 0, 14, 288),     # right wall
-	Rect2(14, 252, 330, 36),     # floor 1
-	Rect2(420, 252, 280, 36),    # floor 2
-	Rect2(774, 252, 652, 36),    # floor 3
-	Rect2(150, 200, 84, 14),
-	Rect2(360, 196, 64, 14),
-	Rect2(520, 178, 84, 14),
-	Rect2(660, 140, 76, 14),
-	Rect2(716, 196, 64, 14),
-	Rect2(840, 200, 96, 14),
-	Rect2(980, 160, 100, 14),
-	Rect2(1140, 124, 110, 14),
-	Rect2(1300, 200, 126, 52),   # raised step
+	Rect2(0, 0, 2800, 14),        # ceiling
+	Rect2(0, 0, 14, 288),         # left wall
+	Rect2(2786, 0, 14, 288),      # right wall
+	# floors — continuous & safe through the intro/bats/NPC, pits come later
+	Rect2(14, 252, 1900, 36),     # x14..1914  (intro + bats + NPC, NO pits)
+	Rect2(2000, 252, 360, 36),    # x2000..2360 (pit before)
+	Rect2(2440, 252, 346, 36),    # x2440..2786 (pit before; checkpoint)
+	# spaced platforms
+	Rect2(330, 176, 120, 16),     # intro (decorative, reachable)
+	Rect2(640, 150, 130, 16),     # intro
+	Rect2(1060, 188, 130, 16),    # bats
+	Rect2(1320, 158, 130, 16),    # bats
+	Rect2(1620, 184, 120, 16),    # NPC area
+	Rect2(1958, 198, 96, 16),     # cross pit 1
+	Rect2(2150, 168, 120, 16),    # crawler climb
+	Rect2(2398, 198, 96, 16),     # cross pit 2
+	Rect2(2560, 176, 120, 16),    # final stretch
+	Rect2(2680, 200, 106, 52),    # raised step to the checkpoint
 ]
 
 const OBJECTS: Array[Rect2] = [
-	Rect2(262, 220, 28, 32),
-	Rect2(902, 168, 30, 32),
+	Rect2(820, 220, 28, 32),
+	Rect2(2240, 220, 30, 32),
 ]
 
-# Spike hazards (legacy defences) — damage the player on touch.
+# Spike hazards — only in the later (post-intro) sections.
 const HAZARDS: Array[Rect2] = [
-	Rect2(600, 226, 56, 26),
-	Rect2(1044, 226, 56, 26),
+	Rect2(2080, 226, 56, 26),
+	Rect2(2500, 226, 56, 26),
 ]
 const SPIKE := Color(0.56, 0.59, 0.68)
 const SPIKE_DK := Color(0.28, 0.3, 0.38)

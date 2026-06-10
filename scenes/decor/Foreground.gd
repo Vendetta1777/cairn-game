@@ -3,7 +3,7 @@ extends Node2D
 ## empty top, subtle corner rock masses, a couple of foreground vines, and a
 ## faint bottom fog. Kept restrained so it frames the scene, not blocks it.
 
-@export var bounds := Rect2(0, 0, 1440, 288)
+@export var bounds := Rect2(0, 0, 2800, 288)
 
 const FG_ROCK := Color(0.02, 0.025, 0.04)
 const FG_VINE := Color(0.05, 0.1, 0.07, 0.8)

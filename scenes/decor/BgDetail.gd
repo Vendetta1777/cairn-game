@@ -4,7 +4,7 @@ extends Node2D
 ## couple of soft light shafts, a few PURPOSEFUL glowing crystal clusters by
 ## landmarks, and a handful of feature vines. The top is left mostly empty/dark.
 
-@export var bounds := Rect2(0, 0, 1440, 288)
+@export var bounds := Rect2(0, 0, 2800, 288)
 
 const FAR := Color(0.125, 0.135, 0.2)     # hazy, recedes
 const NEAR := Color(0.07, 0.08, 0.12)     # darker, closer
@@ -17,9 +17,9 @@ const VINE_LEAF := Color(0.22, 0.42, 0.3)
 const MOSS := Color(0.15, 0.32, 0.27, 0.45)
 
 # Crystal clusters placed against the wall near landmarks (x, y).
-const CRYSTAL_SPOTS := [Vector2(250, 150), Vector2(770, 100), Vector2(1190, 95)]
+const CRYSTAL_SPOTS := [Vector2(450, 150), Vector2(1300, 100), Vector2(2100, 110), Vector2(2600, 95)]
 # Feature vines hanging from the ceiling at a few deliberate spots.
-const VINE_SPOTS := [Vector2(120, 14), Vector2(540, 14), Vector2(905, 14), Vector2(1280, 14)]
+const VINE_SPOTS := [Vector2(220, 14), Vector2(900, 14), Vector2(1700, 14), Vector2(2400, 14)]
 
 
 func _draw() -> void:
