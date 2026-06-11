@@ -139,6 +139,17 @@ position = Vector2(1120, 160)
 [node name="Bat4" parent="." instance=ExtResource("5_bat")]
 position = Vector2(1700, 150)
 
+[node name="MoverBats" parent="." instance=ExtResource("30_mp")]
+position = Vector2(1000, 246)
+travel = Vector2(112, 0)
+period = 3.4
+
+[node name="MoverLift" parent="." instance=ExtResource("30_mp")]
+position = Vector2(845, 244)
+travel = Vector2(0, -104)
+period = 4.0
+size = Vector2(58, 14)
+
 [node name="MovingPlatform" parent="." instance=ExtResource("30_mp")]
 position = Vector2(2300, 190)
 travel = Vector2(160, 0)

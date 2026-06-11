@@ -26,6 +26,25 @@ func _on_area_entered(area: Area2D) -> void:
 	var body := area.get_parent()
 	if body and body.is_in_group("player"):
 		_activate()
+		_maybe_heal(body)
+
+
+## A remnant's small mercy: if you arrive hurt and down to 2 hearts or fewer,
+## it restores one heart. (Only when you've actually lost health.)
+func _maybe_heal(body: Node) -> void:
+	var stats = body.get_node_or_null("Stats")
+	if stats == null:
+		return
+	if stats.health < stats.max_health and stats.health <= 4:   # 4 halves = 2 hearts
+		stats.heal(2)                                            # +1 heart
+		# A warm restorative pulse on the stone's light.
+		if _light:
+			var c := _light.color
+			var tw := create_tween()
+			tw.tween_property(_light, "color", Color(0.6, 1.0, 0.7), 0.15)
+			tw.tween_property(_light, "energy", 3.0, 0.15)
+			tw.tween_property(_light, "energy", 2.0 if _active else 1.0, 0.5)
+			tw.parallel().tween_property(_light, "color", c, 0.5)
 
 
 func _activate() -> void:

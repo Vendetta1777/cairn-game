@@ -41,6 +41,7 @@ const STATE_ANIM := {
 	"dash":   "dash",
 	"crouch": "crouch",
 	"crawl":  "crouch",
+	"wall_slide": "jump",
 	"hurt":   "hurt",
 	"dead":   "hurt",
 }
@@ -62,6 +63,8 @@ var _trail_t := 0.0
 var _attack_t := 0.0
 var _attack_facing := 1
 var _attack_mult := 1.0
+var _was_wall_sliding := false
+var _wall_dust_t := 0.0
 
 
 func _ready() -> void:
@@ -76,6 +79,8 @@ func _ready() -> void:
 		_state = _controller.get_current_state()
 		_controller.state_changed.connect(_on_state_changed)
 		_controller.dashed.connect(func(): _flash = FLASH_DASH)
+		if _controller.has_signal("jumped"):
+			_controller.jumped.connect(_on_jumped)
 	var combat := get_node_or_null("../Combat")
 	if combat and combat.has_signal("attacked"):
 		combat.attacked.connect(_on_attacked)
@@ -138,9 +143,21 @@ func _process(delta: float) -> void:
 		atk_off = Vector2(_attack_facing * swing_lunge * _attack_mult * c, swing_dip * fwd)
 		atk_scale = Vector2(1.0 + swing_thrust.x * fwd, 1.0 - swing_thrust.y * fwd)
 
+	# Wall-slide pose: cling toward the wall with a small lean, and trail dust
+	# down the wall face.
+	var lean := 0.0
+	if _state == "wall_slide":
+		var wall_dir: int = _controller.get_facing() if _controller else 1
+		lean = wall_dir * 0.14
+		_wall_dust_t -= delta
+		if _wall_dust_t <= 0.0:
+			_spawn_wall_dust(wall_dir)
+			_wall_dust_t = 0.05
+	_was_wall_sliding = _state == "wall_slide"
+
 	_sprite.scale = _cur_scale * atk_scale
 	_sprite.position = _cur_pos + atk_off
-	_sprite.rotation = 0.0
+	_sprite.rotation = lean
 
 	# Dash leaves a fading shadow afterimage trail.
 	if _state == "dash":
@@ -174,6 +191,34 @@ func _spawn_ghost() -> void:
 	var tw := ghost.create_tween()
 	tw.tween_property(ghost, "modulate:a", 0.0, trail_fade)
 	tw.tween_callback(ghost.queue_free)
+
+
+## A jump while clinging = wall jump: kick a burst of dust off the wall.
+func _on_jumped() -> void:
+	if _was_wall_sliding:
+		var wall_dir: int = _controller.get_facing() if _controller else 1
+		# facing has already flipped away from the wall, so dust goes off the
+		# opposite side (where the wall was).
+		for i in range(5):
+			_spawn_wall_dust(-wall_dir, 1.0 + i * 0.2)
+
+
+## A small fading puff of dust on the wall side, drifting down (or out, on a jump).
+func _spawn_wall_dust(wall_dir: int, spread := 0.0) -> void:
+	if _sprite == null:
+		return
+	var puff := Polygon2D.new()
+	var s := 2.2
+	puff.polygon = PackedVector2Array([Vector2(0, -s), Vector2(s, 0), Vector2(0, s), Vector2(-s, 0)])
+	puff.color = Color(0.62, 0.66, 0.78, 0.5)
+	var host: Node = _controller.get_parent() if _controller else get_parent()
+	host.add_child(puff)
+	puff.global_position = _sprite.global_position + Vector2(wall_dir * 7.0, 6.0 + randf() * 6.0)
+	var drift := Vector2(wall_dir * (4.0 + spread * 8.0) + randf_range(-3, 3), 10.0 + randf() * 8.0)
+	var tw := puff.create_tween().set_parallel(true)
+	tw.tween_property(puff, "global_position", puff.global_position + drift, 0.35)
+	tw.tween_property(puff, "modulate:a", 0.0, 0.35)
+	tw.chain().tween_callback(puff.queue_free)
 
 
 func _on_state_changed(new_state: String) -> void:

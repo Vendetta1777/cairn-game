@@ -44,25 +44,29 @@ const TERRAIN: Array[Rect2] = [
 	Rect2(3686, 0, 14, 288),      # right wall (behind the threshold chamber)
 	# floors — safe intro/bats, then a long bottomless gauntlet, then the arena
 	Rect2(14, 252, 720, 36),      # INTRO (safe) x14..734
-	Rect2(800, 252, 380, 36),     # BATS x800..1180
+	Rect2(800, 252, 180, 36),     # BATS-A x800..980
+	Rect2(1090, 252, 90, 36),     # BATS-B x1090..1180 (a mover bridges 980..1090)
 	Rect2(1240, 252, 180, 36),    # pre-gauntlet ledge (checkpoint) x1240..1420
 	Rect2(2660, 252, 1026, 36),   # checkpoint + boss arena + gate + threshold
-	# intro decorative platforms (reachable)
+	# intro platforms (reachable, for early hopping)
 	Rect2(330, 212, 120, 16),
 	Rect2(560, 206, 110, 16),
-	# bats platforms
+	Rect2(440, 168, 90, 14),      # higher hop, chained off the 330 platform
+	# bats platforms + a vantage reached by riding the lift
 	Rect2(880, 210, 100, 16),
 	Rect2(1030, 196, 90, 16),
+	Rect2(840, 132, 96, 16),      # bats vantage (ride the vertical lift up to it)
 	# --- PARKOUR GAUNTLET over the pit (1420..2660): miss a jump and you fall ---
 	Rect2(1460, 224, 86, 16),     # hop 1
 	Rect2(1600, 210, 78, 16),     # hop 2
 	Rect2(1730, 224, 78, 16),     # hop 3
-	Rect2(1860, 232, 92, 16),     # approach to the chimney
-	# wall-jump chimney: stand on the base, climb the gap, exit up-right
-	Rect2(1962, 238, 84, 16),     # chimney base (stand here to start the climb)
-	Rect2(1962, 138, 14, 78),     # left wall (headroom beneath it)
-	Rect2(2032, 138, 14, 78),     # right wall
-	Rect2(2046, 142, 92, 16),     # top exit ledge (wall-jump off to reach it)
+	Rect2(1850, 232, 100, 16),    # approach to the chimney
+	# wall-jump chimney: the walls hang high so there's room to stand on the base
+	# and jump up into the gap; kick between them to climb, exit up-right
+	Rect2(1950, 238, 112, 14),    # chimney base (big headroom beneath the walls)
+	Rect2(1958, 120, 14, 70),     # left wall  (y120..190 — 48px clearance to base)
+	Rect2(2032, 120, 14, 70),     # right wall (y120..190)
+	Rect2(2046, 124, 100, 16),    # top exit ledge (wall-jump off to reach it)
 	# descending route: a moving platform bridges the gap (see Area1.tscn)
 	Rect2(2200, 158, 80, 16),     # ledge before the moving platform
 	Rect2(2480, 182, 90, 16),     # landing after it
@@ -76,6 +80,7 @@ const OBJECTS: Array[Rect2] = [
 
 # Spike hazards lining the gauntlet pits — a fall hurts before it respawns you.
 const HAZARDS: Array[Rect2] = [
+	Rect2(985, 262, 100, 26),     # spikes under the bats-pit lift gap
 	Rect2(1440, 262, 240, 26),    # spikes under the first hops
 	Rect2(1760, 262, 220, 26),    # spikes under the shaft approach
 	Rect2(2300, 262, 150, 26),    # spikes under the moving-platform gap
