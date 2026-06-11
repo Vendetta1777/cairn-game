@@ -38,58 +38,64 @@ const CRATE_BOLT := Color(0.55, 0.5, 0.42)
 
 # Paced left->right: a long SAFE intro floor (story, no pits/enemies), then
 # pits + platforming only once the player has learned the ropes.
+# A learning cave: each section teaches ONE new mechanic, in order. The pits
+# between sections are bottomless (a miss = a fall) and lined with spikes. Moving
+# platforms live ONLY in open pits with no static platform in their path, so they
+# never clip a fixed ledge.
 const TERRAIN: Array[Rect2] = [
 	Rect2(0, 0, 3700, 14),        # ceiling
 	Rect2(0, 0, 14, 288),         # left wall
-	Rect2(3686, 0, 14, 288),      # right wall (behind the threshold chamber)
-	# floors — safe intro/bats, then a long bottomless gauntlet, then the arena
-	Rect2(14, 252, 720, 36),      # INTRO (safe) x14..734
-	Rect2(800, 252, 180, 36),     # BATS-A x800..980
-	Rect2(1090, 252, 90, 36),     # BATS-B x1090..1180 (a mover bridges 980..1090)
-	Rect2(1240, 252, 180, 36),    # pre-gauntlet ledge (checkpoint) x1240..1420
-	Rect2(2660, 252, 1026, 36),   # checkpoint + boss arena + gate + threshold
-	# intro platforms (reachable, for early hopping)
-	Rect2(330, 212, 120, 16),
-	Rect2(560, 206, 110, 16),
-	Rect2(440, 168, 90, 14),      # higher hop, chained off the 330 platform
-	# bats platforms + a vantage reached by riding the lift
-	Rect2(880, 210, 100, 16),
-	Rect2(1030, 196, 90, 16),
-	Rect2(840, 132, 96, 16),      # bats vantage (ride the vertical lift up to it)
-	# --- PARKOUR GAUNTLET over the pit (1420..2660): miss a jump and you fall ---
-	Rect2(1460, 224, 86, 16),     # hop 1
-	Rect2(1600, 210, 78, 16),     # hop 2
-	Rect2(1730, 224, 78, 16),     # hop 3
-	Rect2(1850, 232, 100, 16),    # approach to the chimney
-	# wall-jump chimney: the walls hang high so there's room to stand on the base
-	# and jump up into the gap; kick between them to climb, exit up-right
-	Rect2(1950, 238, 112, 14),    # chimney base (big headroom beneath the walls)
-	Rect2(1958, 120, 14, 70),     # left wall  (y120..190 — 48px clearance to base)
-	Rect2(2032, 120, 14, 70),     # right wall (y120..190)
-	Rect2(2046, 124, 100, 16),    # top exit ledge (wall-jump off to reach it)
-	# descending route: a moving platform bridges the gap (see Area1.tscn)
-	Rect2(2200, 158, 80, 16),     # ledge before the moving platform
-	Rect2(2480, 182, 90, 16),     # landing after it
-	Rect2(2590, 214, 86, 16),     # step down to the arena floor
+	Rect2(3686, 0, 14, 288),      # right wall
+
+	# S1 — THE WAKING (move + jump): safe ground, gentle hops
+	Rect2(14, 252, 686, 36),      # x14..700
+	Rect2(300, 210, 110, 16),     # gentle hop
+	Rect2(470, 180, 100, 16),     # higher hop
+
+	# S2 — THE ROOST (combat: bats)
+	Rect2(760, 252, 560, 36),     # x760..1320
+	Rect2(930, 205, 90, 16),
+	Rect2(1130, 198, 90, 16),
+
+	# S3 — THE GAPS (precise jumps over spikes): pit 1380..1900
+	Rect2(1320, 252, 60, 36),     # entry ledge (checkpoint) x1320..1380
+	Rect2(1410, 222, 72, 14),     # hop 1
+	Rect2(1540, 206, 66, 14),     # hop 2
+	Rect2(1670, 222, 66, 14),     # hop 3
+	Rect2(1800, 210, 72, 14),     # hop 4
+	Rect2(1900, 252, 90, 36),     # landing x1900..1990
+
+	# S4 — THE TIDES (moving platforms): pit 1990..2480, movers in Area1.tscn
+	Rect2(2240, 205, 80, 14),     # mid-pit rest (sits BETWEEN the two movers)
+	Rect2(2480, 252, 110, 36),    # landing x2480..2590
+
+	# S5 — THE ASCENT (wall jump): pit 2590..2900 with a climb-only chimney
+	Rect2(2624, 230, 56, 14),     # stepping stone over the pit
+	Rect2(2700, 238, 96, 14),     # chimney base (jump to it, then climb)
+	Rect2(2706, 120, 14, 70),     # left wall  (y120..190)
+	Rect2(2782, 120, 14, 70),     # right wall
+	Rect2(2796, 124, 110, 16),    # exit ledge -> drop into the arena
+
+	# S6 — THE BROOD (boss arena + gate + threshold)
+	Rect2(2900, 252, 786, 36),    # x2900..3686
 ]
 
 const OBJECTS: Array[Rect2] = [
-	Rect2(250, 220, 28, 32),      # intro crate
-	Rect2(660, 220, 28, 32),      # intro crate
+	Rect2(230, 220, 28, 32),      # S1 crate
+	Rect2(1020, 220, 28, 32),     # S2 crate
 ]
 
-# Spike hazards lining the gauntlet pits — a fall hurts before it respawns you.
+# Spike hazards lining the section pits — a fall hurts before it respawns you.
 const HAZARDS: Array[Rect2] = [
-	Rect2(985, 262, 100, 26),     # spikes under the bats-pit lift gap
-	Rect2(1440, 262, 240, 26),    # spikes under the first hops
-	Rect2(1760, 262, 220, 26),    # spikes under the shaft approach
-	Rect2(2300, 262, 150, 26),    # spikes under the moving-platform gap
+	Rect2(1380, 262, 520, 26),    # S3 — under the gap jumps
+	Rect2(1990, 262, 490, 26),    # S4 — under the moving platforms
+	Rect2(2590, 262, 310, 26),    # S5 — under the chimney climb
 ]
 const SPIKE := Color(0.56, 0.59, 0.68)
 const SPIKE_DK := Color(0.28, 0.3, 0.38)
 
 # Top edges that get a moss accent.
-const MOSS_SPOTS := [Vector2(390, 200), Vector2(930, 198), Vector2(1500, 214), Vector2(2110, 120)]
+const MOSS_SPOTS := [Vector2(355, 198), Vector2(975, 193), Vector2(1575, 194), Vector2(2850, 112)]
 
 var _player: Node2D
 var _spawn := Vector2.ZERO

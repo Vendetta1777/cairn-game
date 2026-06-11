@@ -16,6 +16,10 @@ var is_paused: bool = false
 var has_checkpoint: bool = false
 var checkpoint_position: Vector2 = Vector2.ZERO
 
+## Where to drop the player when the next scene loads — set by a Portal so you
+## arrive beside the destination's portal, not at the level start. null = none.
+var pending_spawn = null
+
 
 ## Called by a Remnant Stone when the player activates it.
 func set_checkpoint(position: Vector2) -> void:

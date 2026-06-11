@@ -7,6 +7,9 @@ extends Node2D
 @export_file("*.tscn") var target_scene: String = ""
 @export var label: String = "Descend"
 @export var glow_color: Color = Color(0.55, 0.7, 1.0)
+## Where the player should appear in the TARGET scene (so they arrive next to the
+## matching portal, not at the level start). Zero = use the scene's default spawn.
+@export var arrival_marker: Vector2 = Vector2.ZERO
 
 var _player_in := false
 var _t := 0.0
@@ -42,9 +45,11 @@ func _process(delta: float) -> void:
 	_t += delta
 	queue_redraw()
 	if _player_in and Input.is_action_just_pressed("interact") and target_scene != "":
-		# Persist before leaving.
+		# Persist before leaving, and tell the next scene where to drop the player.
 		SaveManager.autosave()
-		get_tree().change_scene_to_file(target_scene)
+		if arrival_marker != Vector2.ZERO:
+			GameManager.pending_spawn = arrival_marker
+		get_tree().call_deferred("change_scene_to_file", target_scene)
 
 
 func _draw() -> void:

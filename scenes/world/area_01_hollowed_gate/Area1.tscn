@@ -95,70 +95,72 @@ script = ExtResource("11_decor")
 [node name="Decor" type="Node2D" parent="."]
 
 [node name="Moss1" type="PointLight2D" parent="Decor"]
-position = Vector2(900, 210)
+position = Vector2(965, 205)
 color = Color(0.32, 0.78, 0.74, 1)
 energy = 0.55
 texture = SubResource("tex_light")
 texture_scale = 0.8
 
 [node name="Moss2" type="PointLight2D" parent="Decor"]
-position = Vector2(2046, 150)
+position = Vector2(2545, 220)
 color = Color(0.32, 0.78, 0.74, 1)
 energy = 0.5
 texture = SubResource("tex_light")
 texture_scale = 0.75
 
 [node name="Moss3" type="PointLight2D" parent="Decor"]
-position = Vector2(2950, 220)
+position = Vector2(3120, 220)
 color = Color(0.32, 0.78, 0.74, 1)
 energy = 0.5
 texture = SubResource("tex_light")
 texture_scale = 0.8
 
-[node name="CheckpointBoss" parent="Decor" instance=ExtResource("8_stone")]
-position = Vector2(2710, 252)
+[node name="CheckpointGaps" parent="Decor" instance=ExtResource("8_stone")]
+position = Vector2(1345, 252)
 
-[node name="CheckpointGauntlet" parent="Decor" instance=ExtResource("8_stone")]
-position = Vector2(1340, 252)
+[node name="CheckpointTides" parent="Decor" instance=ExtResource("8_stone")]
+position = Vector2(1945, 252)
+
+[node name="CheckpointAscent" parent="Decor" instance=ExtResource("8_stone")]
+position = Vector2(2545, 252)
+
+[node name="CheckpointBoss" parent="Decor" instance=ExtResource("8_stone")]
+position = Vector2(2950, 252)
 
 [node name="LoreNPC" parent="Decor" instance=ExtResource("17_lore")]
 position = Vector2(110, 252)
 
 [node name="Player" parent="." instance=ExtResource("4_player")]
 position = Vector2(50, 215)
+z_index = 1
 
 [node name="Bat1" parent="." instance=ExtResource("5_bat")]
-position = Vector2(900, 150)
+position = Vector2(880, 150)
 
 [node name="Bat2" parent="." instance=ExtResource("5_bat")]
-position = Vector2(1020, 120)
+position = Vector2(1030, 130)
 
 [node name="Bat3" parent="." instance=ExtResource("5_bat")]
-position = Vector2(1120, 160)
+position = Vector2(1180, 160)
 
 [node name="Bat4" parent="." instance=ExtResource("5_bat")]
-position = Vector2(1700, 150)
+position = Vector2(1270, 135)
 
-[node name="MoverBats" parent="." instance=ExtResource("30_mp")]
-position = Vector2(1000, 246)
-travel = Vector2(112, 0)
-period = 3.4
+[node name="MoverA" parent="." instance=ExtResource("30_mp")]
+position = Vector2(2080, 218)
+travel = Vector2(120, 0)
+period = 3.6
 
-[node name="MoverLift" parent="." instance=ExtResource("30_mp")]
-position = Vector2(845, 244)
-travel = Vector2(0, -104)
-period = 4.0
-size = Vector2(58, 14)
-
-[node name="MovingPlatform" parent="." instance=ExtResource("30_mp")]
-position = Vector2(2300, 190)
-travel = Vector2(160, 0)
-period = 4.4
+[node name="MoverB" parent="." instance=ExtResource("30_mp")]
+position = Vector2(2370, 213)
+travel = Vector2(110, 0)
+period = 3.6
+phase = 0.5
 
 [node name="MotherBat" parent="." instance=ExtResource("20_boss")]
-position = Vector2(3120, 110)
+position = Vector2(3180, 110)
 home_y = 110.0
-arena_left = 2760.0
+arena_left = 2920.0
 arena_right = 3400.0
 
 [node name="SealedGate" parent="." instance=ExtResource("21_gate")]
@@ -170,25 +172,42 @@ position = Vector2(3580, 252)
 target_scene = "res://scenes/world/sanctum/Sanctum.tscn"
 label = "Return to the Sanctum"
 glow_color = Color(0.6, 0.55, 0.95, 1)
+arrival_marker = Vector2(840, 232)
 
-[node name="BatsTrigger" type="Area2D" parent="." groups=["trigger"]]
-position = Vector2(800, 150)
+[node name="RoostTrigger" type="Area2D" parent="." groups=["trigger"]]
+position = Vector2(770, 150)
 script = ExtResource("22_trigger")
-objective = "Clear the gloom-bats"
+objective = "The Roost — strike bats with J, parry their dive with J"
 
-[node name="Shape" type="CollisionShape2D" parent="BatsTrigger"]
+[node name="Shape" type="CollisionShape2D" parent="RoostTrigger"]
 shape = SubResource("trigger_tall")
 
-[node name="GauntletTrigger" type="Area2D" parent="." groups=["trigger"]]
-position = Vector2(1410, 150)
+[node name="GapsTrigger" type="Area2D" parent="." groups=["trigger"]]
+position = Vector2(1350, 150)
 script = ExtResource("22_trigger")
-objective = "Cross the hollow — a fall is death"
+objective = "The Gaps — leap each ledge, spikes wait below"
 
-[node name="Shape" type="CollisionShape2D" parent="GauntletTrigger"]
+[node name="Shape" type="CollisionShape2D" parent="GapsTrigger"]
+shape = SubResource("trigger_tall")
+
+[node name="TidesTrigger" type="Area2D" parent="." groups=["trigger"]]
+position = Vector2(1995, 150)
+script = ExtResource("22_trigger")
+objective = "The Tides — ride the moving stones across"
+
+[node name="Shape" type="CollisionShape2D" parent="TidesTrigger"]
+shape = SubResource("trigger_tall")
+
+[node name="AscentTrigger" type="Area2D" parent="." groups=["trigger"]]
+position = Vector2(2600, 150)
+script = ExtResource("22_trigger")
+objective = "The Ascent — jump between the walls to climb"
+
+[node name="Shape" type="CollisionShape2D" parent="AscentTrigger"]
 shape = SubResource("trigger_tall")
 
 [node name="BossTrigger" type="Area2D" parent="." groups=["trigger"]]
-position = Vector2(2700, 150)
+position = Vector2(2915, 150)
 script = ExtResource("22_trigger")
 objective = "Slay the Brood Mother"
 engage_boss_path = NodePath("../MotherBat")
@@ -265,6 +284,7 @@ scale_amount_max = 1.0
 color = Color(0.5, 0.72, 0.92, 0.6)
 
 [node name="Foreground" type="Node2D" parent="."]
+z_index = 2
 script = ExtResource("13_foreground")
 
 [node name="Vignette" type="CanvasLayer" parent="."]

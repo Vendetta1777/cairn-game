@@ -16,26 +16,26 @@ const TEX_WEB := preload("res://assets/decor/web.png")
 # (x, surface_y). Curated: torches light the PATH at key landing spots; crystals
 # mark a few landmarks; rocks cluster at platform bases. Less, but purposeful.
 const TORCHES := [
-	Vector2(130, 252),    # intro entrance
-	Vector2(560, 206),    # intro platform
-	Vector2(850, 252),    # bats floor
-	Vector2(1340, 252),   # pre-gauntlet checkpoint
-	Vector2(2710, 252),   # boss checkpoint
-	Vector2(2900, 252),   # arena
+	Vector2(130, 252),    # S1 entrance
+	Vector2(470, 180),    # S1 platform
+	Vector2(850, 252),    # S2 roost
+	Vector2(1130, 198),   # S2 platform
+	Vector2(1345, 252),   # S3 checkpoint ledge
+	Vector2(2545, 252),   # S4 landing checkpoint
+	Vector2(2960, 252),   # S6 arena
 	Vector2(3360, 252),   # flanking the gate
-	Vector2(3540, 252),   # threshold chamber, by the portal
+	Vector2(3540, 252),   # threshold, by the portal
 	Vector2(3640, 252),   # threshold chamber
 ]
 const CRYSTALS := [
-	Vector2(70, 252), Vector2(330, 212), Vector2(880, 210),
-	Vector2(1030, 196), Vector2(2046, 142), Vector2(2980, 252),
-	Vector2(3300, 252),
+	Vector2(70, 252), Vector2(300, 210), Vector2(930, 205),
+	Vector2(2850, 124), Vector2(2980, 252), Vector2(3300, 252),
 ]
 const ROCKS := [
-	Vector2(250, 252), Vector2(660, 252), Vector2(1100, 252),
-	Vector2(2960, 252), Vector2(3240, 252), Vector2(3540, 252),
+	Vector2(230, 252), Vector2(1000, 252), Vector2(2960, 252),
+	Vector2(3240, 252), Vector2(3540, 252),
 ]
-const WEBS := [40.0, 720.0, 3460.0]   # corners + a couple along the span
+const WEBS := [40.0, 760.0, 3460.0]   # corners + a couple along the span
 
 var _light_tex: GradientTexture2D
 var _crystal_lights: Array = []

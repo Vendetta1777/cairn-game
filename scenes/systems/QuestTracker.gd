@@ -37,9 +37,11 @@ func has_flag(flag: String) -> bool:
 	return flags.get(flag, false)
 
 
-## A boss reports its death here; gates listen for the matching id.
+## A boss reports its death here; gates listen for the matching id. The flag is
+## mirrored into PlayerProgress (which is saved) so the kill sticks across saves.
 func report_boss_defeated(boss_id: String) -> void:
 	set_flag("boss_%s_dead" % boss_id, true)
+	PlayerProgress.set_flag("boss_%s_dead" % boss_id, true)
 	boss_defeated.emit(boss_id)
 
 

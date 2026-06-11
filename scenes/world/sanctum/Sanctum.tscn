@@ -82,6 +82,7 @@ position = Vector2(110, 215)
 position = Vector2(880, 252)
 target_scene = "res://scenes/world/area_01_hollowed_gate/Area1.tscn"
 label = "Descend"
+arrival_marker = Vector2(3540, 232)
 
 [node name="Vignette" type="CanvasLayer" parent="."]
 layer = 5

@@ -21,6 +21,13 @@ func _on_area_completed(_area_id: String) -> void:
 	visible = true
 	QuestTracker.set_objective("")   # clear the tracker
 	var tw := create_tween()
-	tw.tween_property(_dim, "color:a", 0.72, 1.0)
-	tw.parallel().tween_property(_title, "modulate:a", 1.0, 1.2).set_delay(0.4)
-	tw.parallel().tween_property(_sub, "modulate:a", 1.0, 1.2).set_delay(0.9)
+	# Fade in...
+	tw.tween_property(_dim, "color:a", 0.66, 1.0)
+	tw.parallel().tween_property(_title, "modulate:a", 1.0, 1.2)
+	tw.parallel().tween_property(_sub, "modulate:a", 1.0, 1.2)
+	# ...hold, then fade away on its own (~4s total).
+	tw.chain().tween_interval(1.8)
+	tw.chain().tween_property(_dim, "color:a", 0.0, 1.0)
+	tw.parallel().tween_property(_title, "modulate:a", 0.0, 1.0)
+	tw.parallel().tween_property(_sub, "modulate:a", 0.0, 1.0)
+	tw.chain().tween_callback(func() -> void: visible = false)

@@ -26,8 +26,8 @@ func _ready() -> void:
 	QuestTracker.boss_defeated.connect(_on_boss_defeated)
 	_zone.area_entered.connect(_on_area)
 	_make_blocker()
-	# Already cleared (e.g. respawn after the fight)? Start open.
-	if QuestTracker.has_flag("boss_%s_dead" % boss_id):
+	# Already cleared (this session OR a saved one)? Start open.
+	if QuestTracker.has_flag("boss_%s_dead" % boss_id) or PlayerProgress.has_flag("boss_%s_dead" % boss_id):
 		_sealed = false
 		_open_amt = 1.0
 		_ward.energy = 0.0
