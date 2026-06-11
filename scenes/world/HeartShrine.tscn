@@ -1,0 +1,50 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scenes/world/HeartShrine.gd" id="1_hs"]
+[ext_resource type="FontFile" path="res://assets/fonts/silkscreen.ttf" id="2_font"]
+
+[sub_resource type="Gradient" id="grad"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex"]
+gradient = SubResource("grad")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[sub_resource type="RectangleShape2D" id="zone"]
+size = Vector2(54, 70)
+
+[node name="HeartShrine" type="Node2D"]
+script = ExtResource("1_hs")
+
+[node name="Light" type="PointLight2D" parent="."]
+position = Vector2(0, -28)
+color = Color(0.95, 0.35, 0.42, 1)
+energy = 0.9
+texture = SubResource("tex")
+texture_scale = 0.7
+
+[node name="Zone" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="Col" type="CollisionShape2D" parent="Zone"]
+position = Vector2(0, -26)
+shape = SubResource("zone")
+
+[node name="Prompt" type="Control" parent="."]
+
+[node name="Text" type="Label" parent="Prompt"]
+offset_left = -70.0
+offset_top = -62.0
+offset_right = 70.0
+offset_bottom = -46.0
+theme_override_colors/font_color = Color(1, 0.7, 0.74, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 10
+text = "[E] A heart's gift"
+horizontal_alignment = 1

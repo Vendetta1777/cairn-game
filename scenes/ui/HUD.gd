@@ -99,14 +99,15 @@ func _on_shadow(current: float, maximum: float) -> void:
 
 
 func _draw() -> void:
-	var hearts := _max_halves / 2
+	var hearts := (_max_halves + 1) / 2   # round up: a half-max heart still gets a container
 	var low := _cur_halves <= 2   # one heart or less left
 	for i in hearts:
-		var halves := clampi(_cur_halves - i * 2, 0, 2)
+		var capacity := mini(2, _max_halves - i * 2)   # last container may hold only a half
+		var halves := clampi(_cur_halves - i * 2, 0, capacity)
 		# Only the last filled heart beats hard; low health makes all of them race.
 		var is_last_filled := (halves > 0) and (_cur_halves - i * 2 <= 2)
 		var beat := _heartbeat(low) if (is_last_filled or low) else 1.0
-		_draw_heart(origin + Vector2(i * heart_spacing, 0.0), heart_size * beat, halves, low)
+		_draw_heart(origin + Vector2(i * heart_spacing, 0.0), heart_size * beat, halves, low, capacity)
 	_draw_energy_bar(origin.y + heart_size * 0.82 + 11.0, hearts)
 
 	# Throwable-dagger pips, to the right of the hearts.
@@ -146,21 +147,22 @@ func _heartbeat(low: bool) -> float:
 	return 1.0 + clampf(lub + dub, 0.0, 1.0) * 0.1
 
 
-func _draw_heart(c: Vector2, s: float, halves: int, low: bool) -> void:
+func _draw_heart(c: Vector2, s: float, halves: int, low: bool, capacity: int = 2) -> void:
+	var hc := capacity == 1   # half-capacity container: only the left lobe exists
 	# Soft outer glow (stronger/red when low) + dark rim for depth.
 	var glow := heart_glow
 	if low and halves > 0:
 		glow.a = 0.16 + 0.14 * (0.5 + 0.5 * sin(_time * 9.0))
 	if halves > 0:
-		_heart_shape(c + Vector2(0, s * 0.04), s * 1.4, glow)
-	_heart_shape(c + Vector2(0.0, s * 0.05), s * 1.16, heart_rim)
+		_heart_shape(c + Vector2(0, s * 0.04), s * 1.4, glow, hc)
+	_heart_shape(c + Vector2(0.0, s * 0.05), s * 1.16, heart_rim, hc)
 
 	if halves == 0:
-		_heart_shape(c, s, heart_empty)
+		_heart_shape(c, s, heart_empty, hc)
 		return
 
-	var left_only := halves == 1
-	if left_only:
+	var left_only := hc or halves == 1
+	if halves == 1 and not hc:
 		_heart_shape(c, s, heart_empty)   # empty right side shows through
 	# 3 stacked layers = bottom-dark -> top-bright gradient.
 	_heart_fill(c, s, heart_dark, 1.0, 0.0, left_only)
@@ -184,12 +186,14 @@ func _heart_fill(c: Vector2, s: float, col: Color, scl: float, oy: float, left_o
 		cc + Vector2(0.0, sc * 0.55)]), col)
 
 
-func _heart_shape(c: Vector2, s: float, col: Color) -> void:
+func _heart_shape(c: Vector2, s: float, col: Color, left_only: bool = false) -> void:
 	draw_circle(c + Vector2(-s * 0.22, -s * 0.08), s * 0.27, col)
-	draw_circle(c + Vector2(s * 0.22, -s * 0.08), s * 0.27, col)
+	if not left_only:
+		draw_circle(c + Vector2(s * 0.22, -s * 0.08), s * 0.27, col)
+	var rx := 0.0 if left_only else s * 0.46
 	draw_colored_polygon(PackedVector2Array([
 		c + Vector2(-s * 0.46, 0.02 * s),
-		c + Vector2(s * 0.46, 0.02 * s),
+		c + Vector2(rx, 0.02 * s),
 		c + Vector2(0.0, s * 0.55)]), col)
 
 

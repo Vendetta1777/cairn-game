@@ -19,7 +19,7 @@ const MAX_HEARTS := 5     ## hard cap — hearts are precious
 
 var shards: int = 0
 var echoes: int = 0
-var bonus_hearts: int = 0          ## permanent heart upgrades (Keeper / Body tree adds on top)
+var bonus_half_hearts: int = 0     ## permanent HALF-heart upgrades, from heart-shrines only
 var unlocked: Dictionary = {}      ## node_id -> true
 var flags: Dictionary = {}         ## story / world flags
 var furthest_area: String = "hollowed_gate"
@@ -94,10 +94,23 @@ func bonus(key: String) -> float:
 	return total
 
 
-## Final max hearts = base + boss-reward hearts + Body-tree "hearts" nodes,
-## hard-capped at MAX_HEARTS so the player can never become a sponge.
+## Max health in HALF-heart units = base + heart-shrine half-hearts, capped at
+## MAX_HEARTS. Hearts come ONLY from heart-shrines (every 5 levels, +½ each).
+func max_half_hearts() -> int:
+	return clampi(BASE_HEARTS * 2 + bonus_half_hearts, BASE_HEARTS * 2, MAX_HEARTS * 2)
+
+
 func max_hearts() -> int:
-	return clampi(BASE_HEARTS + bonus_hearts + int(bonus("hearts")), BASE_HEARTS, MAX_HEARTS)
+	return max_half_hearts() / 2
+
+
+## A heart-shrine grants +½ a heart, permanently (up to the cap). Returns true if
+## it actually raised the max.
+func grant_half_heart() -> bool:
+	if max_half_hearts() >= MAX_HEARTS * 2:
+		return false
+	bonus_half_hearts += 1
+	return true
 
 
 # --- flags -------------------------------------------------------------------
@@ -116,7 +129,7 @@ func to_dict() -> Dictionary:
 	return {
 		"shards": shards,
 		"echoes": echoes,
-		"bonus_hearts": bonus_hearts,
+		"bonus_half_hearts": bonus_half_hearts,
 		"unlocked": unlocked.keys(),
 		"flags": flags,
 		"furthest_area": furthest_area,
@@ -126,7 +139,7 @@ func to_dict() -> Dictionary:
 func from_dict(d: Dictionary) -> void:
 	shards = int(d.get("shards", 0))
 	echoes = int(d.get("echoes", 0))
-	bonus_hearts = int(d.get("bonus_hearts", 0))
+	bonus_half_hearts = int(d.get("bonus_half_hearts", 0))
 	unlocked = {}
 	for id in d.get("unlocked", []):
 		unlocked[id] = true
@@ -139,7 +152,7 @@ func from_dict(d: Dictionary) -> void:
 func reset() -> void:
 	shards = 0
 	echoes = 0
-	bonus_hearts = 0
+	bonus_half_hearts = 0
 	unlocked = {}
 	flags = {}
 	furthest_area = "hollowed_gate"

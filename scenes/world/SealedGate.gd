@@ -1,42 +1,44 @@
 extends Node2D
-## Cairn — the Hollowed Gate itself: the great warded door the player must reach.
-## Sealed (runes lit, doors shut) until its boss is defeated; then the ward
-## shatters, the doors grind apart, and the gate becomes the area exit. Walking
-## into the open threshold completes Area 1.
-##
-## Drawn procedurally so it needs no art: a carved arch, two stone leaves, and a
-## breathing ward sigil between them.
+## Cairn — the way down out of an area: a CAVE PASSAGE (a jagged chasm-mouth in
+## the rock, not a door). Blocked by rubble + a ward until the area's boss falls;
+## then the rubble clears, glowing crystals brighten, and a cold draft of motes
+## sinks into the dark. Stand in it and press interact to descend to the next
+## level. Drawn procedurally — no art needed.
 
-@export var boss_id: String = "hollow_warden"
+@export var boss_id: String = "mother_bat"
 @export var area_id: String = "hollowed_gate"
-@export var open_objective: String = "Enter the Hollowed Gate"
+@export var open_objective: String = "Descend — press E at the chasm"
+@export_file("*.tscn") var next_scene: String = ""
 
 var _sealed := true
-var _open_amt := 0.0     ## 0 shut .. 1 fully parted
+var _open_amt := 0.0     ## 0 shut .. 1 fully open
 var _t := 0.0
+var _player_in := false
 
-@onready var _ward: PointLight2D = $WardLight
+@onready var _glow: PointLight2D = $WardLight
 @onready var _zone: Area2D = $Threshold
+@onready var _prompt: Control = $Prompt
 
 var _blocker: StaticBody2D
 
 
 func _ready() -> void:
-	add_to_group("exit")   # for the map overlay
+	add_to_group("exit")
 	QuestTracker.boss_defeated.connect(_on_boss_defeated)
-	_zone.area_entered.connect(_on_area)
+	_zone.area_entered.connect(_on_enter)
+	_zone.area_exited.connect(_on_exit)
 	_make_blocker()
+	_prompt.modulate.a = 0.0
 	# Already cleared (this session OR a saved one)? Start open.
 	if QuestTracker.has_flag("boss_%s_dead" % boss_id) or PlayerProgress.has_flag("boss_%s_dead" % boss_id):
 		_sealed = false
 		_open_amt = 1.0
-		_ward.energy = 0.0
 		_remove_blocker()
 		QuestTracker.set_objective(open_objective)
 	set_process(true)
 
 
-## A solid wall in the doorway so the player CANNOT pass until the ward breaks.
+## A solid wall in the passage so the player CANNOT pass until the boss falls.
 func _make_blocker() -> void:
 	_blocker = StaticBody2D.new()
 	var cs := CollisionShape2D.new()
@@ -57,11 +59,18 @@ func _remove_blocker() -> void:
 func _process(delta: float) -> void:
 	_t += delta
 	if _sealed:
-		# Ward breathes ominously.
-		_ward.energy = 0.9 + sin(_t * 2.2) * 0.35
+		_glow.energy = 0.7 + sin(_t * 2.2) * 0.25
+		_glow.color = Color(0.55, 0.7, 1.0)
 	else:
-		_open_amt = move_toward(_open_amt, 1.0, delta * 0.55)
+		_open_amt = move_toward(_open_amt, 1.0, delta * 0.6)
+		_glow.energy = 1.0 + sin(_t * 1.6) * 0.3
+		_glow.color = Color(0.5, 0.85, 0.95)
 	queue_redraw()
+
+	# Descend on interact when open and standing in the chasm mouth.
+	if not _sealed and _open_amt > 0.85 and _player_in \
+			and Input.is_action_just_pressed("interact") and next_scene != "":
+		_descend()
 
 
 func _on_boss_defeated(id: String) -> void:
@@ -70,67 +79,88 @@ func _on_boss_defeated(id: String) -> void:
 	_sealed = false
 	_remove_blocker()
 	QuestTracker.set_objective(open_objective)
-	# Ward shatters: bright flash then dark.
-	_ward.color = Color(0.8, 0.85, 1.0)
-	var tw := create_tween()
-	tw.tween_property(_ward, "energy", 2.6, 0.15)
-	tw.tween_property(_ward, "energy", 0.0, 1.2)
 	var cam := get_viewport().get_camera_2d()
 	if cam and cam.has_method("add_trauma"):
-		cam.add_trauma(0.7)
+		cam.add_trauma(0.6)
 
 
-func _on_area(area: Area2D) -> void:
-	if _sealed or _open_amt < 0.85:
-		return
-	var body := area.get_parent()
-	if body and body.is_in_group("player"):
-		QuestTracker.complete_area(area_id)
+func _on_enter(area: Area2D) -> void:
+	if area.get_parent() and area.get_parent().is_in_group("player"):
+		_player_in = true
+		if not _sealed:
+			create_tween().tween_property(_prompt, "modulate:a", 1.0, 0.2)
+
+
+func _on_exit(area: Area2D) -> void:
+	if area.get_parent() and area.get_parent().is_in_group("player"):
+		_player_in = false
+		create_tween().tween_property(_prompt, "modulate:a", 0.0, 0.2)
+
+
+func _descend() -> void:
+	# The descent IS the completion — go straight down (no full-screen card to
+	# flash for a frame before the scene swaps).
+	QuestTracker.set_flag("area_%s_done" % area_id, true)
+	SaveManager.autosave()
+	get_tree().call_deferred("change_scene_to_file", next_scene)
 
 
 func _draw() -> void:
-	# Arch + frame (local origin sits at the floor, centre of the doorway).
-	var W := 66.0    # half-width of the opening
-	var H := 150.0   # height of the doorway
-	var frame := Color(0.14, 0.12, 0.18)
-	var frame_lit := Color(0.3, 0.26, 0.36)
-	# Outer pillars.
-	draw_rect(Rect2(-W - 16, -H, 16, H), frame)
-	draw_rect(Rect2(W, -H, 16, H), frame)
-	draw_rect(Rect2(-W - 16, -H - 18, (W + 16) * 2.0, 18), frame)
-	# Arch keystone hint.
+	# A jagged chasm-mouth carved in the rock. Origin sits at the floor, centred.
+	var W := 60.0
+	var H := 150.0
+	var rock := Color(0.13, 0.12, 0.17)
+	var rock_lip := Color(0.22, 0.21, 0.28)
+	var deep := Color(0.015, 0.02, 0.035)
+
+	# Rocky frame (left and right jagged jambs + a lintel of stone).
+	var left := PackedVector2Array([
+		Vector2(-W - 22, 6), Vector2(-W - 4, 6), Vector2(-W, -H * 0.4),
+		Vector2(-W - 6, -H * 0.75), Vector2(-W + 2, -H), Vector2(-W - 26, -H - 8), Vector2(-W - 26, 6)])
+	var right := PackedVector2Array([
+		Vector2(W + 22, 6), Vector2(W + 4, 6), Vector2(W, -H * 0.4),
+		Vector2(W + 6, -H * 0.75), Vector2(W - 2, -H), Vector2(W + 26, -H - 8), Vector2(W + 26, 6)])
+	# Dark interior of the chasm.
+	draw_rect(Rect2(-W, -H, W * 2.0, H + 6.0), deep)
+	draw_colored_polygon(left, rock)
+	draw_colored_polygon(right, rock)
+	# Jagged lintel across the top.
 	draw_colored_polygon(PackedVector2Array([
-		Vector2(-14, -H - 18), Vector2(14, -H - 18), Vector2(8, -H - 34), Vector2(-8, -H - 34)
-	]), frame_lit)
-	# Dark recess behind the doors.
-	draw_rect(Rect2(-W, -H, W * 2.0, H), Color(0.02, 0.02, 0.04))
+		Vector2(-W - 26, -H - 8), Vector2(0, -H - 22), Vector2(W + 26, -H - 8),
+		Vector2(W + 26, -H + 16), Vector2(0, -H + 4), Vector2(-W - 26, -H + 16)]), rock)
+	# Lip highlights.
+	draw_polyline(PackedVector2Array([Vector2(-W, -H * 0.4), Vector2(-W + 2, -H)]), rock_lip, 1.5)
+	draw_polyline(PackedVector2Array([Vector2(W, -H * 0.4), Vector2(W - 2, -H)]), rock_lip, 1.5)
 
-	# The two stone leaves, parting by _open_amt.
-	var slide := _open_amt * (W - 4.0)
-	var leaf := Color(0.2, 0.18, 0.24)
-	var leaf_edge := Color(0.34, 0.3, 0.4)
-	# Left leaf.
-	draw_rect(Rect2(-W - slide, -H, W, H), leaf)
-	draw_line(Vector2(-2 - slide, -H), Vector2(-2 - slide, 0), leaf_edge, 2.0)
-	# Right leaf.
-	draw_rect(Rect2(0 + slide, -H, W, H), leaf)
-	draw_line(Vector2(2 + slide, -H), Vector2(2 + slide, 0), leaf_edge, 2.0)
-	# Horizontal banding on the leaves for carved-stone feel.
-	for i in range(1, 5):
-		var yy := -H + H * (i / 5.0)
-		draw_line(Vector2(-W - slide, yy), Vector2(-slide, yy), Color(0.12, 0.1, 0.15, 0.7), 1.0)
-		draw_line(Vector2(slide, yy), Vector2(W + slide, yy), Color(0.12, 0.1, 0.15, 0.7), 1.0)
-
-	# Ward sigil over the seam — only while sealed (or fading right after).
 	if _sealed:
-		var pulse := 0.6 + sin(_t * 2.2) * 0.4
-		var c := Color(0.55, 0.7, 1.0, pulse)
-		var cy := -H * 0.55
-		var r := 18.0
-		# A ringed rune.
-		draw_arc(Vector2(0, cy), r, 0, TAU, 24, c, 2.0)
-		draw_arc(Vector2(0, cy), r * 0.55, 0, TAU, 16, c, 1.5)
-		for k in range(6):
-			var ang := TAU * k / 6.0 + _t * 0.4
-			var p := Vector2(cos(ang), sin(ang)) * r
-			draw_line(Vector2(0, cy), Vector2(0, cy) + p, Color(c.r, c.g, c.b, pulse * 0.5), 1.0)
+		# Rubble pile + a faint ward across the mouth.
+		_draw_rubble(W, deep, rock, rock_lip)
+		var pulse := 0.5 + sin(_t * 2.2) * 0.4
+		draw_arc(Vector2(0, -H * 0.55), 16.0, 0, TAU, 22, Color(0.55, 0.7, 1.0, pulse), 1.5)
+		draw_line(Vector2(0, -H * 0.55 - 14), Vector2(0, -H * 0.55 + 14), Color(0.6, 0.74, 1.0, pulse), 1.5)
+	else:
+		# Open: crystals along the rim glow, and motes drift DOWN into the dark.
+		var g := _open_amt
+		for cx in [-W + 6, -W * 0.4, W * 0.4, W - 6]:
+			var cy := -H * 0.5 + sin(cx) * 18.0
+			var cc := Color(0.4, 0.85, 0.95, 0.9 * g)
+			draw_colored_polygon(PackedVector2Array([
+				Vector2(cx, cy - 6), Vector2(cx + 3, cy), Vector2(cx, cy + 6), Vector2(cx - 3, cy)]), cc)
+		for k in range(7):
+			var mx := sin(_t * 0.7 + k * 1.4) * W * 0.6
+			var my := -H + fmod(_t * 30.0 + k * 22.0, H)   # sink downward
+			draw_circle(Vector2(mx, -my * 0.0 + my), 1.4, Color(0.6, 0.9, 1.0, 0.5 * g))
+
+
+func _draw_rubble(w: float, deep: Color, rock: Color, lip: Color) -> void:
+	# A heap of boulders sealing the lower mouth.
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 4
+	draw_rect(Rect2(-w, -52, w * 2.0, 58), deep)
+	var x := -w + 6.0
+	while x < w - 6.0:
+		var r := rng.randf_range(7.0, 14.0)
+		var y := -rng.randf_range(8.0, 46.0)
+		draw_circle(Vector2(x, y), r, rock)
+		draw_circle(Vector2(x - r * 0.3, y - r * 0.3), r * 0.4, lip)
+		x += rng.randf_range(12.0, 22.0)

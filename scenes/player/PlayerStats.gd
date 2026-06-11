@@ -28,10 +28,10 @@ func _ready() -> void:
 	# Pull everything persistent (hearts, currency) from PlayerProgress and fold
 	# in the unlocked skill-tree bonuses, so a fresh player in any scene starts
 	# with the player's permanent progression already applied.
-	max_hearts = PlayerProgress.max_hearts()
+	max_health = PlayerProgress.max_half_hearts()   # in half-heart units
+	max_hearts = max_health / HALVES_PER_HEART
 	max_shadow += PlayerProgress.bonus("max_shadow")
 	_shadow_regen = PlayerProgress.bonus("shadow_regen")
-	max_health = max_hearts * HALVES_PER_HEART
 	health = max_health
 	shadow = max_shadow
 	shards = PlayerProgress.shards
@@ -70,17 +70,19 @@ func heal(halves: int) -> void:
 	health_changed.emit(health, max_health)
 
 
-## Permanent heart upgrade (boss reward / skill tree). Persists via PlayerProgress
-## and respects the hard MAX_HEARTS cap, so granting past the cap does nothing.
-func add_heart(count: int = 1) -> void:
-	PlayerProgress.bonus_hearts += count
-	var new_max := PlayerProgress.max_hearts()
-	var gained := new_max - max_hearts
-	max_hearts = new_max
-	max_health = max_hearts * HALVES_PER_HEART
+## Heart-shrine upgrade: +½ a heart, permanent, persisted, capped. Tops up the
+## new sliver of health when granted.
+func grant_half_heart() -> bool:
+	if not PlayerProgress.grant_half_heart():
+		return false
+	var new_max := PlayerProgress.max_half_hearts()
+	var gained := new_max - max_health
+	max_health = new_max
+	max_hearts = max_health / HALVES_PER_HEART
 	if gained > 0:
-		health = min(max_health, health + gained * HALVES_PER_HEART)
+		health = min(max_health, health + gained)
 	health_changed.emit(health, max_health)
+	return true
 
 
 func add_shards(count: int) -> void:

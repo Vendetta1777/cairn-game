@@ -33,14 +33,8 @@ func _on_boss_defeated(id: String) -> void:
 	if id != BOSS_ID or PlayerProgress.has_flag("warden_slain"):
 		return
 	PlayerProgress.set_flag("warden_slain")
-	# The unlock: a permanent heart, applied live to the current player and
-	# persisted via PlayerProgress (add_heart bumps bonus_hearts under the hood).
-	var player := get_tree().get_first_node_in_group("player")
-	if player:
-		var stats = player.get_node_or_null("Stats")
-		if stats and stats.has_method("add_heart"):
-			stats.add_heart(1)
-	# Announce it, reusing the location-title card.
+	# No heart from the boss — hearts come only from heart-shrines (every 5
+	# levels). Slaying her simply opens the way down to the next descent.
 	var banner := get_tree().get_first_node_in_group("location_title")
 	if banner and banner.has_method("reveal"):
-		banner.reveal("BROODHEART CLAIMED", "+1 MAX HEART  ·  THE PATH OPENS")
+		banner.reveal("THE BROOD IS BROKEN", "THE WAY DOWN OPENS")

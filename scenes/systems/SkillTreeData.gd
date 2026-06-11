@@ -48,14 +48,14 @@ const NODES := [
 	# --- BODY: speed, resilience, the rare precious heart -------------------
 	{"id": "body_0", "branch": "body", "tier": 0, "name": "Fleetfoot", "cost": 4, "desc": "+15 run speed", "effect": {"run_speed": 15}},
 	{"id": "body_1", "branch": "body", "tier": 1, "name": "Second Wind", "cost": 6, "desc": "Longer dash i-frames", "effect": {"dash_iframes": 0.04}},
-	{"id": "body_2", "branch": "body", "tier": 2, "name": "Toughened", "cost": 12, "desc": "+1 heart (max 5)", "effect": {"hearts": 1}},
+	{"id": "body_2", "branch": "body", "tier": 2, "name": "Surefooted", "cost": 12, "desc": "Longer dash i-frames", "effect": {"dash_iframes": 0.04}},
 	{"id": "body_3", "branch": "body", "tier": 3, "name": "Swift", "cost": 8, "desc": "+15 run speed", "effect": {"run_speed": 15}},
 	{"id": "body_4", "branch": "body", "tier": 4, "name": "Phantom Step", "cost": 10, "desc": "Longer dash i-frames", "effect": {"dash_iframes": 0.04}},
 	{"id": "body_5", "branch": "body", "tier": 5, "name": "Windrunner", "cost": 13, "desc": "+20 run speed", "effect": {"run_speed": 20}},
 	{"id": "body_6", "branch": "body", "tier": 6, "name": "Sure-Footed", "cost": 15, "desc": "Longer dash i-frames", "effect": {"dash_iframes": 0.05}},
-	{"id": "body_7", "branch": "body", "tier": 7, "name": "Hardened", "cost": 20, "desc": "+1 heart (max 5)", "effect": {"hearts": 1}},
+	{"id": "body_7", "branch": "body", "tier": 7, "name": "Untouchable", "cost": 20, "desc": "Longer dash i-frames", "effect": {"dash_iframes": 0.05}},
 	{"id": "body_8", "branch": "body", "tier": 8, "name": "Tireless", "cost": 24, "desc": "+25 run speed", "effect": {"run_speed": 25}},
-	{"id": "body_9", "branch": "body", "tier": 9, "name": "Cairn-Forged", "cost": 30, "desc": "+1 heart (max 5)", "effect": {"hearts": 1}},
+	{"id": "body_9", "branch": "body", "tier": 9, "name": "Stormrunner", "cost": 30, "desc": "+30 run speed", "effect": {"run_speed": 30}},
 ]
 
 
