@@ -1,0 +1,48 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scenes/enemies/boss/MotherBat.gd" id="1_mb"]
+[ext_resource type="SpriteFrames" path="res://scenes/enemies/fly/bat_frames.tres" id="2_frames"]
+
+[sub_resource type="CircleShape2D" id="hurt_shape"]
+radius = 30.0
+
+[sub_resource type="Gradient" id="grad_aura"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.5, 0.4, 0.7, 1, 0.5, 0.4, 0.7, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_aura"]
+gradient = SubResource("grad_aura")
+width = 200
+height = 200
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[node name="MotherBat" type="CharacterBody2D" groups=["enemy", "boss"]]
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_mb")
+max_health = 20
+idle_anim = &"idle_fly"
+shard_drop = 4
+echo_drop = 14
+
+[node name="Aura" type="PointLight2D" parent="."]
+color = Color(0.55, 0.42, 0.78, 1)
+energy = 1.0
+texture = SubResource("tex_aura")
+texture_scale = 1.0
+
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+scale = Vector2(2.3, 2.3)
+sprite_frames = ExtResource("2_frames")
+animation = &"idle_fly"
+autoplay = "idle_fly"
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Col" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("hurt_shape")

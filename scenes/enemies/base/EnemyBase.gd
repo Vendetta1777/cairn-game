@@ -12,6 +12,7 @@ signal died
 @export var idle_anim: StringName = &"idle_fly"
 @export var shard_drop: int = 1   ## Shards (kept on death) awarded on kill
 @export var echo_drop: int = 3    ## Echoes (lost on death) awarded on kill
+@export var stagger_resist: float = 0.45  ## <1 = heavy: shrugs off knockback (1 = light)
 
 var health: int
 var _dead := false
@@ -33,11 +34,12 @@ func _process(delta: float) -> void:
 
 ## Knocked back and stunned (e.g. by a parry). Subclasses pause their AI while
 ## is_staggered() is true and let the knockback velocity play out.
-func stagger(from_position: Vector2, force: float = 230.0, duration: float = 0.9) -> void:
+func stagger(from_position: Vector2, force: float = 150.0, duration: float = 0.7) -> void:
 	if _dead:
 		return
 	_stagger_timer = duration
-	velocity = (global_position - from_position).normalized() * force
+	# Heavy enemies barely budge — the knockback is scaled by their resist.
+	velocity = (global_position - from_position).normalized() * force * stagger_resist
 	_play(&"hurt")
 
 

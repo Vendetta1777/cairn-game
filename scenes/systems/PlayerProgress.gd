@@ -14,7 +14,8 @@ signal progress_loaded
 # class names are guaranteed registered, so the const reference is reliable.
 const Skills = preload("res://scenes/systems/SkillTreeData.gd")
 
-const BASE_HEARTS := 4
+const BASE_HEARTS := 3    ## start fragile
+const MAX_HEARTS := 5     ## hard cap — hearts are precious
 
 var shards: int = 0
 var echoes: int = 0
@@ -93,9 +94,10 @@ func bonus(key: String) -> float:
 	return total
 
 
-## Final max hearts = base + Keeper upgrades + Body-tree "hearts" nodes.
+## Final max hearts = base + boss-reward hearts + Body-tree "hearts" nodes,
+## hard-capped at MAX_HEARTS so the player can never become a sponge.
 func max_hearts() -> int:
-	return BASE_HEARTS + bonus_hearts + int(bonus("hearts"))
+	return clampi(BASE_HEARTS + bonus_hearts + int(bonus("hearts")), BASE_HEARTS, MAX_HEARTS)
 
 
 # --- flags -------------------------------------------------------------------

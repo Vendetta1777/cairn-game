@@ -42,9 +42,15 @@ class_name PlayerController
 # --- Ability gates (locked at M1; flipped on as the game unlocks them) ---
 @export_group("Unlocked Abilities")
 @export var can_double_jump: bool = false     ## Area 3
-@export var can_wall_slide: bool = false      ## Area 4
+@export var can_wall_slide: bool = true       ## wall-slide + wall-jump (for parkour)
 @export var can_swim: bool = false            ## Area 3
 @export var can_grapple: bool = false         ## Area 5
+
+@export_group("Wall")
+@export var wall_slide_speed: float = 90.0    ## capped fall speed while hugging a wall
+@export var wall_jump_velocity: float = -340.0
+@export var wall_jump_push: float = 270.0     ## horizontal kick away from the wall
+@export var wall_jump_lock_time: float = 0.16 ## air-control is muted briefly after a wall jump
 
 @export_group("Damage")
 @export var hurt_invuln_time: float = 0.8     ## i-frames after taking a hit
@@ -73,6 +79,8 @@ var _current_state: String = "idle"
 var _hurt_iframes: float = 0.0
 var _hurt_stun: float = 0.0
 var _parry_window: float = 0.0
+var _wall_jump_lock: float = 0.0
+var _is_wall_sliding: bool = false
 
 # Cached frame->seconds conversions (computed in _ready from the physics tick).
 var _coyote_time: float
@@ -110,6 +118,7 @@ func _physics_process(delta: float) -> void:
 		return
 
 	_handle_buffered_jump_input()
+	_handle_wall_slide(delta)
 	_handle_jump()
 	_handle_dash_start()
 	_handle_crouch()
@@ -138,6 +147,7 @@ func _update_timers(delta: float) -> void:
 	_hurt_iframes = maxf(0.0, _hurt_iframes - delta)
 	_hurt_stun = maxf(0.0, _hurt_stun - delta)
 	_parry_window = maxf(0.0, _parry_window - delta)
+	_wall_jump_lock = maxf(0.0, _wall_jump_lock - delta)
 
 
 func _handle_buffered_jump_input() -> void:
@@ -152,6 +162,20 @@ func _apply_gravity(delta: float) -> void:
 		velocity.y = minf(velocity.y + gravity * delta, max_fall_speed)
 
 
+## Slow the slide while pressing into a wall in mid-air. Sets the flag wall-jump
+## and the animator read.
+func _handle_wall_slide(_delta: float) -> void:
+	_is_wall_sliding = false
+	if not can_wall_slide or is_on_floor() or not is_on_wall_only():
+		return
+	var wall_normal := get_wall_normal().x        # points away from the wall
+	var pressing := Input.get_axis("move_left", "move_right")
+	# Only slide if actively holding toward the wall and falling.
+	if pressing != 0.0 and signf(pressing) == -signf(wall_normal) and velocity.y > 0.0:
+		_is_wall_sliding = true
+		velocity.y = minf(velocity.y, wall_slide_speed)
+
+
 func _handle_jump() -> void:
 	# A jump fires when a buffered press meets ground OR coyote grace.
 	var grounded_or_coyote := is_on_floor() or _coyote_timer > 0.0
@@ -159,6 +183,15 @@ func _handle_jump() -> void:
 		velocity.y = jump_velocity
 		_jump_buffer_timer = 0.0
 		_coyote_timer = 0.0
+		jumped.emit()
+	# Wall jump: airborne, hugging a wall — kick up and away.
+	elif _jump_buffer_timer > 0.0 and can_wall_slide and is_on_wall_only():
+		var wall_normal := get_wall_normal().x
+		velocity.y = wall_jump_velocity
+		velocity.x = wall_normal * wall_jump_push
+		_facing = int(signf(wall_normal))
+		_wall_jump_lock = wall_jump_lock_time
+		_jump_buffer_timer = 0.0
 		jumped.emit()
 
 	# Variable height: releasing jump while still rising cuts the ascent short.
@@ -206,6 +239,10 @@ func _apply_horizontal_movement(delta: float) -> void:
 	if _is_crouching:
 		target_speed *= crouch_speed_mult
 
+	# Just after a wall jump, mute air control so the kick away actually carries.
+	if _wall_jump_lock > 0.0:
+		return
+
 	var accel := ground_accel if is_on_floor() else air_accel
 	var decel := ground_decel if is_on_floor() else air_decel
 
@@ -236,6 +273,8 @@ func _resolve_state() -> String:
 		return "hurt"
 	if _is_dashing:
 		return "dash"
+	if _is_wall_sliding:
+		return "wall_slide"
 	if not is_on_floor():
 		return "fall" if velocity.y > 0.0 else "jump"
 	if _is_crouching:

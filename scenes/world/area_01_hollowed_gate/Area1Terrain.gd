@@ -42,45 +42,49 @@ const TERRAIN: Array[Rect2] = [
 	Rect2(0, 0, 3700, 14),        # ceiling
 	Rect2(0, 0, 14, 288),         # left wall
 	Rect2(3686, 0, 14, 288),      # right wall (behind the threshold chamber)
-	# floors — continuous & safe through the intro/bats/NPC, pits come later
-	Rect2(14, 252, 1900, 36),     # x14..1914  (intro + bats + NPC, NO pits)
-	Rect2(2000, 252, 360, 36),    # x2000..2360 (pit before)
-	Rect2(2440, 252, 346, 36),    # x2440..2786 (pit before; checkpoint)
-	Rect2(2786, 252, 900, 36),    # x2786..3686 (boss arena + gate + threshold)
-	# spaced platforms — kept within jump reach of the floor (~40-50px up)
-	Rect2(330, 212, 120, 16),     # intro (decorative, reachable)
-	Rect2(640, 206, 130, 16),     # intro
-	Rect2(1060, 210, 130, 16),    # bats
-	Rect2(1320, 202, 130, 16),    # bats
-	Rect2(1620, 210, 120, 16),    # NPC area
-	Rect2(1958, 212, 96, 16),     # cross pit 1
-	Rect2(2150, 208, 120, 16),    # crawler climb
-	Rect2(2398, 212, 96, 16),     # cross pit 2
-	Rect2(2560, 208, 120, 16),    # final stretch
-	Rect2(2680, 216, 106, 36),    # raised step to the checkpoint
-	# higher platforms — reached by chaining off a lower one (verticality you
-	# can't reach from the floor, but can from the platform beneath)
-	Rect2(470, 170, 100, 16),     # up from the 330 platform
-	Rect2(1180, 165, 110, 16),    # bats vantage, up from the 1060 platform
-	Rect2(2280, 168, 110, 16),    # crawler climb, up from the 2150 platform
-	Rect2(2430, 128, 100, 16),    # higher still, up from the 2280 platform
+	# floors — safe intro/bats, then a long bottomless gauntlet, then the arena
+	Rect2(14, 252, 720, 36),      # INTRO (safe) x14..734
+	Rect2(800, 252, 380, 36),     # BATS x800..1180
+	Rect2(1240, 252, 180, 36),    # pre-gauntlet ledge (checkpoint) x1240..1420
+	Rect2(2660, 252, 1026, 36),   # checkpoint + boss arena + gate + threshold
+	# intro decorative platforms (reachable)
+	Rect2(330, 212, 120, 16),
+	Rect2(560, 206, 110, 16),
+	# bats platforms
+	Rect2(880, 210, 100, 16),
+	Rect2(1030, 196, 90, 16),
+	# --- PARKOUR GAUNTLET over the pit (1420..2660): miss a jump and you fall ---
+	Rect2(1460, 224, 86, 16),     # hop 1
+	Rect2(1600, 210, 78, 16),     # hop 2
+	Rect2(1730, 224, 78, 16),     # hop 3
+	Rect2(1860, 232, 92, 16),     # approach to the chimney
+	# wall-jump chimney: stand on the base, climb the gap, exit up-right
+	Rect2(1962, 238, 84, 16),     # chimney base (stand here to start the climb)
+	Rect2(1962, 138, 14, 78),     # left wall (headroom beneath it)
+	Rect2(2032, 138, 14, 78),     # right wall
+	Rect2(2046, 142, 92, 16),     # top exit ledge (wall-jump off to reach it)
+	# descending route: a moving platform bridges the gap (see Area1.tscn)
+	Rect2(2200, 158, 80, 16),     # ledge before the moving platform
+	Rect2(2480, 182, 90, 16),     # landing after it
+	Rect2(2590, 214, 86, 16),     # step down to the arena floor
 ]
 
 const OBJECTS: Array[Rect2] = [
-	Rect2(820, 220, 28, 32),
-	Rect2(2240, 220, 30, 32),
+	Rect2(250, 220, 28, 32),      # intro crate
+	Rect2(660, 220, 28, 32),      # intro crate
 ]
 
-# Spike hazards — only in the later (post-intro) sections.
+# Spike hazards lining the gauntlet pits — a fall hurts before it respawns you.
 const HAZARDS: Array[Rect2] = [
-	Rect2(2080, 226, 56, 26),
-	Rect2(2500, 226, 56, 26),
+	Rect2(1440, 262, 240, 26),    # spikes under the first hops
+	Rect2(1760, 262, 220, 26),    # spikes under the shaft approach
+	Rect2(2300, 262, 150, 26),    # spikes under the moving-platform gap
 ]
 const SPIKE := Color(0.56, 0.59, 0.68)
 const SPIKE_DK := Color(0.28, 0.3, 0.38)
 
 # Top edges that get a moss accent.
-const MOSS_SPOTS := [Vector2(226, 200), Vector2(596, 178), Vector2(1078, 160), Vector2(1240, 124)]
+const MOSS_SPOTS := [Vector2(390, 200), Vector2(930, 198), Vector2(1500, 214), Vector2(2110, 120)]
 
 var _player: Node2D
 var _spawn := Vector2.ZERO

@@ -3,7 +3,7 @@ extends Node2D
 ## and hands out the boss reward: slaying the Hollow Warden grants the Wardstone
 ## (a permanent +1 heart) and opens the path onward to the Sanctum.
 
-const WARDEN_ID := "hollow_warden"
+const BOSS_ID := "mother_bat"
 
 
 func _ready() -> void:
@@ -12,7 +12,7 @@ func _ready() -> void:
 
 
 func _on_boss_defeated(id: String) -> void:
-	if id != WARDEN_ID or PlayerProgress.has_flag("warden_slain"):
+	if id != BOSS_ID or PlayerProgress.has_flag("warden_slain"):
 		return
 	PlayerProgress.set_flag("warden_slain")
 	# The unlock: a permanent heart, applied live to the current player and
@@ -25,4 +25,4 @@ func _on_boss_defeated(id: String) -> void:
 	# Announce it, reusing the location-title card.
 	var banner := get_tree().get_first_node_in_group("location_title")
 	if banner and banner.has_method("reveal"):
-		banner.reveal("WARDSTONE CLAIMED", "+1 MAX HEART  ·  THE PATH OPENS")
+		banner.reveal("BROODHEART CLAIMED", "+1 MAX HEART  ·  THE PATH OPENS")

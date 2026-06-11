@@ -70,13 +70,16 @@ func heal(halves: int) -> void:
 	health_changed.emit(health, max_health)
 
 
-## Permanent heart upgrade (the Keeper NPC). Persists via PlayerProgress and tops
-## up the new heart.
+## Permanent heart upgrade (boss reward / skill tree). Persists via PlayerProgress
+## and respects the hard MAX_HEARTS cap, so granting past the cap does nothing.
 func add_heart(count: int = 1) -> void:
 	PlayerProgress.bonus_hearts += count
-	max_hearts += count
+	var new_max := PlayerProgress.max_hearts()
+	var gained := new_max - max_hearts
+	max_hearts = new_max
 	max_health = max_hearts * HALVES_PER_HEART
-	health = min(max_health, health + count * HALVES_PER_HEART)
+	if gained > 0:
+		health = min(max_health, health + gained * HALVES_PER_HEART)
 	health_changed.emit(health, max_health)
 
 

@@ -1,26 +1,23 @@
-[gd_scene load_steps=35 format=3]
+[gd_scene load_steps=32 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1Terrain.gd" id="1_terrain"]
 [ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1.gd" id="1_root"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/boss/HollowWarden.tscn" id="20_warden"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/boss/MotherBat.tscn" id="20_boss"]
 [ext_resource type="PackedScene" path="res://scenes/world/SealedGate.tscn" id="21_gate"]
 [ext_resource type="Script" path="res://scenes/world/Trigger.gd" id="22_trigger"]
 [ext_resource type="PackedScene" path="res://scenes/ui/BossBar.tscn" id="23_bossbar"]
 [ext_resource type="PackedScene" path="res://scenes/ui/ObjectiveHUD.tscn" id="24_obj"]
 [ext_resource type="PackedScene" path="res://scenes/ui/AreaComplete.tscn" id="25_ac"]
 [ext_resource type="PackedScene" path="res://scenes/world/Portal.tscn" id="26_portal"]
-[ext_resource type="PackedScene" path="res://scenes/world/Shrine.tscn" id="27_shrine"]
 [ext_resource type="PackedScene" path="res://scenes/ui/BoonChoiceUI.tscn" id="28_boon"]
 [ext_resource type="PackedScene" path="res://scenes/ui/MapOverlay.tscn" id="29_map"]
+[ext_resource type="PackedScene" path="res://scenes/world/MovingPlatform.tscn" id="30_mp"]
 [ext_resource type="Texture2D" path="res://assets/environment/caverns/background.png" id="2_bg"]
 [ext_resource type="Texture2D" path="res://assets/environment/caverns/back-walls.png" id="3_walls"]
 [ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="4_player"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/fly/Bat.tscn" id="5_bat"]
 [ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="6_hud"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/crawler/Crawler.tscn" id="7_crawler"]
 [ext_resource type="PackedScene" path="res://scenes/world/RemnantStone.tscn" id="8_stone"]
-[ext_resource type="PackedScene" path="res://scenes/npc/Keeper.tscn" id="9_keeper"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/brute/Brute.tscn" id="10_brute"]
 [ext_resource type="Script" path="res://scenes/decor/Decor.gd" id="11_decor"]
 [ext_resource type="Script" path="res://scenes/decor/BgDetail.gd" id="12_bgdetail"]
 [ext_resource type="Script" path="res://scenes/decor/Foreground.gd" id="13_foreground"]
@@ -98,31 +95,31 @@ script = ExtResource("11_decor")
 [node name="Decor" type="Node2D" parent="."]
 
 [node name="Moss1" type="PointLight2D" parent="Decor"]
-position = Vector2(1100, 210)
+position = Vector2(900, 210)
 color = Color(0.32, 0.78, 0.74, 1)
 energy = 0.55
 texture = SubResource("tex_light")
 texture_scale = 0.8
 
 [node name="Moss2" type="PointLight2D" parent="Decor"]
-position = Vector2(2030, 212)
+position = Vector2(2046, 150)
 color = Color(0.32, 0.78, 0.74, 1)
 energy = 0.5
 texture = SubResource("tex_light")
 texture_scale = 0.75
 
 [node name="Moss3" type="PointLight2D" parent="Decor"]
-position = Vector2(2560, 208)
+position = Vector2(2950, 220)
 color = Color(0.32, 0.78, 0.74, 1)
 energy = 0.5
 texture = SubResource("tex_light")
 texture_scale = 0.8
 
-[node name="RemnantStone" parent="Decor" instance=ExtResource("8_stone")]
-position = Vector2(2720, 200)
+[node name="CheckpointBoss" parent="Decor" instance=ExtResource("8_stone")]
+position = Vector2(2710, 252)
 
-[node name="Keeper" parent="Decor" instance=ExtResource("9_keeper")]
-position = Vector2(1700, 252)
+[node name="CheckpointGauntlet" parent="Decor" instance=ExtResource("8_stone")]
+position = Vector2(1340, 252)
 
 [node name="LoreNPC" parent="Decor" instance=ExtResource("17_lore")]
 position = Vector2(110, 252)
@@ -130,38 +127,32 @@ position = Vector2(110, 252)
 [node name="Player" parent="." instance=ExtResource("4_player")]
 position = Vector2(50, 215)
 
-[node name="Shrine" parent="." instance=ExtResource("27_shrine")]
-position = Vector2(1520, 252)
-
 [node name="Bat1" parent="." instance=ExtResource("5_bat")]
-position = Vector2(1080, 140)
+position = Vector2(900, 150)
 
 [node name="Bat2" parent="." instance=ExtResource("5_bat")]
-position = Vector2(1300, 110)
+position = Vector2(1020, 120)
 
 [node name="Bat3" parent="." instance=ExtResource("5_bat")]
-position = Vector2(1420, 150)
+position = Vector2(1120, 160)
 
 [node name="Bat4" parent="." instance=ExtResource("5_bat")]
-position = Vector2(1180, 170)
+position = Vector2(1700, 150)
 
-[node name="Crawler1" parent="." instance=ExtResource("7_crawler")]
-position = Vector2(2060, 232)
+[node name="MovingPlatform" parent="." instance=ExtResource("30_mp")]
+position = Vector2(2300, 190)
+travel = Vector2(160, 0)
+period = 4.4
 
-[node name="Crawler2" parent="." instance=ExtResource("7_crawler")]
-position = Vector2(2290, 232)
-
-[node name="Crawler3" parent="." instance=ExtResource("7_crawler")]
-position = Vector2(2500, 232)
-
-[node name="Brute1" parent="." instance=ExtResource("10_brute")]
-position = Vector2(2650, 225)
-
-[node name="HollowWarden" parent="." instance=ExtResource("20_warden")]
-position = Vector2(3180, 224)
+[node name="MotherBat" parent="." instance=ExtResource("20_boss")]
+position = Vector2(3120, 110)
+home_y = 110.0
+arena_left = 2760.0
+arena_right = 3400.0
 
 [node name="SealedGate" parent="." instance=ExtResource("21_gate")]
 position = Vector2(3440, 252)
+boss_id = "mother_bat"
 
 [node name="ReturnPortal" parent="." instance=ExtResource("26_portal")]
 position = Vector2(3580, 252)
@@ -170,27 +161,27 @@ label = "Return to the Sanctum"
 glow_color = Color(0.6, 0.55, 0.95, 1)
 
 [node name="BatsTrigger" type="Area2D" parent="." groups=["trigger"]]
-position = Vector2(980, 150)
+position = Vector2(800, 150)
 script = ExtResource("22_trigger")
-objective = "Cut through the gloom-bats"
+objective = "Clear the gloom-bats"
 
 [node name="Shape" type="CollisionShape2D" parent="BatsTrigger"]
 shape = SubResource("trigger_tall")
 
-[node name="CrawlerTrigger" type="Area2D" parent="." groups=["trigger"]]
-position = Vector2(1980, 150)
+[node name="GauntletTrigger" type="Area2D" parent="." groups=["trigger"]]
+position = Vector2(1410, 150)
 script = ExtResource("22_trigger")
-objective = "Press past the husk-crawlers"
+objective = "Cross the hollow — a fall is death"
 
-[node name="Shape" type="CollisionShape2D" parent="CrawlerTrigger"]
+[node name="Shape" type="CollisionShape2D" parent="GauntletTrigger"]
 shape = SubResource("trigger_tall")
 
 [node name="BossTrigger" type="Area2D" parent="." groups=["trigger"]]
-position = Vector2(2950, 150)
+position = Vector2(2700, 150)
 script = ExtResource("22_trigger")
-objective = "Break the Warden's ward"
-engage_boss_path = NodePath("../HollowWarden")
-boss_display_name = "THE HOLLOW WARDEN"
+objective = "Slay the Brood Mother"
+engage_boss_path = NodePath("../MotherBat")
+boss_display_name = "THE BROOD MOTHER"
 
 [node name="Shape" type="CollisionShape2D" parent="BossTrigger"]
 shape = SubResource("trigger_tall")
