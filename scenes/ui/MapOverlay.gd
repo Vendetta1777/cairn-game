@@ -1,12 +1,14 @@
 extends Control
-## Cairn — the area map (GDD Section 10: "map on hold-TAB, fog of war"). A
-## schematic strip of the current area: explored ground is lit, the unexplored
-## stretch stays dark, and points of interest (checkpoints, the boss, the exit,
-## shrines, portals) are pinned once you've been near them. Held, not toggled.
+## Cairn — the area map (hold TAB). A real side-view minimap: it reads the level's
+## actual terrain (CaveTerrain.get_solids) and draws the platform silhouette to
+## scale inside a framed panel, with fog of war (only what you've explored shows),
+## spike-pit warnings, pinned points of interest, and your position. Held, not
+## toggled.
 
 const FONT := preload("res://assets/fonts/silkscreen.ttf")
 
 var _player: Node2D
+var _terrain: Node
 var _bl := 0.0
 var _br := 3000.0
 var _explored_l := INF
@@ -20,15 +22,15 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if _player == null or not is_instance_valid(_player):
 		_player = get_tree().get_first_node_in_group("player")
+	if _terrain == null or not is_instance_valid(_terrain):
+		_terrain = get_tree().get_first_node_in_group("terrain")
 	if _player:
-		# Bounds come from the camera limits the terrain set.
-		var cam = _player.get_node_or_null("Camera")
-		if cam:
-			_bl = cam.limit_left
-			_br = cam.limit_right
+		if _terrain and "bounds" in _terrain:
+			_bl = _terrain.bounds.position.x
+			_br = _terrain.bounds.end.x
 		var px := _player.global_position.x
-		_explored_l = minf(_explored_l, px - 120.0)
-		_explored_r = maxf(_explored_r, px + 120.0)
+		_explored_l = minf(_explored_l, px - 130.0)
+		_explored_r = maxf(_explored_r, px + 130.0)
 
 	var show := Input.is_action_pressed("map")
 	if show != visible:
@@ -37,58 +39,89 @@ func _process(_delta: float) -> void:
 		queue_redraw()
 
 
-func _x_to_screen(world_x: float, sx: float, sw: float) -> float:
-	var span := maxf(_br - _bl, 1.0)
-	return sx + sw * clampf((world_x - _bl) / span, 0.0, 1.0)
-
-
 func _draw() -> void:
-	draw_rect(Rect2(0, 0, size.x, size.y), Color(0.02, 0.02, 0.05, 0.78))
+	draw_rect(Rect2(0, 0, size.x, size.y), Color(0.02, 0.02, 0.05, 0.82))
 
-	var sw := size.x * 0.74
-	var sx := (size.x - sw) * 0.5
-	var sy := size.y * 0.5
-	var sh := 26.0
+	# Panel.
+	var pw := size.x * 0.82
+	var px0 := (size.x - pw) * 0.5
+	var pad := 22.0
+	var bounds_w := maxf(_br - _bl, 1.0)
+	var scale := (pw - pad * 2.0) / bounds_w
+	var map_h := 288.0 * scale
+	var py0 := size.y * 0.5 - map_h * 0.5
+	var ph := map_h + pad * 1.6
 
-	draw_string(FONT, Vector2(sx, sy - 54.0), "THE HOLLOWED GATE", HORIZONTAL_ALIGNMENT_LEFT, sw, 16, Color(0.88, 0.9, 1.0))
-	draw_string(FONT, Vector2(sx, sy - 34.0), "AREA MAP", HORIZONTAL_ALIGNMENT_LEFT, sw, 10, Color(0.55, 0.6, 0.74))
+	# Frame + backplate.
+	var frame := Rect2(px0, py0 - pad * 0.6, pw, ph)
+	draw_rect(frame, Color(0.04, 0.05, 0.08, 0.95))
+	draw_rect(frame, Color(0.4, 0.45, 0.58, 0.8), false, 1.5)
+	draw_rect(Rect2(frame.position, Vector2(frame.size.x, 1.0)), Color(0.55, 0.62, 0.78, 0.9))
 
-	# Unexplored track (dark) then explored band (lit) over it.
-	draw_rect(Rect2(sx, sy, sw, sh), Color(0.07, 0.07, 0.11))
-	draw_rect(Rect2(sx, sy, sw, sh), Color(0.3, 0.32, 0.42), false, 1.0)
+	draw_string(FONT, Vector2(px0 + pad, py0 - pad * 0.6 - 8.0), "MAP", HORIZONTAL_ALIGNMENT_LEFT, pw, 14, Color(0.86, 0.9, 1.0))
+
+	var mx := px0 + pad
+	var my := py0
+	var to_map := func(wx: float, wy: float) -> Vector2:
+		return Vector2(mx + (wx - _bl) * scale, my + wy * scale)
+
+	# Explored band shading.
 	if _explored_r > _explored_l:
-		var ex0 := _x_to_screen(_explored_l, sx, sw)
-		var ex1 := _x_to_screen(_explored_r, sx, sw)
-		draw_rect(Rect2(ex0, sy, ex1 - ex0, sh), Color(0.2, 0.26, 0.36))
-		draw_rect(Rect2(ex0, sy, ex1 - ex0, sh * 0.4), Color(0.26, 0.34, 0.46))
+		var ex0: float = (to_map.call(maxf(_explored_l, _bl), 0.0) as Vector2).x
+		var ex1: float = (to_map.call(minf(_explored_r, _br), 0.0) as Vector2).x
+		draw_rect(Rect2(ex0, my, ex1 - ex0, map_h), Color(0.12, 0.16, 0.24, 0.6))
 
-	# POI pins (only if within the explored band — fog of war).
-	_pins("checkpoint", Color(0.7, 0.45, 0.85), "R", sx, sw, sy, sh)
-	_pins("shrine", Color(0.55, 0.72, 1.0), "S", sx, sw, sy, sh)
-	_pins("boss", Color(0.85, 0.3, 0.34), "B", sx, sw, sy, sh)
-	_pins("exit", Color(0.6, 0.85, 0.7), "G", sx, sw, sy, sh)
-	_pins("portal", Color(0.7, 0.66, 1.0), "P", sx, sw, sy, sh)
+	# Terrain silhouette — only the interior platforms/floors, fogged by explore.
+	if _terrain and _terrain.has_method("get_solids"):
+		for r in _terrain.get_solids():
+			# Skip the ceiling and the full-height border walls (they're the frame).
+			if r.position.y <= 0.0 or r.size.y > 180.0:
+				continue
+			var cxw: float = r.position.x + r.size.x * 0.5
+			if cxw < _explored_l or cxw > _explored_r:
+				continue
+			var a: Vector2 = to_map.call(r.position.x, r.position.y)
+			var b: Vector2 = to_map.call(r.end.x, r.end.y)
+			var rect := Rect2(a, b - a)
+			rect.size = rect.size.max(Vector2(1.5, 1.5))
+			draw_rect(rect, Color(0.5, 0.56, 0.7))
+			draw_rect(Rect2(rect.position, Vector2(rect.size.x, 1.0)), Color(0.7, 0.78, 0.92))
 
-	# Player marker.
+	# Spike pits (hazards) as small red warnings.
+	if _terrain and _terrain.has_method("hazards"):
+		for r in _terrain.hazards():
+			var cxw: float = r.position.x + r.size.x * 0.5
+			if cxw < _explored_l or cxw > _explored_r:
+				continue
+			var a: Vector2 = to_map.call(r.position.x, r.position.y)
+			var w: float = r.size.x * scale
+			draw_rect(Rect2(a.x, a.y, w, 2.0), Color(0.85, 0.3, 0.32, 0.85))
+
+	# POI pins.
+	_pins("checkpoint", Color(0.7, 0.45, 0.85), to_map, my, map_h)
+	_pins("boss", Color(0.85, 0.3, 0.34), to_map, my, map_h)
+	_pins("exit", Color(0.55, 0.85, 0.95), to_map, my, map_h)
+	_pins("portal", Color(0.7, 0.66, 1.0), to_map, my, map_h)
+	_pins("shrine", Color(1.0, 0.55, 0.6), to_map, my, map_h)
+
+	# Player marker (pulsing).
 	if _player:
-		var mx := _x_to_screen(_player.global_position.x, sx, sw)
-		draw_colored_polygon(PackedVector2Array([
-			Vector2(mx, sy - 6.0), Vector2(mx + 4.0, sy - 13.0), Vector2(mx - 4.0, sy - 13.0)]),
-			Color(1, 1, 1))
-		draw_line(Vector2(mx, sy), Vector2(mx, sy + sh), Color(1, 1, 1, 0.8), 1.5)
+		var p: Vector2 = to_map.call(_player.global_position.x, _player.global_position.y)
+		draw_circle(p, 4.0, Color(1, 1, 1, 0.25))
+		draw_circle(p, 2.2, Color(1, 1, 1))
 
-	draw_string(FONT, Vector2(sx, sy + sh + 24.0), "hold TAB to view", HORIZONTAL_ALIGNMENT_LEFT, sw, 9, Color(0.5, 0.52, 0.62))
+	draw_string(FONT, Vector2(px0 + pad, py0 + map_h + pad * 0.7), "hold TAB", HORIZONTAL_ALIGNMENT_LEFT, pw, 9, Color(0.5, 0.54, 0.66))
 
 
-func _pins(group: String, col: Color, glyph: String, sx: float, sw: float, sy: float, sh: float) -> void:
+func _pins(group: String, col: Color, to_map: Callable, my: float, map_h: float) -> void:
 	for n in get_tree().get_nodes_in_group(group):
 		if not (n is Node2D):
 			continue
 		var wx: float = (n as Node2D).global_position.x
-		# Fog of war: only show what you've discovered.
 		if wx < _explored_l or wx > _explored_r:
 			continue
-		var px := _x_to_screen(wx, sx, sw)
-		draw_circle(Vector2(px, sy + sh * 0.5), 4.0, col)
-		draw_circle(Vector2(px, sy + sh * 0.5), 4.0, Color(0, 0, 0, 0.5), false)
-		draw_string(FONT, Vector2(px - 4.0, sy - 2.0), glyph, HORIZONTAL_ALIGNMENT_CENTER, 8, 8, col)
+		var p: Vector2 = to_map.call(wx, (n as Node2D).global_position.y)
+		# Pin sits just above the floor line for clarity.
+		var pin := Vector2(p.x, my + map_h - 4.0)
+		draw_circle(pin, 3.0, col)
+		draw_line(pin, Vector2(pin.x, my), Color(col.r, col.g, col.b, 0.25), 1.0)

@@ -213,6 +213,7 @@ func _do_screech(player: Node2D) -> void:
 func _do_summon() -> void:
 	for i in range(2):
 		var bat := BAT.instantiate()
+		bat.add_to_group("summoned_bat")
 		get_parent().add_child(bat)
 		bat.global_position = global_position + Vector2(-30 + i * 60, 16)
 	_flash_tell(Color(0.8, 0.7, 1.0))
@@ -241,6 +242,25 @@ func take_damage(amount: int, from: Vector2 = Vector2.ZERO) -> void:
 	if not is_dead() and _phase() != was and _sprite:
 		var tint := Color(0.8, 0.55, 0.7) if _phase() == 2 else Color(1.0, 0.5, 0.55)
 		create_tween().tween_property(_sprite, "modulate", tint, 0.4)
+
+
+## Player died mid-fight: reset to full HP (and clear the arena) so it's a clean
+## retry — both of you start over, the way the player asked.
+func reset_fight() -> void:
+	if is_dead():
+		return
+	health = max_health
+	_cooldown = 1.0
+	velocity = Vector2.ZERO
+	global_position = Vector2(global_position.x, home_y)
+	if _sprite:
+		_sprite.modulate = Color(0.7, 0.62, 0.8)
+	for n in get_tree().get_nodes_in_group("boss_projectile"):
+		n.queue_free()
+	for n in get_tree().get_nodes_in_group("summoned_bat"):
+		n.queue_free()
+	_state = HOVER if _engaged else DORMANT
+	health_changed.emit(health, max_health)
 
 
 func _die() -> void:

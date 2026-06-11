@@ -16,6 +16,7 @@ func launch(dir: Vector2) -> void:
 
 
 func _ready() -> void:
+	add_to_group("boss_projectile")
 	collision_layer = 0
 	collision_mask = 2     # the player's hurtbox
 	monitoring = true
