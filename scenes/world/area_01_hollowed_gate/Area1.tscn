@@ -77,11 +77,11 @@ texture = ExtResource("3_walls")
 region_enabled = true
 region_rect = Rect2(0, 0, 3700, 288)
 
-[node name="BgArchitecture" type="Node2D" parent="."]
-script = ExtResource("16_arch")
-
 [node name="BgDetail" type="Node2D" parent="."]
 script = ExtResource("12_bgdetail")
+
+[node name="BgArchitecture" type="Node2D" parent="."]
+script = ExtResource("16_arch")
 
 [node name="Terrain" type="Node2D" parent="."]
 script = ExtResource("1_terrain")

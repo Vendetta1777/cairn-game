@@ -83,9 +83,10 @@ func _physics_process(delta: float) -> void:
 	var player := get_tree().get_first_node_in_group("player")
 	match _state:
 		DORMANT:
-			_hover_drift(delta, player, false)
-			if player and absf(player.global_position.x - global_position.x) < aggro_range:
-				engage()
+			# Hang still over the arena until the BossTrigger wakes her (or she's
+			# struck). No early aggro through the walls before you arrive.
+			var ty := home_y + sin(_bob) * 8.0
+			velocity = Vector2(0.0, (ty - global_position.y) * 2.0)
 		HOVER:
 			_do_hover(delta, player)
 		SWOOP_TELL:

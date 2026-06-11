@@ -23,7 +23,7 @@ fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(0.5, 0)
 
 [sub_resource type="RectangleShape2D" id="shape_hitbox"]
-size = Vector2(24, 26)
+size = Vector2(40, 30)
 
 [sub_resource type="RectangleShape2D" id="shape_hurtbox"]
 size = Vector2(14, 26)

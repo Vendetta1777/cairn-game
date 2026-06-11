@@ -66,11 +66,12 @@ func _process(delta: float) -> void:
 	if _hitbox and _controller:
 		var f: int = _controller.get_facing()
 		if Input.is_action_pressed("move_up"):
-			_hitbox.position = Vector2(f * 4.0, -19.0)
+			_hitbox.position = Vector2(f * 4.0, -24.0)
 		elif Input.is_action_pressed("move_down"):
-			_hitbox.position = Vector2(f * 4.0, 20.0)
+			_hitbox.position = Vector2(f * 4.0, 24.0)
 		else:
-			_hitbox.position = Vector2(f * 16.0, -12.0)
+			# Reach forward to match the slash crescent's visual length.
+			_hitbox.position = Vector2(f * 22.0, -12.0)
 
 	if Input.is_action_just_pressed("attack") and _cooldown <= 0.0:
 		_do_attack()
