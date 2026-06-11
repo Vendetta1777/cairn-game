@@ -1,0 +1,46 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/AreaComplete.gd" id="1_ac"]
+[ext_resource type="FontFile" path="res://assets/fonts/silkscreen.ttf" id="2_font"]
+
+[node name="AreaComplete" type="CanvasLayer"]
+layer = 25
+script = ExtResource("1_ac")
+
+[node name="Dim" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.01, 0.01, 0.03, 0)
+mouse_filter = 2
+
+[node name="Center" type="Control" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Sub" type="Label" parent="Center"]
+offset_left = -260.0
+offset_top = -86.0
+offset_right = 260.0
+offset_bottom = -58.0
+theme_override_colors/font_color = Color(0.6, 0.66, 0.82, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "THE WARD IS BROKEN"
+horizontal_alignment = 1
+
+[node name="Title" type="Label" parent="Center"]
+offset_left = -420.0
+offset_top = -52.0
+offset_right = 420.0
+offset_bottom = 8.0
+theme_override_colors/font_color = Color(0.93, 0.95, 1, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 36
+text = "AREA COMPLETE"
+horizontal_alignment = 1

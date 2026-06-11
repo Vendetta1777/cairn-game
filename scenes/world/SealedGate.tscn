@@ -1,0 +1,36 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scenes/world/SealedGate.gd" id="1_gate"]
+
+[sub_resource type="Gradient" id="grad_ward"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.55, 0.7, 1, 1, 0.55, 0.7, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_ward"]
+gradient = SubResource("grad_ward")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[sub_resource type="RectangleShape2D" id="zone"]
+size = Vector2(60, 150)
+
+[node name="SealedGate" type="Node2D"]
+script = ExtResource("1_gate")
+
+[node name="WardLight" type="PointLight2D" parent="."]
+position = Vector2(0, -82)
+color = Color(0.55, 0.7, 1, 1)
+energy = 0.9
+texture = SubResource("tex_ward")
+texture_scale = 1.2
+
+[node name="Threshold" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="Col" type="CollisionShape2D" parent="Threshold"]
+position = Vector2(0, -75)
+shape = SubResource("zone")

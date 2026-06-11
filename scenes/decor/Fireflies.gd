@@ -5,7 +5,7 @@ extends Node2D
 
 @export var color := Color(0.5, 0.92, 0.75)
 # Cluster centres (x, y) and how many motes each.
-const CLUSTERS := [Vector2(500, 168), Vector2(1100, 178), Vector2(1700, 140), Vector2(2300, 150), Vector2(2650, 160)]
+const CLUSTERS := [Vector2(500, 168), Vector2(1100, 178), Vector2(1700, 140), Vector2(2300, 150), Vector2(2650, 160), Vector2(3050, 158), Vector2(3360, 150)]
 const PER_CLUSTER := 5
 
 var _motes: Array = []

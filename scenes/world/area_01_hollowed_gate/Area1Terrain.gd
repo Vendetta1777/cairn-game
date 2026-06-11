@@ -33,19 +33,20 @@ const CRATE_DK := Color(0.2, 0.13, 0.08)
 const CRATE_LIP := Color(0.46, 0.34, 0.21)
 const CRATE_BOLT := Color(0.55, 0.5, 0.42)
 
-@export var bounds := Rect2(0, 0, 2800, 288)
+@export var bounds := Rect2(0, 0, 3500, 288)
 @export var fall_damage_halves := 2   # one full heart when you fall in a pit
 
 # Paced left->right: a long SAFE intro floor (story, no pits/enemies), then
 # pits + platforming only once the player has learned the ropes.
 const TERRAIN: Array[Rect2] = [
-	Rect2(0, 0, 2800, 14),        # ceiling
+	Rect2(0, 0, 3500, 14),        # ceiling
 	Rect2(0, 0, 14, 288),         # left wall
-	Rect2(2786, 0, 14, 288),      # right wall
+	Rect2(3486, 0, 14, 288),      # right wall (behind the gate)
 	# floors — continuous & safe through the intro/bats/NPC, pits come later
 	Rect2(14, 252, 1900, 36),     # x14..1914  (intro + bats + NPC, NO pits)
 	Rect2(2000, 252, 360, 36),    # x2000..2360 (pit before)
 	Rect2(2440, 252, 346, 36),    # x2440..2786 (pit before; checkpoint)
+	Rect2(2786, 252, 700, 36),    # x2786..3486 (the boss arena + gate, flat)
 	# spaced platforms — kept within jump reach of the floor (~40-50px up)
 	Rect2(330, 212, 120, 16),     # intro (decorative, reachable)
 	Rect2(640, 206, 130, 16),     # intro

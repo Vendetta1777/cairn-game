@@ -4,7 +4,7 @@ extends Node2D
 ## few remnant window-lights still burning), and grand carved pillars + an arch
 ## framing the space — the architecture of a people who are gone. Hazy = depth.
 
-@export var bounds := Rect2(0, 0, 2800, 288)
+@export var bounds := Rect2(0, 0, 3500, 288)
 
 const TOWN_FAR := Color(0.115, 0.12, 0.175)
 const TOWN_NEAR := Color(0.085, 0.09, 0.135)
