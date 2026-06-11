@@ -68,14 +68,14 @@ texture_repeat = 1
 centered = false
 texture = ExtResource("2_bg")
 region_enabled = true
-region_rect = Rect2(0, 0, 3500, 288)
+region_rect = Rect2(0, 0, 3700, 288)
 
 [node name="Walls" type="Sprite2D" parent="Background"]
 texture_repeat = 1
 centered = false
 texture = ExtResource("3_walls")
 region_enabled = true
-region_rect = Rect2(0, 0, 3500, 288)
+region_rect = Rect2(0, 0, 3700, 288)
 
 [node name="BgArchitecture" type="Node2D" parent="."]
 script = ExtResource("16_arch")
@@ -127,12 +127,6 @@ position = Vector2(110, 252)
 [node name="Player" parent="." instance=ExtResource("4_player")]
 position = Vector2(50, 215)
 
-[node name="SanctumPortal" parent="." instance=ExtResource("26_portal")]
-position = Vector2(210, 252)
-target_scene = "res://scenes/world/sanctum/Sanctum.tscn"
-label = "The Sanctum"
-glow_color = Color(0.6, 0.55, 0.95, 1)
-
 [node name="Bat1" parent="." instance=ExtResource("5_bat")]
 position = Vector2(1080, 140)
 
@@ -162,6 +156,12 @@ position = Vector2(3180, 224)
 
 [node name="SealedGate" parent="." instance=ExtResource("21_gate")]
 position = Vector2(3440, 252)
+
+[node name="ReturnPortal" parent="." instance=ExtResource("26_portal")]
+position = Vector2(3580, 252)
+target_scene = "res://scenes/world/sanctum/Sanctum.tscn"
+label = "Return to the Sanctum"
+glow_color = Color(0.6, 0.55, 0.95, 1)
 
 [node name="BatsTrigger" type="Area2D" parent="." groups=["trigger"]]
 position = Vector2(980, 150)

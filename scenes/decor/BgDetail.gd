@@ -4,7 +4,7 @@ extends Node2D
 ## couple of soft light shafts, a few PURPOSEFUL glowing crystal clusters by
 ## landmarks, and a handful of feature vines. The top is left mostly empty/dark.
 
-@export var bounds := Rect2(0, 0, 3500, 288)
+@export var bounds := Rect2(0, 0, 3700, 288)
 
 const FAR := Color(0.125, 0.135, 0.2)     # hazy, recedes
 const NEAR := Color(0.07, 0.08, 0.12)     # darker, closer

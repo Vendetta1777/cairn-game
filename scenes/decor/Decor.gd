@@ -24,6 +24,8 @@ const TORCHES := [
 	Vector2(2620, 252),   # near the checkpoint
 	Vector2(2900, 252),   # arena entrance
 	Vector2(3360, 252),   # flanking the gate
+	Vector2(3540, 252),   # threshold chamber, by the portal
+	Vector2(3640, 252),   # threshold chamber
 ]
 const CRYSTALS := [
 	Vector2(70, 252), Vector2(640, 206), Vector2(1060, 210),

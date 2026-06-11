@@ -18,17 +18,39 @@ var _t := 0.0
 @onready var _ward: PointLight2D = $WardLight
 @onready var _zone: Area2D = $Threshold
 
+var _blocker: StaticBody2D
+
 
 func _ready() -> void:
 	QuestTracker.boss_defeated.connect(_on_boss_defeated)
 	_zone.area_entered.connect(_on_area)
+	_make_blocker()
 	# Already cleared (e.g. respawn after the fight)? Start open.
 	if QuestTracker.has_flag("boss_%s_dead" % boss_id):
 		_sealed = false
 		_open_amt = 1.0
 		_ward.energy = 0.0
+		_remove_blocker()
 		QuestTracker.set_objective(open_objective)
 	set_process(true)
+
+
+## A solid wall in the doorway so the player CANNOT pass until the ward breaks.
+func _make_blocker() -> void:
+	_blocker = StaticBody2D.new()
+	var cs := CollisionShape2D.new()
+	var shape := RectangleShape2D.new()
+	shape.size = Vector2(28, 156)
+	cs.shape = shape
+	cs.position = Vector2(0, -78)
+	_blocker.add_child(cs)
+	add_child(_blocker)
+
+
+func _remove_blocker() -> void:
+	if _blocker:
+		_blocker.queue_free()
+		_blocker = null
 
 
 func _process(delta: float) -> void:
@@ -45,6 +67,7 @@ func _on_boss_defeated(id: String) -> void:
 	if id != boss_id or not _sealed:
 		return
 	_sealed = false
+	_remove_blocker()
 	QuestTracker.set_objective(open_objective)
 	# Ward shatters: bright flash then dark.
 	_ward.color = Color(0.8, 0.85, 1.0)
