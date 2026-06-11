@@ -1,0 +1,102 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://scenes/world/sanctum/Sanctum.gd" id="1_root"]
+[ext_resource type="Script" path="res://scenes/world/sanctum/SanctumRoom.gd" id="2_room"]
+[ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="3_player"]
+[ext_resource type="PackedScene" path="res://scenes/world/sanctum/SkillAltar.tscn" id="4_altar"]
+[ext_resource type="PackedScene" path="res://scenes/world/Portal.tscn" id="5_portal"]
+[ext_resource type="PackedScene" path="res://scenes/npc/LoreNPC.tscn" id="6_lore"]
+[ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="7_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/SkillTreeUI.tscn" id="8_tree"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DialogueBox.tscn" id="9_dlg"]
+[ext_resource type="PackedScene" path="res://scenes/ui/LocationTitle.tscn" id="10_loc"]
+
+[sub_resource type="Gradient" id="grad_light"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_light"]
+gradient = SubResource("grad_light")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[sub_resource type="Gradient" id="grad_vig"]
+offsets = PackedFloat32Array(0.55, 1)
+colors = PackedColorArray(0, 0, 0, 0, 0.01, 0.01, 0.03, 0.6)
+
+[sub_resource type="GradientTexture2D" id="tex_vig"]
+gradient = SubResource("grad_vig")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[node name="Sanctum" type="Node2D"]
+script = ExtResource("1_root")
+
+[node name="Mood" type="CanvasModulate" parent="."]
+color = Color(0.5, 0.52, 0.66, 1)
+
+[node name="Room" type="Node2D" parent="."]
+script = ExtResource("2_room")
+
+[node name="TorchL" type="PointLight2D" parent="."]
+position = Vector2(150, 210)
+color = Color(1, 0.7, 0.42, 1)
+energy = 1.0
+texture = SubResource("tex_light")
+texture_scale = 1.0
+
+[node name="TorchR" type="PointLight2D" parent="."]
+position = Vector2(810, 210)
+color = Color(1, 0.7, 0.42, 1)
+energy = 1.0
+texture = SubResource("tex_light")
+texture_scale = 1.0
+
+[node name="AltarGlow" type="PointLight2D" parent="."]
+position = Vector2(480, 220)
+color = Color(0.5, 0.68, 1, 1)
+energy = 0.7
+texture = SubResource("tex_light")
+texture_scale = 1.2
+
+[node name="SkillAltar" parent="." instance=ExtResource("4_altar")]
+position = Vector2(480, 240)
+
+[node name="LoreNPC" parent="." instance=ExtResource("6_lore")]
+position = Vector2(280, 252)
+lines = PackedStringArray("You are dead, wanderer. As are we all, here.", "This is the Sanctum — the one still point in falling Cairn.", "Bring me the Shards of what you slay, and I will carve their strength into your memory at the altar.", "Echoes scatter when you fall. Strength, once carved, is yours to keep.", "Descend when you are ready. The Pale Sovereign waits below.")
+location_name = "THE SANCTUM"
+location_subtitle = "A REST BETWEEN DEATHS"
+reveals_location = false
+
+[node name="Player" parent="." instance=ExtResource("3_player")]
+position = Vector2(110, 215)
+
+[node name="Portal" parent="." instance=ExtResource("5_portal")]
+position = Vector2(880, 252)
+target_scene = "res://scenes/world/area_01_hollowed_gate/Area1.tscn"
+label = "Descend"
+
+[node name="Vignette" type="CanvasLayer" parent="."]
+layer = 5
+
+[node name="Tex" type="TextureRect" parent="Vignette"]
+offset_right = 960.0
+offset_bottom = 540.0
+texture = SubResource("tex_vig")
+stretch_mode = 0
+mouse_filter = 2
+
+[node name="HUD" parent="." instance=ExtResource("7_hud")]
+
+[node name="DialogueBox" parent="." instance=ExtResource("9_dlg")]
+
+[node name="LocationTitle" parent="." instance=ExtResource("10_loc")]
+
+[node name="SkillTreeUI" parent="." instance=ExtResource("8_tree")]

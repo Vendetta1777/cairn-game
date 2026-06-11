@@ -24,6 +24,8 @@ config/icon="res://icon.svg"
 
 GameManager="*res://scenes/systems/GameManager.gd"
 QuestTracker="*res://scenes/systems/QuestTracker.gd"
+PlayerProgress="*res://scenes/systems/PlayerProgress.gd"
+SaveManager="*res://scenes/systems/SaveManager.gd"
 
 [display]
 

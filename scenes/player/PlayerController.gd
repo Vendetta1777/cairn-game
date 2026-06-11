@@ -83,6 +83,10 @@ func _ready() -> void:
 	var tick := float(ProjectSettings.get_setting("physics/common/physics_ticks_per_second", 60))
 	_coyote_time = coyote_frames / tick
 	_jump_buffer_time = jump_buffer_frames / tick
+	# Permanent Body / Blade skill-tree bonuses.
+	run_speed += PlayerProgress.bonus("run_speed")
+	parry_window_time += PlayerProgress.bonus("parry_window")
+	hurt_invuln_time += PlayerProgress.bonus("dash_iframes")
 
 
 func _physics_process(delta: float) -> void:

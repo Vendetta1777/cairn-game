@@ -21,14 +21,29 @@ var health: int                        ## in half-heart units
 var shadow: float
 var echoes: int = 0
 var shards: int = 0
+var _shadow_regen: float = 0.0         ## per-second, from the Shadow skill branch
 
 
 func _ready() -> void:
+	# Pull everything persistent (hearts, currency) from PlayerProgress and fold
+	# in the unlocked skill-tree bonuses, so a fresh player in any scene starts
+	# with the player's permanent progression already applied.
+	max_hearts = PlayerProgress.max_hearts()
+	max_shadow += PlayerProgress.bonus("max_shadow")
+	_shadow_regen = PlayerProgress.bonus("shadow_regen")
 	max_health = max_hearts * HALVES_PER_HEART
 	health = max_health
 	shadow = max_shadow
+	shards = PlayerProgress.shards
+	echoes = PlayerProgress.echoes
 	# Defer so the HUD (which connects in its own _ready) gets the initial values.
 	call_deferred("_broadcast")
+
+
+func _process(delta: float) -> void:
+	if _shadow_regen > 0.0 and shadow < max_shadow:
+		shadow = minf(max_shadow, shadow + _shadow_regen * delta)
+		shadow_changed.emit(shadow, max_shadow)
 
 
 func _broadcast() -> void:
@@ -44,6 +59,9 @@ func take_damage(amount: int = 1) -> void:
 	health = max(0, health - amount)
 	health_changed.emit(health, max_health)
 	if health == 0:
+		# Roguelite penalty: Echoes are dropped on death (Shards are kept).
+		PlayerProgress.drop_echoes()
+		echoes = 0
 		died.emit()
 
 
@@ -52,8 +70,10 @@ func heal(halves: int) -> void:
 	health_changed.emit(health, max_health)
 
 
-## Permanent heart upgrade (the future NPC). Also tops up the new heart.
+## Permanent heart upgrade (the Keeper NPC). Persists via PlayerProgress and tops
+## up the new heart.
 func add_heart(count: int = 1) -> void:
+	PlayerProgress.bonus_hearts += count
 	max_hearts += count
 	max_health = max_hearts * HALVES_PER_HEART
 	health = min(max_health, health + count * HALVES_PER_HEART)
@@ -62,6 +82,7 @@ func add_heart(count: int = 1) -> void:
 
 func add_shards(count: int) -> void:
 	shards += count
+	PlayerProgress.add_shards(count)
 	shards_changed.emit(shards)
 
 
@@ -69,8 +90,14 @@ func spend_shards(count: int) -> bool:
 	if shards < count:
 		return false
 	shards -= count
+	PlayerProgress.spend_shards(count)
 	shards_changed.emit(shards)
 	return true
+
+
+func add_echoes(count: int) -> void:
+	echoes += count
+	PlayerProgress.add_echoes(count)
 
 
 func spend_shadow(amount: float) -> bool:

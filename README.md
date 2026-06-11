@@ -42,11 +42,13 @@ Full design doc: [`CAIRN_GAME_BRIEF.md`](CAIRN_GAME_BRIEF.md).
 downloadable artifact. It pins Godot **4.3** — if you install a different 4.x, bump `GODOT_VERSION`
 and the container image tag, then re-save the export preset from the editor (Project → Export).
 
-## Status — Milestones 1–4 ✅ · Milestone 5 in progress
+## Status — Milestones 1–5 ✅ · Milestone 6 in progress
 - **M1** scaffold · repo + branches · CI · system stubs.
 - **M2** full movement controller (run, variable jump, coyote, buffer, dash + i-frames, crouch) · pixel-art player + animator.
 - **M3** combat v1: directional 3-hit combo, parry, dagger throw, shadow bolt, hit juice.
 - **M4** enemy AI: gloom-bat, husk-crawler, brute (elite) state machines.
 - **M5** Area 1 "The Hollowed Gate": paced left→right level, HUD, checkpoints, lore NPC + dialogue, and now the **gameplay loop** — an objective tracker, the **Hollow Warden** boss (3 phases, ground-slam shockwaves, boss bar), the **Sealed Gate** that opens on the warden's death, and an **Area Complete** win state.
 
-Next in M5: a second boss / refining the encounter, then **M6: progression systems** (skill tree, roguelite loop, Sanctum, save).
+- **M6** progression systems: a persistent **`PlayerProgress`** spine, the **skill tree** (30 nodes / 3 branches — Blade · Shadow · Body — bought with Shards, real stat/ability effects), **Echoes** soft currency (dropped on death) vs **Shards** (kept), the **Sanctum** hub (rest, lore, skill altar, descend portal), and **3-slot save/load** with auto-save on checkpoint / boss death / area transition.
+
+Next in M6: roguelite run boons (Shrines) + the fog-of-war map, then **M7: Areas 2–4** with ability unlocks.

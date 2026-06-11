@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3]
+[gd_scene load_steps=32 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1Terrain.gd" id="1_terrain"]
 [ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1.gd" id="1_root"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/BossBar.tscn" id="23_bossbar"]
 [ext_resource type="PackedScene" path="res://scenes/ui/ObjectiveHUD.tscn" id="24_obj"]
 [ext_resource type="PackedScene" path="res://scenes/ui/AreaComplete.tscn" id="25_ac"]
+[ext_resource type="PackedScene" path="res://scenes/world/Portal.tscn" id="26_portal"]
 [ext_resource type="Texture2D" path="res://assets/environment/caverns/background.png" id="2_bg"]
 [ext_resource type="Texture2D" path="res://assets/environment/caverns/back-walls.png" id="3_walls"]
 [ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="4_player"]
@@ -125,6 +126,12 @@ position = Vector2(110, 252)
 
 [node name="Player" parent="." instance=ExtResource("4_player")]
 position = Vector2(50, 215)
+
+[node name="SanctumPortal" parent="." instance=ExtResource("26_portal")]
+position = Vector2(210, 252)
+target_scene = "res://scenes/world/sanctum/Sanctum.tscn"
+label = "The Sanctum"
+glow_color = Color(0.6, 0.55, 0.95, 1)
 
 [node name="Bat1" parent="." instance=ExtResource("5_bat")]
 position = Vector2(1080, 140)

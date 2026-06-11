@@ -42,6 +42,7 @@ var _shadow_max := 50.0
 var _daggers := 3
 var _dagger_max := 3
 var _shards := 0
+var _echoes := 0
 var _time := 0.0
 
 
@@ -57,6 +58,11 @@ func _ready() -> void:
 		_on_health(stats.health, stats.max_health)
 		_on_shadow(stats.shadow, stats.max_shadow)
 		_shards = stats.shards
+	# Currency (Shards + Echoes) is owned by PlayerProgress — track it there so
+	# it stays correct when spent in the Sanctum or dropped on death.
+	PlayerProgress.currency_changed.connect(_on_currency)
+	_shards = PlayerProgress.shards
+	_echoes = PlayerProgress.echoes
 	var combat := player.get_node_or_null("Combat")
 	if combat and combat.has_signal("daggers_changed"):
 		combat.daggers_changed.connect(_on_daggers)
@@ -70,6 +76,11 @@ func _on_daggers(count: int) -> void:
 
 func _on_shards(total: int) -> void:
 	_shards = total
+
+
+func _on_currency(shards: int, echoes: int) -> void:
+	_shards = shards
+	_echoes = echoes
 
 
 func _process(delta: float) -> void:
@@ -113,6 +124,15 @@ func _draw() -> void:
 		Color(0.35, 0.62, 0.78))
 	draw_string(ThemeDB.fallback_font, sd + Vector2(9, 4), "x%d" % _shards,
 		HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color(0.78, 0.86, 0.95))
+
+	# Echoes (soft currency, lost on death) — a faint violet wisp + count, below.
+	var ed := sd + Vector2(0.0, 15.0)
+	var flick := 0.7 + 0.3 * sin(_time * 4.0 + 1.0)
+	draw_circle(ed, 4.2, Color(0.5, 0.42, 0.78, 0.25 * flick))
+	draw_circle(ed, 2.6, Color(0.66, 0.56, 0.95, 0.9))
+	draw_circle(ed + Vector2(-0.8, -0.8), 1.0, Color(0.85, 0.8, 1.0, flick))
+	draw_string(ThemeDB.fallback_font, ed + Vector2(9, 4), "x%d" % _echoes,
+		HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color(0.74, 0.7, 0.92))
 
 
 # --- Hearts ---------------------------------------------------------------

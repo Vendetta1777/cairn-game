@@ -27,6 +27,8 @@ var _cooldown := 0.0
 var _combo := 0
 var _combo_timer := 0.0
 var _daggers := 3
+var _finisher_bonus := 0      ## extra finisher damage from the Blade tree
+var _bolt_pierce_bonus := 0   ## extra shadow-bolt pierce from the Shadow tree
 var _controller
 var _hitbox: Area2D
 var _camera
@@ -43,6 +45,12 @@ func _ready() -> void:
 		_hitbox.monitoring = true
 	if _controller.has_signal("parried"):
 		_controller.parried.connect(_on_parried)
+	# Fold in permanent skill-tree bonuses (Blade / Shadow branches).
+	damage += int(PlayerProgress.bonus("damage"))
+	_finisher_bonus = int(PlayerProgress.bonus("finisher_damage"))
+	max_daggers += int(PlayerProgress.bonus("dagger_charges"))
+	shadow_bolt_cost = maxf(5.0, shadow_bolt_cost - PlayerProgress.bonus("bolt_discount"))
+	_bolt_pierce_bonus = int(PlayerProgress.bonus("bolt_pierce"))
 	_daggers = max_daggers
 	call_deferred("emit_signal", "daggers_changed", _daggers)
 
@@ -111,7 +119,7 @@ func _do_attack() -> void:
 		return
 	var already := {}
 	var connected := false
-	var dmg := damage + (1 if is_finisher else 0)
+	var dmg := damage + ((1 + _finisher_bonus) if is_finisher else 0)
 	for area in _hitbox.get_overlapping_areas():
 		var body := area.get_parent()
 		if body and body.has_method("take_damage") and not already.has(body):
@@ -148,7 +156,13 @@ func _throw_dagger() -> void:
 func _cast_shadow_bolt() -> void:
 	if _stats == null or not _stats.spend_shadow(shadow_bolt_cost):
 		return   # not enough shadow energy
-	_launch(SHADOW_BOLT)
+	var bolt := SHADOW_BOLT.instantiate()
+	if bolt.has_method("setup"):
+		bolt.setup(_controller.get_facing())
+	bolt.pierce += _bolt_pierce_bonus
+	_controller.get_parent().add_child(bolt)
+	var f: int = _controller.get_facing()
+	bolt.global_position = _controller.global_position + Vector2(f * 12.0, -8.0)
 
 
 ## Spawn a projectile scene at the player's front, aimed at the facing direction.
