@@ -16,6 +16,7 @@ var _t := 0.0
 
 
 func _ready() -> void:
+	add_to_group("portal")   # for the map overlay
 	_zone.area_entered.connect(_on_enter)
 	_zone.area_exited.connect(_on_exit)
 	_prompt.text = "[E] %s" % label

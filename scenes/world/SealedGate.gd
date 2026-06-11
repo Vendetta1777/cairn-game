@@ -22,6 +22,7 @@ var _blocker: StaticBody2D
 
 
 func _ready() -> void:
+	add_to_group("exit")   # for the map overlay
 	QuestTracker.boss_defeated.connect(_on_boss_defeated)
 	_zone.area_entered.connect(_on_area)
 	_make_blocker()

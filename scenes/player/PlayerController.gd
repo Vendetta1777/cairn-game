@@ -306,6 +306,22 @@ func _do_parry(attacker: Node) -> void:
 		attacker.stagger(global_position)
 	parried.emit(attacker)
 
+## Apply a run boon (from a Shrine) live to the current run. Routes each stat
+## key to the component that owns it. Not persisted — a fresh player has none.
+func grant_boon(effect: Dictionary) -> void:
+	if effect.has("run_speed"):
+		run_speed += float(effect["run_speed"])
+	if effect.has("parry_window"):
+		parry_window_time += float(effect["parry_window"])
+	var combat := get_node_or_null("Combat")
+	if combat and effect.has("damage"):
+		combat.damage += int(effect["damage"])
+	var stats := get_node_or_null("Stats")
+	if stats and effect.has("max_shadow"):
+		stats.max_shadow += float(effect["max_shadow"])
+		stats.refill_shadow()
+
+
 ## 1 = facing right, -1 = facing left.
 func get_facing() -> int:
 	return _facing

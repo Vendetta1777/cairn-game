@@ -14,6 +14,7 @@ var _active := false
 
 
 func _ready() -> void:
+	add_to_group("checkpoint")   # for the map overlay
 	# Already-set checkpoint (e.g. returning) stays lit.
 	if GameManager.has_checkpoint and GameManager.checkpoint_position.distance_to(global_position + respawn_offset) < 4.0:
 		_set_lit(true)
