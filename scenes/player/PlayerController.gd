@@ -39,10 +39,14 @@ class_name PlayerController
 @export var crouch_speed_mult: float = 0.5    ## crouch-walk is slower
 @export var crouch_detection_mult: float = 0.4 ## GDD: -60% detection radius => 40% remains
 
-# --- Ability gates (locked at M1; flipped on as the game unlocks them) ---
+# --- Ability gates: movement powers are found as Ability Relics in the world
+# and persist in PlayerProgress. require_unlocks=false (e.g. TestLevel) keeps
+# the exported values as-is for isolated testing.
 @export_group("Unlocked Abilities")
-@export var can_double_jump: bool = false     ## Area 3
-@export var can_wall_slide: bool = true       ## wall-slide + wall-jump (for parkour)
+@export var require_unlocks: bool = true      ## read dash/wall/double from PlayerProgress
+@export var can_dash: bool = true             ## found in Area 1 (The Hollowed Gate)
+@export var can_double_jump: bool = false     ## found in Area 3 (The Sunken Nave)
+@export var can_wall_slide: bool = true       ## wall-slide + wall-jump — found in Area 2 (The Ashpits)
 @export var can_swim: bool = false            ## Area 3
 @export var can_grapple: bool = false         ## Area 5
 
@@ -81,6 +85,7 @@ var _hurt_stun: float = 0.0
 var _parry_window: float = 0.0
 var _wall_jump_lock: float = 0.0
 var _is_wall_sliding: bool = false
+var _air_jumps: int = 0                       ## double-jump charges left this airtime
 
 # Cached frame->seconds conversions (computed in _ready from the physics tick).
 var _coyote_time: float
@@ -95,6 +100,17 @@ func _ready() -> void:
 	run_speed += PlayerProgress.bonus("run_speed")
 	parry_window_time += PlayerProgress.bonus("parry_window")
 	hurt_invuln_time += PlayerProgress.bonus("dash_iframes")
+	# Movement powers come from found Ability Relics (persisted), and switch on
+	# live the moment one is claimed mid-level.
+	if require_unlocks:
+		_apply_ability_unlocks()
+		PlayerProgress.ability_unlocked.connect(func(_id): _apply_ability_unlocks())
+
+
+func _apply_ability_unlocks() -> void:
+	can_dash = PlayerProgress.has_ability("dash")
+	can_wall_slide = PlayerProgress.has_ability("wall_jump")
+	can_double_jump = PlayerProgress.has_ability("double_jump")
 
 
 func _physics_process(delta: float) -> void:
@@ -135,6 +151,7 @@ func _update_timers(delta: float) -> void:
 	# Coyote time: refresh while grounded, count down once airborne.
 	if is_on_floor():
 		_coyote_timer = _coyote_time
+		_air_jumps = 1 if can_double_jump else 0
 	else:
 		_coyote_timer = maxf(0.0, _coyote_timer - delta)
 
@@ -192,6 +209,13 @@ func _handle_jump() -> void:
 		_facing = int(signf(wall_normal))
 		_wall_jump_lock = wall_jump_lock_time
 		_jump_buffer_timer = 0.0
+		_air_jumps = 1 if can_double_jump else 0   # a wall kick refreshes the air jump
+		jumped.emit()
+	# Double jump: airborne with a charge left — a second, slightly softer leap.
+	elif _jump_buffer_timer > 0.0 and can_double_jump and _air_jumps > 0:
+		_air_jumps -= 1
+		velocity.y = jump_velocity * 0.92
+		_jump_buffer_timer = 0.0
 		jumped.emit()
 
 	# Variable height: releasing jump while still rising cuts the ascent short.
@@ -202,6 +226,8 @@ func _handle_jump() -> void:
 # --- Dash ------------------------------------------------------------------
 
 func _handle_dash_start() -> void:
+	if not can_dash:
+		return
 	if Input.is_action_just_pressed("dash") and _dash_cooldown_timer <= 0.0:
 		_is_dashing = true
 		_dash_timer = dash_duration

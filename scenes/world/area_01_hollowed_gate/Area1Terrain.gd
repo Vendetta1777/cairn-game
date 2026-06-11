@@ -14,6 +14,7 @@ const TERRAIN: Array[Rect2] = [
 	Rect2(14, 252, 686, 36),      # x14..700
 	Rect2(300, 210, 110, 16),
 	Rect2(470, 180, 100, 16),
+	Rect2(560, 132, 100, 14),     # the loft — a dash-gated cache sits up here
 
 	# S2 — THE ROOST (combat: bats)
 	Rect2(760, 252, 560, 36),     # x760..1320
@@ -30,14 +31,18 @@ const TERRAIN: Array[Rect2] = [
 
 	# S4 — THE TIDES (moving platforms): pit 1990..2480
 	Rect2(2240, 205, 80, 14),     # mid-pit rest (between the two movers)
+	Rect2(2200, 128, 90, 14),     # high loft above the rest — double-jump only
 	Rect2(2480, 252, 110, 36),    # landing
 
-	# S5 — THE ASCENT (wall jump): pit 2590..2900 with a climb-only chimney
+	# S5 — THE ASCENT: pit 2590..2900. The low route hops across; the chimney
+	# is a wall-jump-only climb to a shrine (a backtracking reward — wall jump
+	# is found later, in The Ashpits).
 	Rect2(2624, 230, 56, 14),     # stepping stone
 	Rect2(2700, 238, 96, 14),     # chimney base
 	Rect2(2706, 120, 14, 70),     # left wall
 	Rect2(2782, 120, 14, 70),     # right wall
-	Rect2(2796, 124, 110, 16),    # exit ledge
+	Rect2(2796, 124, 110, 16),    # exit ledge (shrine up here)
+	Rect2(2826, 218, 64, 14),     # low-route hop to the arena side
 
 	# S6 — THE BROOD (boss arena + chasm + threshold)
 	Rect2(2900, 252, 786, 36),    # x2900..3686

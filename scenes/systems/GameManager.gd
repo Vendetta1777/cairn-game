@@ -16,6 +16,16 @@ var is_paused: bool = false
 var has_checkpoint: bool = false
 var checkpoint_position: Vector2 = Vector2.ZERO
 
+## The display name of the loaded area (set by each area root) and how long this
+## life has lasted — both shown on the death screen.
+var current_area_name: String = "THE DEEP"
+var run_time: float = 0.0
+
+
+func _process(delta: float) -> void:
+	if not get_tree().paused:
+		run_time += delta
+
 ## Where to drop the player when the next scene loads — set by a Portal so you
 ## arrive beside the destination's portal, not at the level start. null = none.
 var pending_spawn = null

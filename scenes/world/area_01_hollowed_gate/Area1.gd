@@ -7,6 +7,7 @@ const BOSS_ID := "mother_bat"
 
 
 func _ready() -> void:
+	GameManager.current_area_name = "THE HOLLOWED GATE"
 	QuestTracker.begin_area("The Waking — move with A / D, leap with Space")
 	QuestTracker.boss_defeated.connect(_on_boss_defeated)
 	# The Brood Mother dies ONCE. If she's already slain on this save, remove her

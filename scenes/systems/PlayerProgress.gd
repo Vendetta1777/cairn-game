@@ -8,6 +8,7 @@ extends Node
 
 signal currency_changed(shards: int, echoes: int)
 signal node_unlocked(id: String)
+signal ability_unlocked(id: String)
 signal progress_loaded
 
 # Preloaded rather than referenced by class_name: an autoload parses before global
@@ -21,6 +22,7 @@ var shards: int = 0
 var echoes: int = 0
 var bonus_half_hearts: int = 0     ## permanent HALF-heart upgrades, from heart-shrines only
 var unlocked: Dictionary = {}      ## node_id -> true
+var abilities: Dictionary = {}     ## movement abilities: "dash" / "wall_jump" / "double_jump"
 var flags: Dictionary = {}         ## story / world flags
 var furthest_area: String = "hollowed_gate"
 
@@ -113,6 +115,21 @@ func grant_half_heart() -> bool:
 	return true
 
 
+# --- movement abilities (metroidvania unlocks) --------------------------------
+
+func has_ability(id: String) -> bool:
+	return abilities.get(id, false)
+
+
+## An Ability Relic grants a movement power permanently. The live player listens
+## to ability_unlocked so the power works the moment it's claimed.
+func grant_ability(id: String) -> void:
+	if has_ability(id):
+		return
+	abilities[id] = true
+	ability_unlocked.emit(id)
+
+
 # --- flags -------------------------------------------------------------------
 
 func set_flag(flag: String, value: bool = true) -> void:
@@ -131,6 +148,7 @@ func to_dict() -> Dictionary:
 		"echoes": echoes,
 		"bonus_half_hearts": bonus_half_hearts,
 		"unlocked": unlocked.keys(),
+		"abilities": abilities.keys(),
 		"flags": flags,
 		"furthest_area": furthest_area,
 	}
@@ -143,6 +161,9 @@ func from_dict(d: Dictionary) -> void:
 	unlocked = {}
 	for id in d.get("unlocked", []):
 		unlocked[id] = true
+	abilities = {}
+	for id in d.get("abilities", []):
+		abilities[id] = true
 	flags = d.get("flags", {})
 	furthest_area = d.get("furthest_area", "hollowed_gate")
 	currency_changed.emit(shards, echoes)
@@ -154,6 +175,7 @@ func reset() -> void:
 	echoes = 0
 	bonus_half_hearts = 0
 	unlocked = {}
+	abilities = {}
 	flags = {}
 	furthest_area = "hollowed_gate"
 	currency_changed.emit(shards, echoes)

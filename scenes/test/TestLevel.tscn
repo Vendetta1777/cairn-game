@@ -116,6 +116,9 @@ shape = SubResource("shape_wall")
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
 position = Vector2(120, 100)
+require_unlocks = false
+can_dash = true
+can_double_jump = true
 
 [node name="Bat1" parent="." instance=ExtResource("5_bat")]
 position = Vector2(285, 108)

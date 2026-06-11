@@ -5,6 +5,7 @@ extends Node2D
 ## Sanctum keeps you from being stranded.
 
 func _ready() -> void:
+	GameManager.current_area_name = "THE SUNKEN WAY"
 	PlayerProgress.furthest_area = "sunken_way"
 	QuestTracker.begin_area("The Sunken Way — deeper still (more to come)")
 	call_deferred("_apply_pending_spawn")

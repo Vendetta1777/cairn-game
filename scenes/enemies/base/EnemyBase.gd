@@ -23,6 +23,7 @@ var _stagger_timer := 0.0
 
 
 func _ready() -> void:
+	add_to_group("enemy")   # the level's respawn registry finds enemies by this
 	health = max_health
 	_play(idle_anim)
 

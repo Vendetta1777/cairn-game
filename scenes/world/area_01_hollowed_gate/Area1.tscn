@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3]
+[gd_scene load_steps=36 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1Terrain.gd" id="1_terrain"]
 [ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1.gd" id="1_root"]
@@ -27,6 +27,10 @@
 [ext_resource type="PackedScene" path="res://scenes/npc/LoreNPC.tscn" id="17_lore"]
 [ext_resource type="PackedScene" path="res://scenes/ui/DialogueBox.tscn" id="18_dlg"]
 [ext_resource type="PackedScene" path="res://scenes/ui/LocationTitle.tscn" id="19_loc"]
+[ext_resource type="PackedScene" path="res://scenes/world/AbilityRelic.tscn" id="31_relic"]
+[ext_resource type="PackedScene" path="res://scenes/world/AbilityGate.tscn" id="32_agate"]
+[ext_resource type="PackedScene" path="res://scenes/world/ShardCache.tscn" id="33_cache"]
+[ext_resource type="PackedScene" path="res://scenes/world/Shrine.tscn" id="34_shrine"]
 
 [sub_resource type="Gradient" id="grad_light"]
 offsets = PackedFloat32Array(0, 1)
@@ -156,6 +160,31 @@ position = Vector2(2370, 213)
 travel = Vector2(110, 0)
 period = 3.6
 phase = 0.5
+
+[node name="DashRelic" parent="." instance=ExtResource("31_relic")]
+position = Vector2(1240, 252)
+ability_id = "dash"
+display_name = "THE SHADOWSTEP"
+subtitle = "DASH UNLOCKED — SHIFT"
+objective = "Dash with SHIFT — the gaps ahead demand it"
+
+[node name="LoftGate" parent="." instance=ExtResource("32_agate")]
+position = Vector2(600, 132)
+required_ability = "dash"
+gate_height = 70.0
+
+[node name="LoftCache" parent="." instance=ExtResource("33_cache")]
+position = Vector2(640, 132)
+cache_id = "a1_loft"
+shards = 8
+
+[node name="TidesLoftCache" parent="." instance=ExtResource("33_cache")]
+position = Vector2(2245, 128)
+cache_id = "a1_tides_loft"
+shards = 12
+
+[node name="ChimneyShrine" parent="." instance=ExtResource("34_shrine")]
+position = Vector2(2850, 124)
 
 [node name="MotherBat" parent="." instance=ExtResource("20_boss")]
 position = Vector2(3180, 110)

@@ -4,6 +4,7 @@ extends Node2D
 ## hear the keeper's lore, then descend through the portal.
 
 func _ready() -> void:
+	GameManager.current_area_name = "THE SANCTUM"
 	QuestTracker.set_objective("")
 	call_deferred("_apply_pending_spawn")
 	await get_tree().process_frame

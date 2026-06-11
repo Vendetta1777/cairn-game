@@ -30,8 +30,15 @@ const SPIKE_DK := Color(0.28, 0.3, 0.38)
 @export var fall_damage_halves := 2
 @export var ceiling_seed := 99
 
+const DEATH_SCREEN := preload("res://scenes/ui/DeathScreen.tscn")
+
 var _player: Node2D
 var _spawn := Vector2.ZERO
+var _death_screen   # DeathScreen (untyped: its script methods resolve at runtime)
+var _dying := false
+## Enemy spawn registry: every non-boss enemy's scene + position at level load,
+## so death can repopulate the level (enemies respawn; your Shards stay).
+var _enemy_spawns: Array[Dictionary] = []
 
 
 # --- Subclasses override these to define the level ---------------------------
@@ -57,7 +64,11 @@ func _ready() -> void:
 	for r in hazards():
 		_make_hazard(r)
 	queue_redraw()
+	_death_screen = DEATH_SCREEN.instantiate()
+	add_child(_death_screen)
+	_death_screen.respawn_requested.connect(_do_respawn)
 	call_deferred("_setup_player")
+	call_deferred("_capture_enemy_spawns")
 
 
 ## Solids + objects, for the map overlay to draw the level silhouette.
@@ -104,6 +115,9 @@ func _setup_player() -> void:
 	if _player == null:
 		return
 	_spawn = _player.global_position
+	# Checkpoints are per-level: a stone touched in the LAST area must not pull
+	# a death in THIS one back to coordinates that mean nothing here.
+	GameManager.has_checkpoint = false
 	var stats = _player.get_node_or_null("Stats")
 	if stats:
 		stats.died.connect(_on_player_died)
@@ -115,9 +129,31 @@ func _setup_player() -> void:
 		cam.limit_bottom = int(bounds.end.y)
 
 
-## Health hit 0 -> die: respawn at the checkpoint (or start) at full health, and
-## reset any active boss fight so it's a clean retry.
+## Snapshot every non-boss enemy at level load so death can repopulate them.
+func _capture_enemy_spawns() -> void:
+	_enemy_spawns.clear()
+	for e in get_tree().get_nodes_in_group("enemy"):
+		if e.is_in_group("boss") or e.scene_file_path == "":
+			continue
+		_enemy_spawns.append({
+			"scene": e.scene_file_path,
+			"pos": e.global_position,
+			"parent": e.get_parent().get_path(),
+		})
+
+
+## Health hit 0 -> the death sequence takes over: slow-mo, grey, YOU PERISHED.
+## The actual respawn happens in _do_respawn() when the player presses a key.
 func _on_player_died() -> void:
+	if _player == null or _dying:
+		return
+	_dying = true
+	_death_screen.play_death(GameManager.current_area_name, GameManager.run_time)
+
+
+## Put the world back: player at the shrine at full health, every boss fight
+## reset, every enemy repopulated. Shards/abilities persist — that's the loop.
+func _do_respawn() -> void:
 	if _player == null:
 		return
 	_player.global_position = GameManager.get_respawn(_spawn)
@@ -129,10 +165,50 @@ func _on_player_died() -> void:
 	for boss in get_tree().get_nodes_in_group("boss"):
 		if boss.has_method("reset_fight"):
 			boss.reset_fight()
-	GameManager.hitstop(0.16)
-	var cam = _player.get_node_or_null("Camera")
-	if cam and cam.has_method("add_trauma"):
-		cam.add_trauma(0.7)
+	_respawn_enemies()
+	GameManager.run_time = 0.0
+	get_tree().paused = false
+	_death_screen.dismiss()
+	_dying = false
+	_spawn_respawn_burst(_player.global_position)
+
+
+## Free whatever enemies are left and re-instance the level's original set.
+func _respawn_enemies() -> void:
+	for e in get_tree().get_nodes_in_group("enemy"):
+		if not e.is_in_group("boss"):
+			e.queue_free()
+	for rec in _enemy_spawns:
+		var packed: PackedScene = load(rec["scene"])
+		if packed == null:
+			continue
+		var parent := get_node_or_null(rec["parent"])
+		if parent == null:
+			continue
+		var e := packed.instantiate()
+		parent.add_child(e)
+		e.global_position = rec["pos"]
+
+
+## A brief burst of pale motes where the player re-forms at the shrine.
+func _spawn_respawn_burst(at: Vector2) -> void:
+	var p := CPUParticles2D.new()
+	p.one_shot = true
+	p.emitting = true
+	p.amount = 24
+	p.lifetime = 0.8
+	p.explosiveness = 0.95
+	p.direction = Vector2(0, -1)
+	p.spread = 70.0
+	p.initial_velocity_min = 30.0
+	p.initial_velocity_max = 90.0
+	p.gravity = Vector2(0, -40)
+	p.scale_amount_min = 1.0
+	p.scale_amount_max = 2.2
+	p.color = Color(0.6, 0.9, 1.0, 0.9)
+	add_child(p)
+	p.global_position = at
+	get_tree().create_timer(1.4).timeout.connect(p.queue_free)
 
 
 func _physics_process(_delta: float) -> void:
