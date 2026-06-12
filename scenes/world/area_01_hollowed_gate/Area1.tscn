@@ -1,4 +1,4 @@
-[gd_scene load_steps=42 format=3]
+[gd_scene load_steps=44 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1Terrain.gd" id="1_terrain"]
 [ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1.gd" id="1_root"]
@@ -37,6 +37,8 @@
 [ext_resource type="PackedScene" path="res://scenes/world/CharmPickup.tscn" id="93_cp"]
 [ext_resource type="PackedScene" path="res://scenes/ui/CharmUI.tscn" id="94_cu"]
 [ext_resource type="PackedScene" path="res://scenes/world/OrePickup.tscn" id="95_ore"]
+[ext_resource type="PackedScene" path="res://scenes/world/EchoPoint.tscn" id="97_ep"]
+[ext_resource type="PackedScene" path="res://scenes/ui/Cutscene.tscn" id="98_cut"]
 
 [sub_resource type="Gradient" id="grad_light"]
 offsets = PackedFloat32Array(0, 1)
@@ -372,3 +374,27 @@ pickup_id = "notch_a1b"
 [node name="OreLoft" parent="." instance=ExtResource("95_ore")]
 position = Vector2(700, 132)
 ore_id = "crypts"
+
+[node name="EchoBrood" parent="." instance=ExtResource("97_ep")]
+position = Vector2(3180, 252)
+echo_id = "a1_brood"
+title = "THE GATE FALLS"
+art = "sinking"
+text = "The gate guard held the brood back for six days. On the seventh, they sealed the gate with themselves inside."
+
+[node name="EchoThreshold" parent="." instance=ExtResource("97_ep")]
+position = Vector2(3580, 252)
+echo_id = "a1_threshold"
+title = "THE FIRST DESCENT"
+art = "sealing"
+text = "The court walked down this passage once, carrying the King. None of them planned to walk back up."
+
+[node name="EchoMason" parent="." instance=ExtResource("97_ep")]
+position = Vector2(590, 132)
+echo_id = "a1_mason"
+title = "WHAT THE MASON HID"
+art = "hollow"
+reveals_cache = true
+text = "A mason carved his daughter's name where the foreman wouldn't look. The wage he hid beside it is still good."
+
+[node name="Cutscene" parent="." instance=ExtResource("98_cut")]

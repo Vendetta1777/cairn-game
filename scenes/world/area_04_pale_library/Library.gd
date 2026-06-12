@@ -29,10 +29,19 @@ func _ready() -> void:
 		var boss := get_node_or_null("PaleLibrarian")
 		if boss:
 			boss.queue_free()
-	# The Archivist's ghost sells hints for shards.
+	# The Archivist's ghost sells hints — and teaches the ECHO TOUCH.
 	var ghost := get_node_or_null("LoreNPC")
 	if ghost:
 		ghost.chose.connect(_on_ghost_choice)
+		if not PlayerProgress.has_flag("echo_touch"):
+			ghost.chose.connect(func(_i):
+				if not PlayerProgress.has_flag("echo_touch"):
+					PlayerProgress.set_flag("echo_touch")
+					SaveManager.autosave()
+					var banner := get_tree().get_first_node_in_group("location_title")
+					if banner and banner.has_method("reveal"):
+						banner.reveal("THE ECHO TOUCH", "hold E where the past pools — it will show you")
+				, CONNECT_ONE_SHOT)
 	call_deferred("_apply_pending_spawn")
 	await get_tree().process_frame
 	var title := get_tree().get_first_node_in_group("location_title")

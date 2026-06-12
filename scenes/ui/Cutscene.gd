@@ -22,6 +22,7 @@ var _fade := 0.0       ## panel fade-in
 
 
 func _ready() -> void:
+	add_to_group("cutscene")
 	layer = 40
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	visible = false

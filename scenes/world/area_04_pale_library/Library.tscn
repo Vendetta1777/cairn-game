@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=3]
+[gd_scene load_steps=40 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_04_pale_library/Library.gd" id="1_root"]
 [ext_resource type="Script" path="res://scenes/world/area_04_pale_library/LibraryTerrain.gd" id="2_terrain"]
@@ -35,6 +35,8 @@
 [ext_resource type="PackedScene" path="res://scenes/world/CharmPickup.tscn" id="93_cp"]
 [ext_resource type="PackedScene" path="res://scenes/ui/CharmUI.tscn" id="94_cu"]
 [ext_resource type="PackedScene" path="res://scenes/world/OrePickup.tscn" id="95_ore"]
+[ext_resource type="PackedScene" path="res://scenes/world/EchoPoint.tscn" id="97_ep"]
+[ext_resource type="PackedScene" path="res://scenes/ui/Cutscene.tscn" id="98_cut"]
 
 [sub_resource type="Gradient" id="grad"]
 offsets = PackedFloat32Array(0, 1)
@@ -324,3 +326,19 @@ pickup_id = "notch_a4"
 position = Vector2(3470, 252)
 ore_id = "library"
 appears_flag = "boss_pale_librarian_dead"
+
+[node name="EchoArgument" parent="." instance=ExtResource("97_ep")]
+position = Vector2(1400, 252)
+echo_id = "a4_argument"
+title = "THE ARGUMENT"
+art = "sealing"
+text = "Two scholars argued a decade over one forbidden page. The Librarian ended the argument by becoming it."
+
+[node name="EchoBinding" parent="." instance=ExtResource("97_ep")]
+position = Vector2(3320, 252)
+echo_id = "a4_binding"
+title = "THE BINDING"
+art = "king"
+text = "They fed it every book that frightened them, and called the fear curation. It learned to shelve itself last."
+
+[node name="Cutscene" parent="." instance=ExtResource("98_cut")]

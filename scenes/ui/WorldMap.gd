@@ -63,6 +63,7 @@ const GATE_TINTS := {
 var _open := false
 var _t := 0.0
 var _etch: Dictionary = {}    ## area id -> etch progress 0..1 (1 = fully drawn)
+var _journal := false         ## the tablet's back face: the echo journal
 
 
 func _ready() -> void:
@@ -73,6 +74,11 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("world_map"):
 		_toggle()
+		get_viewport().set_input_as_handled()
+	elif _open and event.is_action_pressed("interact"):
+		# Flip the tablet over: the ECHO JOURNAL lives on the back.
+		_journal = not _journal
+		AudioManager.ui("map_rustle", -12.0)
 		get_viewport().set_input_as_handled()
 	elif _open and (event.is_action_pressed("pause") or event.is_action_pressed("crouch")):
 		_toggle()
@@ -116,13 +122,43 @@ func _draw() -> void:
 	var ox := (size.x - 700.0) * 0.5
 	var oy := (size.y - 420.0) * 0.5
 	_draw_tablet(ox, oy)
+	if _journal:
+		_draw_journal(ox, oy)
+		return
 	# The descending shaft connecting the depths.
 	_draw_shaft(ox, oy)
 	for a in AREAS:
 		_draw_area(a, ox, oy)
 	draw_string(FONT, Vector2(0, oy - 14), "THE DESCENT", HORIZONTAL_ALIGNMENT_CENTER,
 		size.x, 18, Color(0.75, 0.78, 0.9))
-	draw_string(FONT, Vector2(0, oy + 446), "M  close      skull = you      runes = shrines      locks = what you lack",
+	var echo_n := PlayerProgress.echoes_seen.size()
+	draw_string(FONT, Vector2(0, oy + 446), "M  close      E  echo journal (%d/16)      skull = you      locks = what you lack" % echo_n,
+		HORIZONTAL_ALIGNMENT_CENTER, size.x, 9, Color(0.45, 0.48, 0.6))
+
+
+## The back of the tablet: every echo the Touch has kept, in the order found.
+func _draw_journal(ox: float, oy: float) -> void:
+	draw_string(FONT, Vector2(0, oy - 14), "THE ECHO JOURNAL", HORIZONTAL_ALIGNMENT_CENTER,
+		size.x, 18, Color(0.75, 0.82, 0.95))
+	var n := PlayerProgress.echoes_seen.size()
+	draw_string(FONT, Vector2(0, oy + 22), "%d of 16 memories kept" % n,
+		HORIZONTAL_ALIGNMENT_CENTER, size.x, 10, Color(0.55, 0.62, 0.78))
+	if n == 0:
+		draw_string(FONT, Vector2(0, oy + 200), "— hold E where the past pools, and it will show you —",
+			HORIZONTAL_ALIGNMENT_CENTER, size.x, 11, Color(0.45, 0.5, 0.66))
+	else:
+		var i := 0
+		for id in PlayerProgress.echoes_seen:
+			var col := ox + 40.0 + (360.0 if i >= 12 else 0.0)
+			var row := oy + 56.0 + (i % 12) * 28.0
+			_draw_rune(Vector2(col - 14, row - 4), 0.6 + 0.3 * sin(_t * 2.0 + i))
+			draw_string(FONT, Vector2(col, row), str(PlayerProgress.echoes_seen[id]),
+				HORIZONTAL_ALIGNMENT_LEFT, 340, 11, Color(0.78, 0.82, 0.95))
+			i += 1
+	if n >= 16:
+		draw_string(FONT, Vector2(0, oy + 410), "all of it. every grief accounted for.",
+			HORIZONTAL_ALIGNMENT_CENTER, size.x, 10, Color(0.9, 0.85, 0.6))
+	draw_string(FONT, Vector2(0, oy + 446), "E  back to the map      M  close",
 		HORIZONTAL_ALIGNMENT_CENTER, size.x, 9, Color(0.45, 0.48, 0.6))
 
 

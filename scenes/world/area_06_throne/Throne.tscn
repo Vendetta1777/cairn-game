@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=3]
+[gd_scene load_steps=39 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_06_throne/Throne.gd" id="1_root"]
 [ext_resource type="Script" path="res://scenes/world/area_06_throne/ThroneTerrain.gd" id="2_terrain"]
@@ -35,6 +35,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/Cutscene.tscn" id="99_cut"]
 [ext_resource type="PackedScene" path="res://scenes/world/CharmPickup.tscn" id="93_cp"]
 [ext_resource type="PackedScene" path="res://scenes/ui/CharmUI.tscn" id="94_cu"]
+[ext_resource type="PackedScene" path="res://scenes/world/EchoPoint.tscn" id="97_ep"]
 
 [sub_resource type="Gradient" id="grad"]
 offsets = PackedFloat32Array(0, 1)
@@ -346,3 +347,24 @@ notch = true
 pickup_id = "notch_a6"
 
 [node name="CharmUI" parent="." instance=ExtResource("94_cu")]
+
+[node name="EchoChoice" parent="." instance=ExtResource("97_ep")]
+position = Vector2(2200, 238)
+echo_id = "a6_choice"
+title = "THE TERRIBLE CHOICE"
+art = "king"
+text = "The Sovereign was offered the surface for his people, at the price of every memory of Cairn. He looked at the crown a long time. Then he chose the deep, and the grief, and the keeping."
+
+[node name="EchoProcession" parent="." instance=ExtResource("97_ep")]
+position = Vector2(420, 252)
+echo_id = "a6_procession"
+title = "THE PROCESSION"
+art = "sealing"
+text = "The court walked this hall in order of rank, one last time. By the door they were walking in order of love."
+
+[node name="EchoPost" parent="." instance=ExtResource("97_ep")]
+position = Vector2(1560, 252)
+echo_id = "a6_post"
+title = "THE STANDING ORDER"
+art = "hollow"
+text = "The knight's order reads: hold the antechamber until relieved. It was signed by a hand that has been dust for centuries. He holds it still."

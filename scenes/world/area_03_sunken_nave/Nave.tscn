@@ -1,4 +1,4 @@
-[gd_scene load_steps=40 format=3]
+[gd_scene load_steps=42 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_03_sunken_nave/Nave.gd" id="1_root"]
 [ext_resource type="Script" path="res://scenes/world/area_03_sunken_nave/NaveTerrain.gd" id="2_terrain"]
@@ -35,6 +35,8 @@
 [ext_resource type="PackedScene" path="res://scenes/world/CharmPickup.tscn" id="93_cp"]
 [ext_resource type="PackedScene" path="res://scenes/ui/CharmUI.tscn" id="94_cu"]
 [ext_resource type="PackedScene" path="res://scenes/world/OrePickup.tscn" id="95_ore"]
+[ext_resource type="PackedScene" path="res://scenes/world/EchoPoint.tscn" id="97_ep"]
+[ext_resource type="PackedScene" path="res://scenes/ui/Cutscene.tscn" id="98_cut"]
 
 [sub_resource type="Gradient" id="grad"]
 offsets = PackedFloat32Array(0, 1)
@@ -350,3 +352,27 @@ pickup_id = "notch_a3"
 [node name="OrePocket" parent="." instance=ExtResource("95_ore")]
 position = Vector2(2205, 196)
 ore_id = "nave"
+
+[node name="EchoPrayer" parent="." instance=ExtResource("97_ep")]
+position = Vector2(320, 252)
+echo_id = "a3_prayer"
+title = "THE PRAYER LINE"
+art = "sinking"
+text = "They queued through this hall to pray the water back. The water joined the queue."
+
+[node name="EchoBell" parent="." instance=ExtResource("97_ep")]
+position = Vector2(2090, 64)
+echo_id = "a3_last_toll"
+title = "THE LAST TOLL"
+art = "king"
+text = "The bellringer rang nine days under rising water. The ninth toll is still down here somewhere, swimming."
+
+[node name="EchoChorister" parent="." instance=ExtResource("97_ep")]
+position = Vector2(1770, 252)
+echo_id = "a3_chorister"
+title = "THE CHORISTER'S NOTE"
+art = "hollow"
+reveals_cache = true
+text = "A chorister wrote the hymn's true last verse and hid it from the choirmaster. The deep hums it sometimes."
+
+[node name="Cutscene" parent="." instance=ExtResource("98_cut")]

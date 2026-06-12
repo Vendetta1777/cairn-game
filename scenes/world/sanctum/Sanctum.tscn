@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3]
+[gd_scene load_steps=24 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/sanctum/Sanctum.gd" id="1_root"]
 [ext_resource type="Script" path="res://scenes/world/sanctum/SanctumRoom.gd" id="2_room"]
@@ -18,6 +18,8 @@
 [ext_resource type="PackedScene" path="res://scenes/world/CharmPickup.tscn" id="93_cp"]
 [ext_resource type="PackedScene" path="res://scenes/ui/CharmUI.tscn" id="94_cu"]
 [ext_resource type="PackedScene" path="res://scenes/world/OrePickup.tscn" id="95_ore"]
+[ext_resource type="PackedScene" path="res://scenes/world/EchoPoint.tscn" id="97_ep"]
+[ext_resource type="PackedScene" path="res://scenes/ui/Cutscene.tscn" id="98_cut"]
 
 [sub_resource type="Gradient" id="grad_light"]
 offsets = PackedFloat32Array(0, 1)
@@ -161,3 +163,13 @@ appears_flag = "game_beaten"
 position = Vector2(710, 252)
 ore_id = "pilgrims_gift"
 appears_flag = "boss_buried_king_dead"
+
+[node name="EchoOrigin" parent="." instance=ExtResource("97_ep")]
+position = Vector2(480, 252)
+echo_id = "hub_origin"
+title = "THE ONE WHO FELL"
+art = "hollow"
+appears_after_echoes = 15
+text = "You did not wander in, outsider. The deep called for an auditor the day the grief outgrew the bargain - and the surface sent what it always sends: someone who was already falling."
+
+[node name="Cutscene" parent="." instance=ExtResource("98_cut")]

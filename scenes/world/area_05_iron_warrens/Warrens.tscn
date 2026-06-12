@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3]
+[gd_scene load_steps=37 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_05_iron_warrens/Warrens.gd" id="1_root"]
 [ext_resource type="Script" path="res://scenes/world/area_05_iron_warrens/WarrensTerrain.gd" id="2_terrain"]
@@ -33,6 +33,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/CharmPickup.tscn" id="93_cp"]
 [ext_resource type="PackedScene" path="res://scenes/ui/CharmUI.tscn" id="94_cu"]
 [ext_resource type="PackedScene" path="res://scenes/world/OrePickup.tscn" id="95_ore"]
+[ext_resource type="PackedScene" path="res://scenes/world/EchoPoint.tscn" id="97_ep"]
 
 [sub_resource type="Gradient" id="grad"]
 offsets = PackedFloat32Array(0, 1)
@@ -327,3 +328,17 @@ reveals_location = false
 lines = PackedStringArray("Mind the sparks. ... An outsider. With THAT sad grey edge. Sit. Give it here.", "I tempered the Warden's plates, before the kingdom asked it to be a furnace. I know metal that remembers.", "Pale ore. Six pieces left in all the deep. Bring them and I will make your blade remember what it was FOR.", "The last working needs the deep half-empty — three guardians down. The void does not pour for amateurs.")
 choice_prompt = "The Forger turns your blade over."
 choice_options = PackedStringArray("Temper the blade (1 pale ore)", "Rework Fragile Strength (150 shards)", "Not today")
+
+[node name="EchoCoronation" parent="." instance=ExtResource("97_ep")]
+position = Vector2(3500, 252)
+echo_id = "a5_coronation"
+title = "THE CORONATION"
+art = "kingdom"
+text = "At his coronation the whole court knelt - and one pale figure in the crowd did not. The King noticed. The King said nothing."
+
+[node name="EchoRails" parent="." instance=ExtResource("97_ep")]
+position = Vector2(1660, 252)
+echo_id = "a5_last_run"
+title = "THE LAST RUN"
+art = "sinking"
+text = "The final cart out carried children and ore in equal measure. The rails remember the weight."

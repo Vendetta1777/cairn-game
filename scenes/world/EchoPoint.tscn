@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/world/EchoPoint.gd" id="1_echo"]
+
+[sub_resource type="RectangleShape2D" id="zone_shape"]
+size = Vector2(44, 50)
+
+[node name="EchoPoint" type="Node2D"]
+script = ExtResource("1_echo")
+
+[node name="Zone" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="Shape" type="CollisionShape2D" parent="Zone"]
+position = Vector2(0, -18)
+shape = SubResource("zone_shape")

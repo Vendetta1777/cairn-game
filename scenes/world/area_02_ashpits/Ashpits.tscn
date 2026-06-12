@@ -1,4 +1,4 @@
-[gd_scene load_steps=37 format=3]
+[gd_scene load_steps=39 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_02_ashpits/Ashpits.gd" id="1_root"]
 [ext_resource type="Script" path="res://scenes/world/area_02_ashpits/AshpitsTerrain.gd" id="2_terrain"]
@@ -32,6 +32,8 @@
 [ext_resource type="PackedScene" path="res://scenes/world/GrapplePoint.tscn" id="95_gp"]
 [ext_resource type="PackedScene" path="res://scenes/world/CharmPickup.tscn" id="93_cp"]
 [ext_resource type="PackedScene" path="res://scenes/ui/CharmUI.tscn" id="94_cu"]
+[ext_resource type="PackedScene" path="res://scenes/world/EchoPoint.tscn" id="97_ep"]
+[ext_resource type="PackedScene" path="res://scenes/ui/Cutscene.tscn" id="98_cut"]
 
 [sub_resource type="Gradient" id="grad"]
 offsets = PackedFloat32Array(0, 1)
@@ -323,3 +325,27 @@ notch = true
 pickup_id = "notch_a2"
 
 [node name="CharmUI" parent="." instance=ExtResource("94_cu")]
+
+[node name="EchoWarden" parent="." instance=ExtResource("97_ep")]
+position = Vector2(3100, 252)
+echo_id = "a2_volunteer"
+title = "THE VOLUNTEER"
+art = "kingdom"
+text = "They asked for a guardian. The smith stepped into the furnace mold while it was still warm, smiling."
+
+[node name="EchoForge" parent="." instance=ExtResource("97_ep")]
+position = Vector2(1250, 252)
+echo_id = "a2_last_shift"
+title = "THE LAST SHIFT"
+art = "sinking"
+text = "The bell rang flood. The forge crews finished the pour anyway - Cairn steel does not abandon a melt."
+
+[node name="EchoStoker" parent="." instance=ExtResource("97_ep")]
+position = Vector2(640, 118)
+echo_id = "a2_stoker"
+title = "THE STOKER'S CACHE"
+art = "hollow"
+reveals_cache = true
+text = "The stoker kept his savings above the heat where his wife wouldn't find them. She knew. She left them for you."
+
+[node name="Cutscene" parent="." instance=ExtResource("98_cut")]
