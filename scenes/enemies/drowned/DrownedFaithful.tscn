@@ -1,0 +1,56 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scenes/enemies/drowned/DrownedFaithful.gd" id="1_drowned"]
+[ext_resource type="SpriteFrames" path="res://scenes/enemies/brute/brute_frames.tres" id="2_frames"]
+
+[sub_resource type="RectangleShape2D" id="body_shape"]
+size = Vector2(22, 40)
+
+[sub_resource type="CapsuleShape2D" id="hurt_shape"]
+radius = 13.0
+height = 42.0
+
+[node name="DrownedFaithful" type="CharacterBody2D" groups=["enemy"]]
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("1_drowned")
+max_health = 7
+idle_anim = &"idle"
+shard_drop = 2
+echo_drop = 7
+
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -6)
+scale = Vector2(0.62, 0.62)
+sprite_frames = ExtResource("2_frames")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="Body" type="CollisionShape2D" parent="."]
+position = Vector2(0, -2)
+shape = SubResource("body_shape")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+position = Vector2(0, -8)
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+
+[node name="Col" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("hurt_shape")
+
+[node name="Drips" type="CPUParticles2D" parent="."]
+position = Vector2(0, -14)
+amount = 6
+lifetime = 0.7
+local_coords = false
+emission_shape = 3
+emission_rect_extents = Vector2(8, 10)
+direction = Vector2(0, 1)
+spread = 5.0
+gravity = Vector2(0, 380)
+initial_velocity_min = 2.0
+initial_velocity_max = 8.0
+scale_amount_min = 0.5
+scale_amount_max = 1.0
+color = Color(0.4, 0.65, 0.7, 0.55)

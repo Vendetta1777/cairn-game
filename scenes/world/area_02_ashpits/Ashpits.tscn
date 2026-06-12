@@ -1,0 +1,303 @@
+[gd_scene load_steps=32 format=3]
+
+[ext_resource type="Script" path="res://scenes/world/area_02_ashpits/Ashpits.gd" id="1_root"]
+[ext_resource type="Script" path="res://scenes/world/area_02_ashpits/AshpitsTerrain.gd" id="2_terrain"]
+[ext_resource type="Texture2D" path="res://assets/environment/caverns/background.png" id="3_bg"]
+[ext_resource type="Texture2D" path="res://assets/environment/caverns/back-walls.png" id="4_walls"]
+[ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="5_player"]
+[ext_resource type="PackedScene" path="res://scenes/world/RemnantStone.tscn" id="6_stone"]
+[ext_resource type="PackedScene" path="res://scenes/npc/LoreNPC.tscn" id="7_lore"]
+[ext_resource type="Script" path="res://scenes/world/Trigger.gd" id="10_trigger"]
+[ext_resource type="Script" path="res://scenes/decor/BgDetail.gd" id="11_bgdetail"]
+[ext_resource type="Script" path="res://scenes/decor/BgArchitecture.gd" id="12_arch"]
+[ext_resource type="Script" path="res://scenes/decor/Fireflies.gd" id="14_fire"]
+[ext_resource type="Script" path="res://scenes/decor/Foreground.gd" id="15_fg"]
+[ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="16_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DialogueBox.tscn" id="17_dlg"]
+[ext_resource type="PackedScene" path="res://scenes/ui/LocationTitle.tscn" id="18_loc"]
+[ext_resource type="PackedScene" path="res://scenes/ui/MapOverlay.tscn" id="19_map"]
+[ext_resource type="PackedScene" path="res://scenes/ui/BossBar.tscn" id="20_bossbar"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ObjectiveHUD.tscn" id="21_obj"]
+[ext_resource type="PackedScene" path="res://scenes/ui/BoonChoiceUI.tscn" id="22_boon"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/boss/AshenWarden.tscn" id="23_warden"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/wraith/CinderWraith.tscn" id="24_wraith"]
+[ext_resource type="PackedScene" path="res://scenes/world/AshVent.tscn" id="25_vent"]
+[ext_resource type="PackedScene" path="res://scenes/world/AbilityRelic.tscn" id="26_relic"]
+[ext_resource type="PackedScene" path="res://scenes/world/AbilityGate.tscn" id="27_agate"]
+[ext_resource type="PackedScene" path="res://scenes/world/ShardCache.tscn" id="28_cache"]
+[ext_resource type="PackedScene" path="res://scenes/world/SealedGate.tscn" id="29_gate"]
+[ext_resource type="PackedScene" path="res://scenes/world/Shrine.tscn" id="30_shrine"]
+
+[sub_resource type="Gradient" id="grad"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_light"]
+gradient = SubResource("grad")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[sub_resource type="Gradient" id="grad_vig"]
+offsets = PackedFloat32Array(0.52, 1)
+colors = PackedColorArray(0, 0, 0, 0, 0.03, 0.015, 0.01, 0.7)
+
+[sub_resource type="GradientTexture2D" id="tex_vig"]
+gradient = SubResource("grad_vig")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[sub_resource type="RectangleShape2D" id="trigger_tall"]
+size = Vector2(40, 220)
+
+[node name="Ashpits" type="Node2D"]
+script = ExtResource("1_root")
+
+[node name="Mood" type="CanvasModulate" parent="."]
+color = Color(0.6, 0.44, 0.34, 1)
+
+[node name="Background" type="Node2D" parent="."]
+
+[node name="Deep" type="Sprite2D" parent="Background"]
+modulate = Color(0.85, 0.62, 0.5, 1)
+texture_repeat = 1
+centered = false
+texture = ExtResource("3_bg")
+region_enabled = true
+region_rect = Rect2(0, 0, 3460, 288)
+
+[node name="Walls" type="Sprite2D" parent="Background"]
+modulate = Color(0.9, 0.66, 0.52, 1)
+texture_repeat = 1
+centered = false
+texture = ExtResource("4_walls")
+region_enabled = true
+region_rect = Rect2(0, 0, 3460, 288)
+
+[node name="BgDetail" type="Node2D" parent="."]
+script = ExtResource("11_bgdetail")
+bounds = Rect2(0, 0, 3460, 288)
+
+[node name="BgArchitecture" type="Node2D" parent="."]
+script = ExtResource("12_arch")
+bounds = Rect2(0, 0, 3460, 288)
+
+[node name="Terrain" type="Node2D" parent="."]
+script = ExtResource("2_terrain")
+bounds = Rect2(0, 0, 3460, 288)
+ceiling_seed = 77
+
+[node name="ForgeLightA" type="PointLight2D" parent="."]
+position = Vector2(140, 238)
+color = Color(1, 0.55, 0.25, 1)
+energy = 0.85
+texture = SubResource("tex_light")
+texture_scale = 1.0
+
+[node name="ForgeLightB" type="PointLight2D" parent="."]
+position = Vector2(1000, 238)
+color = Color(1, 0.5, 0.22, 1)
+energy = 0.8
+texture = SubResource("tex_light")
+texture_scale = 1.0
+
+[node name="ForgeLightC" type="PointLight2D" parent="."]
+position = Vector2(1500, 238)
+color = Color(1, 0.5, 0.22, 1)
+energy = 0.75
+texture = SubResource("tex_light")
+texture_scale = 0.9
+
+[node name="ForgeLightD" type="PointLight2D" parent="."]
+position = Vector2(2110, 226)
+color = Color(1, 0.55, 0.25, 1)
+energy = 0.7
+texture = SubResource("tex_light")
+texture_scale = 0.9
+
+[node name="ForgeLightE" type="PointLight2D" parent="."]
+position = Vector2(2620, 238)
+color = Color(1, 0.55, 0.25, 1)
+energy = 0.85
+texture = SubResource("tex_light")
+texture_scale = 1.0
+
+[node name="ForgeLightF" type="PointLight2D" parent="."]
+position = Vector2(3060, 200)
+color = Color(1, 0.45, 0.18, 1)
+energy = 0.7
+texture = SubResource("tex_light")
+texture_scale = 1.4
+
+[node name="CheckpointEntry" parent="." instance=ExtResource("6_stone")]
+position = Vector2(200, 252)
+
+[node name="CheckpointForge" parent="." instance=ExtResource("6_stone")]
+position = Vector2(1820, 252)
+
+[node name="CheckpointAntechamber" parent="." instance=ExtResource("6_stone")]
+position = Vector2(2560, 252)
+
+[node name="LoreNPC" parent="." instance=ExtResource("7_lore")]
+position = Vector2(140, 252)
+lines = PackedStringArray("The forges fed the whole kingdom once. Then the kingdom became the fuel.", "The vents still breathe, outsider. Ride their breath — the high paths remember it.", "Something keeps the last furnace lit. It has not let anyone pass in a hundred years.")
+location_name = "THE ASHPITS"
+location_subtitle = "DESCENT II"
+reveals_location = false
+
+[node name="Player" parent="." instance=ExtResource("5_player")]
+position = Vector2(60, 215)
+z_index = 1
+
+[node name="VentLift" parent="." instance=ExtResource("25_vent")]
+position = Vector2(675, 252)
+column_height = 150.0
+
+[node name="VentLedgeCache" parent="." instance=ExtResource("28_cache")]
+position = Vector2(675, 118)
+cache_id = "a2_vent_ledge"
+shards = 6
+
+[node name="Wraith1" parent="." instance=ExtResource("24_wraith")]
+position = Vector2(1100, 168)
+
+[node name="Wraith2" parent="." instance=ExtResource("24_wraith")]
+position = Vector2(1320, 140)
+
+[node name="Wraith3" parent="." instance=ExtResource("24_wraith")]
+position = Vector2(1550, 168)
+
+[node name="Wraith4" parent="." instance=ExtResource("24_wraith")]
+position = Vector2(1760, 198)
+
+[node name="WalkwayGate" parent="." instance=ExtResource("27_agate")]
+position = Vector2(1722, 162)
+required_ability = "double_jump"
+gate_height = 54.0
+
+[node name="WalkwayCache" parent="." instance=ExtResource("28_cache")]
+position = Vector2(1758, 162)
+cache_id = "a2_walkway"
+shards = 14
+
+[node name="WallJumpRelic" parent="." instance=ExtResource("26_relic")]
+position = Vector2(1850, 252)
+ability_id = "wall_jump"
+display_name = "THE ASHEN GRIP"
+subtitle = "WALL JUMP UNLOCKED — leap wall to wall"
+objective = "Climb the chimney — kick between the walls"
+tint = Color(1, 0.62, 0.38, 1)
+
+[node name="ClimbGate" parent="." instance=ExtResource("27_agate")]
+position = Vector2(1990, 252)
+required_ability = "wall_jump"
+gate_height = 80.0
+
+[node name="ArenaVentL" parent="." groups=["arena_vent"] instance=ExtResource("25_vent")]
+position = Vector2(2815, 252)
+column_height = 130.0
+active = false
+
+[node name="ArenaVentR" parent="." groups=["arena_vent"] instance=ExtResource("25_vent")]
+position = Vector2(3325, 252)
+column_height = 130.0
+active = false
+
+[node name="AshenWarden" parent="." instance=ExtResource("23_warden")]
+position = Vector2(3060, 215)
+
+[node name="SealedGate" parent="." instance=ExtResource("29_gate")]
+position = Vector2(3400, 252)
+boss_id = "ashen_warden"
+area_id = "ashpits"
+next_scene = "res://scenes/world/area_03_sunken_nave/Nave.tscn"
+
+[node name="Shrine" parent="." instance=ExtResource("30_shrine")]
+position = Vector2(2660, 252)
+
+[node name="ForgeTrigger" type="Area2D" parent="." groups=["trigger"]]
+position = Vector2(900, 150)
+script = ExtResource("10_trigger")
+objective = "Cross the forge floor — the cinders are awake"
+
+[node name="Shape" type="CollisionShape2D" parent="ForgeTrigger"]
+shape = SubResource("trigger_tall")
+
+[node name="RelicTrigger" type="Area2D" parent="." groups=["trigger"]]
+position = Vector2(1650, 150)
+script = ExtResource("10_trigger")
+objective = "Something old glows ahead — claim it"
+
+[node name="Shape" type="CollisionShape2D" parent="RelicTrigger"]
+shape = SubResource("trigger_tall")
+
+[node name="AntechamberTrigger" type="Area2D" parent="." groups=["trigger"]]
+position = Vector2(2500, 150)
+script = ExtResource("10_trigger")
+objective = "Rest. The last furnace waits"
+
+[node name="Shape" type="CollisionShape2D" parent="AntechamberTrigger"]
+shape = SubResource("trigger_tall")
+
+[node name="BossTrigger" type="Area2D" parent="." groups=["trigger"]]
+position = Vector2(2745, 150)
+script = ExtResource("10_trigger")
+objective = "Slay the Ashen Warden"
+engage_boss_path = NodePath("../AshenWarden")
+boss_display_name = "THE ASHEN WARDEN"
+
+[node name="Shape" type="CollisionShape2D" parent="BossTrigger"]
+shape = SubResource("trigger_tall")
+
+[node name="AshDrift" type="CPUParticles2D" parent="."]
+position = Vector2(1700, 30)
+amount = 60
+lifetime = 7.0
+preprocess = 7.0
+emission_shape = 3
+emission_rect_extents = Vector2(1760, 10)
+direction = Vector2(0, 1)
+spread = 20.0
+gravity = Vector2(8, 14)
+initial_velocity_min = 6.0
+initial_velocity_max = 16.0
+scale_amount_min = 0.6
+scale_amount_max = 1.4
+color = Color(0.75, 0.6, 0.5, 0.5)
+
+[node name="Fireflies" type="Node2D" parent="."]
+script = ExtResource("14_fire")
+
+[node name="Foreground" type="Node2D" parent="."]
+z_index = 2
+script = ExtResource("15_fg")
+bounds = Rect2(0, 0, 3460, 288)
+
+[node name="Vignette" type="CanvasLayer" parent="."]
+layer = 5
+
+[node name="Tex" type="TextureRect" parent="Vignette"]
+offset_right = 960.0
+offset_bottom = 540.0
+texture = SubResource("tex_vig")
+stretch_mode = 0
+mouse_filter = 2
+
+[node name="HUD" parent="." instance=ExtResource("16_hud")]
+
+[node name="DialogueBox" parent="." instance=ExtResource("17_dlg")]
+
+[node name="LocationTitle" parent="." instance=ExtResource("18_loc")]
+
+[node name="BossBar" parent="." instance=ExtResource("20_bossbar")]
+
+[node name="ObjectiveHUD" parent="." instance=ExtResource("21_obj")]
+
+[node name="BoonChoice" parent="." instance=ExtResource("22_boon")]
+
+[node name="MapOverlay" parent="." instance=ExtResource("19_map")]

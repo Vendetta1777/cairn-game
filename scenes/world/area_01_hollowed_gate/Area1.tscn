@@ -195,7 +195,7 @@ arena_right = 3400.0
 [node name="SealedGate" parent="." instance=ExtResource("21_gate")]
 position = Vector2(3460, 252)
 boss_id = "mother_bat"
-next_scene = "res://scenes/world/area_02_sunken_way/Area2.tscn"
+next_scene = "res://scenes/world/area_02_ashpits/Ashpits.tscn"
 
 [node name="RoostTrigger" type="Area2D" parent="." groups=["trigger"]]
 position = Vector2(770, 150)

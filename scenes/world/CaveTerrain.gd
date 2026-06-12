@@ -6,25 +6,26 @@ class_name CaveTerrain
 ## ceiling, clamps the player camera, handles fall-into-a-pit respawn, and
 ## exposes the solids for the map. New levels = a tiny subclass with new arrays.
 
-# Stone palette (dark cave, cool) — shared so every level reads as one world.
-const ROCK_A := Color(0.12, 0.14, 0.19)
-const ROCK_B := Color(0.16, 0.185, 0.245)
-const STONE_DEEP := Color(0.045, 0.052, 0.08)
-const SPECK_LIGHT := Color(0.24, 0.27, 0.35)
-const SPECK_DARK := Color(0.05, 0.05, 0.08)
-const RIM := Color(0.3, 0.35, 0.46)
-const RIM_HI := Color(0.42, 0.48, 0.6)
-const MOSS_D := Color(0.22, 0.46, 0.4)
-const MOSS_L := Color(0.42, 0.8, 0.62)
-const ROOT := Color(0.07, 0.11, 0.09)
-const STAL := Color(0.1, 0.115, 0.16)
-const STAL_HI := Color(0.2, 0.23, 0.31)
-const CRATE := Color(0.3, 0.21, 0.13)
-const CRATE_DK := Color(0.2, 0.13, 0.08)
-const CRATE_LIP := Color(0.46, 0.34, 0.21)
-const CRATE_BOLT := Color(0.55, 0.5, 0.42)
-const SPIKE := Color(0.56, 0.59, 0.68)
-const SPIKE_DK := Color(0.28, 0.3, 0.38)
+# Stone palette (dark cave, cool) — vars, not consts, so an area subclass can
+# re-skin the whole terrain (Ashpits soot, Nave drowned stone) in _init().
+var ROCK_A := Color(0.12, 0.14, 0.19)
+var ROCK_B := Color(0.16, 0.185, 0.245)
+var STONE_DEEP := Color(0.045, 0.052, 0.08)
+var SPECK_LIGHT := Color(0.24, 0.27, 0.35)
+var SPECK_DARK := Color(0.05, 0.05, 0.08)
+var RIM := Color(0.3, 0.35, 0.46)
+var RIM_HI := Color(0.42, 0.48, 0.6)
+var MOSS_D := Color(0.22, 0.46, 0.4)
+var MOSS_L := Color(0.42, 0.8, 0.62)
+var ROOT := Color(0.07, 0.11, 0.09)
+var STAL := Color(0.1, 0.115, 0.16)
+var STAL_HI := Color(0.2, 0.23, 0.31)
+var CRATE := Color(0.3, 0.21, 0.13)
+var CRATE_DK := Color(0.2, 0.13, 0.08)
+var CRATE_LIP := Color(0.46, 0.34, 0.21)
+var CRATE_BOLT := Color(0.55, 0.5, 0.42)
+var SPIKE := Color(0.56, 0.59, 0.68)
+var SPIKE_DK := Color(0.28, 0.3, 0.38)
 
 @export var bounds := Rect2(0, 0, 3700, 288)
 @export var fall_damage_halves := 2
@@ -230,6 +231,12 @@ func _draw() -> void:
 		_draw_crate(r)
 	for r in hazards():
 		_draw_spikes(r)
+	_draw_extra()
+
+
+## Hook for subclasses to draw area-specific set dressing (the Nave's bell, etc.).
+func _draw_extra() -> void:
+	pass
 
 
 func _is_ceiling(r: Rect2) -> bool:

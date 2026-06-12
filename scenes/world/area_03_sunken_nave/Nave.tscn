@@ -1,0 +1,313 @@
+[gd_scene load_steps=33 format=3]
+
+[ext_resource type="Script" path="res://scenes/world/area_03_sunken_nave/Nave.gd" id="1_root"]
+[ext_resource type="Script" path="res://scenes/world/area_03_sunken_nave/NaveTerrain.gd" id="2_terrain"]
+[ext_resource type="Texture2D" path="res://assets/environment/caverns/background.png" id="3_bg"]
+[ext_resource type="Texture2D" path="res://assets/environment/caverns/back-walls.png" id="4_walls"]
+[ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="5_player"]
+[ext_resource type="PackedScene" path="res://scenes/world/RemnantStone.tscn" id="6_stone"]
+[ext_resource type="PackedScene" path="res://scenes/npc/LoreNPC.tscn" id="7_lore"]
+[ext_resource type="Script" path="res://scenes/world/Trigger.gd" id="10_trigger"]
+[ext_resource type="Script" path="res://scenes/decor/BgDetail.gd" id="11_bgdetail"]
+[ext_resource type="Script" path="res://scenes/decor/BgArchitecture.gd" id="12_arch"]
+[ext_resource type="Script" path="res://scenes/decor/CeilingVines.gd" id="13_ceil"]
+[ext_resource type="Script" path="res://scenes/decor/Fireflies.gd" id="14_fire"]
+[ext_resource type="Script" path="res://scenes/decor/Foreground.gd" id="15_fg"]
+[ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="16_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DialogueBox.tscn" id="17_dlg"]
+[ext_resource type="PackedScene" path="res://scenes/ui/LocationTitle.tscn" id="18_loc"]
+[ext_resource type="PackedScene" path="res://scenes/ui/MapOverlay.tscn" id="19_map"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ObjectiveHUD.tscn" id="21_obj"]
+[ext_resource type="PackedScene" path="res://scenes/ui/BoonChoiceUI.tscn" id="22_boon"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/drowned/DrownedFaithful.tscn" id="23_drowned"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/fly/Bat.tscn" id="24_bat"]
+[ext_resource type="PackedScene" path="res://scenes/world/WaterZone.tscn" id="25_water"]
+[ext_resource type="PackedScene" path="res://scenes/world/AbilityRelic.tscn" id="26_relic"]
+[ext_resource type="PackedScene" path="res://scenes/world/AbilityGate.tscn" id="27_agate"]
+[ext_resource type="PackedScene" path="res://scenes/world/ShardCache.tscn" id="28_cache"]
+[ext_resource type="PackedScene" path="res://scenes/world/SealedGate.tscn" id="29_gate"]
+[ext_resource type="PackedScene" path="res://scenes/world/Shrine.tscn" id="30_shrine"]
+[ext_resource type="PackedScene" path="res://scenes/world/Portal.tscn" id="31_portal"]
+
+[sub_resource type="Gradient" id="grad"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_light"]
+gradient = SubResource("grad")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[sub_resource type="Gradient" id="grad_vig"]
+offsets = PackedFloat32Array(0.52, 1)
+colors = PackedColorArray(0, 0, 0, 0, 0.005, 0.02, 0.025, 0.72)
+
+[sub_resource type="GradientTexture2D" id="tex_vig"]
+gradient = SubResource("grad_vig")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[sub_resource type="RectangleShape2D" id="trigger_tall"]
+size = Vector2(40, 220)
+
+[node name="Nave" type="Node2D"]
+script = ExtResource("1_root")
+
+[node name="Mood" type="CanvasModulate" parent="."]
+color = Color(0.36, 0.5, 0.54, 1)
+
+[node name="Background" type="Node2D" parent="."]
+
+[node name="Deep" type="Sprite2D" parent="Background"]
+modulate = Color(0.6, 0.8, 0.85, 1)
+texture_repeat = 1
+centered = false
+texture = ExtResource("3_bg")
+region_enabled = true
+region_rect = Rect2(0, 0, 3200, 288)
+
+[node name="Walls" type="Sprite2D" parent="Background"]
+modulate = Color(0.65, 0.85, 0.9, 1)
+texture_repeat = 1
+centered = false
+texture = ExtResource("4_walls")
+region_enabled = true
+region_rect = Rect2(0, 0, 3200, 288)
+
+[node name="BgDetail" type="Node2D" parent="."]
+script = ExtResource("11_bgdetail")
+bounds = Rect2(0, 0, 3200, 288)
+
+[node name="BgArchitecture" type="Node2D" parent="."]
+script = ExtResource("12_arch")
+bounds = Rect2(0, 0, 3200, 288)
+
+[node name="Terrain" type="Node2D" parent="."]
+script = ExtResource("2_terrain")
+bounds = Rect2(0, 0, 3200, 288)
+ceiling_seed = 53
+
+[node name="CeilingVines" type="Node2D" parent="."]
+script = ExtResource("13_ceil")
+bounds = Rect2(0, 0, 3200, 288)
+
+[node name="FungusLightA" type="PointLight2D" parent="."]
+position = Vector2(160, 236)
+color = Color(0.35, 0.85, 0.75, 1)
+energy = 0.8
+texture = SubResource("tex_light")
+texture_scale = 1.0
+
+[node name="FungusLightB" type="PointLight2D" parent="."]
+position = Vector2(1180, 200)
+color = Color(0.35, 0.85, 0.75, 1)
+energy = 0.7
+texture = SubResource("tex_light")
+texture_scale = 1.0
+
+[node name="FungusLightC" type="PointLight2D" parent="."]
+position = Vector2(1810, 236)
+color = Color(0.35, 0.85, 0.75, 1)
+energy = 0.75
+texture = SubResource("tex_light")
+texture_scale = 0.9
+
+[node name="BellLight" type="PointLight2D" parent="."]
+position = Vector2(2031, 70)
+color = Color(0.45, 0.8, 0.8, 1)
+energy = 0.65
+texture = SubResource("tex_light")
+texture_scale = 1.0
+
+[node name="ChoirLight" type="PointLight2D" parent="."]
+position = Vector2(3100, 200)
+color = Color(0.3, 0.7, 0.8, 1)
+energy = 0.7
+texture = SubResource("tex_light")
+texture_scale = 1.2
+
+[node name="CheckpointEntry" parent="." instance=ExtResource("6_stone")]
+position = Vector2(220, 252)
+
+[node name="CheckpointLanding" parent="." instance=ExtResource("6_stone")]
+position = Vector2(1770, 252)
+
+[node name="CheckpointAntechamber" parent="." instance=ExtResource("6_stone")]
+position = Vector2(2470, 252)
+
+[node name="LoreNPC" parent="." instance=ExtResource("7_lore")]
+position = Vector2(150, 252)
+lines = PackedStringArray("They came down here to pray the sinking away. The water heard them first.", "Stay out of the black water, outsider. The shallow only slows you. The deep KEEPS.", "The choir still sings behind the sealed door. Do not learn the words.")
+location_name = "THE SUNKEN NAVE"
+location_subtitle = "DESCENT III"
+reveals_location = false
+
+[node name="Player" parent="." instance=ExtResource("5_player")]
+position = Vector2(60, 215)
+z_index = 1
+
+[node name="WadePoolA" parent="." instance=ExtResource("25_water")]
+position = Vector2(150, 226)
+size = Vector2(140, 26)
+
+[node name="WadePoolB" parent="." instance=ExtResource("25_water")]
+position = Vector2(430, 226)
+size = Vector2(130, 26)
+
+[node name="LibraryDeep" parent="." instance=ExtResource("25_water")]
+position = Vector2(760, 264)
+size = Vector2(990, 24)
+deep = true
+
+[node name="WadePoolC" parent="." instance=ExtResource("25_water")]
+position = Vector2(2820, 226)
+size = Vector2(120, 26)
+
+[node name="DrownedGuard" parent="." instance=ExtResource("23_drowned")]
+position = Vector2(640, 234)
+
+[node name="DrownedRelic" parent="." instance=ExtResource("23_drowned")]
+position = Vector2(1790, 234)
+
+[node name="DrownedPewA" parent="." instance=ExtResource("23_drowned")]
+position = Vector2(2640, 234)
+
+[node name="DrownedPewB" parent="." instance=ExtResource("23_drowned")]
+position = Vector2(2950, 234)
+
+[node name="TowerBat1" parent="." instance=ExtResource("24_bat")]
+position = Vector2(2230, 120)
+
+[node name="TowerBat2" parent="." instance=ExtResource("24_bat")]
+position = Vector2(2310, 168)
+
+[node name="DoubleJumpRelic" parent="." instance=ExtResource("26_relic")]
+position = Vector2(1840, 252)
+ability_id = "double_jump"
+display_name = "THE SECOND BREATH"
+subtitle = "DOUBLE JUMP UNLOCKED — leap again mid-air"
+objective = "Ascend the bell tower"
+tint = Color(0.55, 0.95, 0.7, 1)
+
+[node name="TowerGate" parent="." instance=ExtResource("27_agate")]
+position = Vector2(2000, 238)
+required_ability = "double_jump"
+gate_height = 80.0
+
+[node name="TowerCache" parent="." instance=ExtResource("28_cache")]
+position = Vector2(2105, 64)
+cache_id = "a3_belltower"
+shards = 10
+
+[node name="ArchCache" parent="." instance=ExtResource("28_cache")]
+position = Vector2(2240, 140)
+cache_id = "a3_arch"
+shards = 6
+
+[node name="ChoirDoor" parent="." instance=ExtResource("29_gate")]
+position = Vector2(3100, 252)
+boss_id = "drowned_choir"
+area_id = "sunken_nave"
+open_objective = "The choir door grinds open — descend"
+next_scene = ""
+
+[node name="Shrine" parent="." instance=ExtResource("30_shrine")]
+position = Vector2(2720, 252)
+
+[node name="SanctumPortal" parent="." instance=ExtResource("31_portal")]
+position = Vector2(2540, 252)
+target_scene = "res://scenes/world/sanctum/Sanctum.tscn"
+label = "The Sanctum"
+glow_color = Color(0.6, 0.55, 0.95, 1)
+
+[node name="LibraryTrigger" type="Area2D" parent="." groups=["trigger"]]
+position = Vector2(790, 150)
+script = ExtResource("10_trigger")
+objective = "Cross the drowned library — shelf to shelf"
+
+[node name="Shape" type="CollisionShape2D" parent="LibraryTrigger"]
+shape = SubResource("trigger_tall")
+
+[node name="RelicTrigger" type="Area2D" parent="." groups=["trigger"]]
+position = Vector2(1740, 150)
+script = ExtResource("10_trigger")
+objective = "Claim what the faithful guard"
+
+[node name="Shape" type="CollisionShape2D" parent="RelicTrigger"]
+shape = SubResource("trigger_tall")
+
+[node name="AntechamberTrigger" type="Area2D" parent="." groups=["trigger"]]
+position = Vector2(2430, 150)
+script = ExtResource("10_trigger")
+objective = "The choir door is sealed — for now. Rest, or return to the Sanctum"
+
+[node name="Shape" type="CollisionShape2D" parent="AntechamberTrigger"]
+shape = SubResource("trigger_tall")
+
+[node name="DripA" type="CPUParticles2D" parent="."]
+position = Vector2(600, 40)
+amount = 8
+lifetime = 1.4
+preprocess = 1.4
+emission_shape = 3
+emission_rect_extents = Vector2(500, 4)
+direction = Vector2(0, 1)
+spread = 2.0
+gravity = Vector2(0, 420)
+initial_velocity_min = 4.0
+initial_velocity_max = 10.0
+scale_amount_min = 0.5
+scale_amount_max = 1.0
+color = Color(0.45, 0.7, 0.75, 0.6)
+
+[node name="DripB" type="CPUParticles2D" parent="."]
+position = Vector2(2700, 40)
+amount = 8
+lifetime = 1.4
+preprocess = 1.4
+emission_shape = 3
+emission_rect_extents = Vector2(420, 4)
+direction = Vector2(0, 1)
+spread = 2.0
+gravity = Vector2(0, 420)
+initial_velocity_min = 4.0
+initial_velocity_max = 10.0
+scale_amount_min = 0.5
+scale_amount_max = 1.0
+color = Color(0.45, 0.7, 0.75, 0.6)
+
+[node name="Fireflies" type="Node2D" parent="."]
+script = ExtResource("14_fire")
+
+[node name="Foreground" type="Node2D" parent="."]
+z_index = 2
+script = ExtResource("15_fg")
+bounds = Rect2(0, 0, 3200, 288)
+
+[node name="Vignette" type="CanvasLayer" parent="."]
+layer = 5
+
+[node name="Tex" type="TextureRect" parent="Vignette"]
+offset_right = 960.0
+offset_bottom = 540.0
+texture = SubResource("tex_vig")
+stretch_mode = 0
+mouse_filter = 2
+
+[node name="HUD" parent="." instance=ExtResource("16_hud")]
+
+[node name="DialogueBox" parent="." instance=ExtResource("17_dlg")]
+
+[node name="LocationTitle" parent="." instance=ExtResource("18_loc")]
+
+[node name="ObjectiveHUD" parent="." instance=ExtResource("21_obj")]
+
+[node name="BoonChoice" parent="." instance=ExtResource("22_boon")]
+
+[node name="MapOverlay" parent="." instance=ExtResource("19_map")]

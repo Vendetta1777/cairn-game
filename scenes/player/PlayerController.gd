@@ -86,6 +86,7 @@ var _parry_window: float = 0.0
 var _wall_jump_lock: float = 0.0
 var _is_wall_sliding: bool = false
 var _air_jumps: int = 0                       ## double-jump charges left this airtime
+var speed_zone_mult: float = 1.0              ## set by WaterZones (wading drag)
 
 # Cached frame->seconds conversions (computed in _ready from the physics tick).
 var _coyote_time: float
@@ -261,7 +262,7 @@ func _apply_horizontal_movement(delta: float) -> void:
 	if dir != 0.0:
 		_facing = int(signf(dir))
 
-	var target_speed := run_speed
+	var target_speed := run_speed * speed_zone_mult
 	if _is_crouching:
 		target_speed *= crouch_speed_mult
 

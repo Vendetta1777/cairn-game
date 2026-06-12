@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/world/WaterZone.gd" id="1_water"]
+
+[sub_resource type="RectangleShape2D" id="zone_shape"]
+size = Vector2(200, 26)
+
+[node name="WaterZone" type="Node2D"]
+script = ExtResource("1_water")
+
+[node name="Zone" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="Shape" type="CollisionShape2D" parent="Zone"]
+position = Vector2(100, 13)
+shape = SubResource("zone_shape")
