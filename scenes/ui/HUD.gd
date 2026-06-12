@@ -44,6 +44,9 @@ var _dagger_max := 3
 var _shards := 0
 var _echoes := 0
 var _time := 0.0
+var _streak := 0
+var _streak_t := 0.0       ## fades after 2s of no hits
+var _streak_shatter := 0.0 ## broken-counter burst timer
 
 
 func _ready() -> void:
@@ -68,6 +71,14 @@ func _ready() -> void:
 		combat.daggers_changed.connect(_on_daggers)
 		_dagger_max = combat.max_daggers
 		_daggers = combat.get_dagger_count()
+	# Flow state: the streak tally climbs; taking a hit shatters it.
+	if combat and combat.has_signal("streak_changed"):
+		combat.streak_changed.connect(func(n):
+			_streak = n
+			_streak_t = 2.0)
+		combat.streak_broken.connect(func():
+			_streak_shatter = 0.5
+			_streak = 0)
 
 
 func _on_daggers(count: int) -> void:
@@ -85,6 +96,10 @@ func _on_currency(shards: int, echoes: int) -> void:
 
 func _process(delta: float) -> void:
 	_time += delta
+	_streak_t = maxf(0.0, _streak_t - delta)
+	_streak_shatter = maxf(0.0, _streak_shatter - delta)
+	if _streak_t <= 0.0 and _streak > 0 and _streak < 5:
+		_streak = 0   # small streaks fade quietly; flows of 5+ persist till broken
 	queue_redraw()  # continuous, for the animation
 
 
@@ -114,6 +129,34 @@ func _draw() -> void:
 	var dx := origin.x + hearts * heart_spacing + 4.0
 	for i in _dagger_max:
 		_draw_dagger(Vector2(dx + i * 9.0, origin.y - 1.0), i < _daggers)
+
+	# FLOW STATE tally: small strokes stack under the daggers; glows at 10+,
+	# burns gold at 20+ (soul surge), shatters outward when you get hit.
+	if _streak >= 2:
+		var sx := dx
+		var sy := origin.y + 16.0
+		var col := Color(0.7, 0.74, 0.85, 0.8)
+		if _streak >= 20:
+			col = Color(1.0, 0.85, 0.45)
+		elif _streak >= 10:
+			col = Color(0.85, 0.9, 1.0)
+		var pulse := 1.0 + (0.15 * sin(_time * 8.0) if _streak >= 10 else 0.0)
+		for i in mini(_streak, 24):
+			var h := 5.0 * pulse
+			draw_line(Vector2(sx + i * 3.5, sy), Vector2(sx + i * 3.5 + 1.5, sy - h), col, 1.4)
+		if _streak >= 10:
+			draw_circle(Vector2(sx - 6, sy - 3), 2.0 * pulse, col)
+	elif _streak_shatter > 0.0:
+		# The broken tally bursts apart.
+		var p := 1.0 - _streak_shatter / 0.5
+		var sx := dx
+		var sy := origin.y + 16.0
+		for i in 8:
+			var ang := TAU * i / 8.0
+			var d := p * 14.0
+			draw_line(Vector2(sx, sy - 3) + Vector2.from_angle(ang) * d,
+				Vector2(sx, sy - 3) + Vector2.from_angle(ang) * (d + 3.0),
+				Color(0.85, 0.4, 0.4, 1.0 - p), 1.4)
 
 	# Shards (currency) — a small crystal + count, under the energy bar.
 	var sd := Vector2(origin.x + 4.0, origin.y + heart_size * 0.82 + 26.0)

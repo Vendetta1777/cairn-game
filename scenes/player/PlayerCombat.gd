@@ -9,6 +9,8 @@ class_name PlayerCombat
 
 signal attacked(combo_step: int)
 signal daggers_changed(count: int)
+signal streak_changed(streak: int)
+signal streak_broken
 
 @export var attack_cooldown: float = 0.28  ## min seconds between swings
 @export var damage: int = 1
@@ -27,6 +29,8 @@ var _cooldown := 0.0
 var _combo := 0
 var _combo_timer := 0.0
 var _daggers := 3
+var _streak := 0          ## consecutive hits without taking damage (flow state)
+var _attack_buffer := 0.0 ## input buffering: a press just before ready still fires
 var _finisher_bonus := 0      ## extra finisher damage from the Blade tree
 var _bolt_pierce_bonus := 0   ## extra shadow-bolt pierce from the Shadow tree
 var _controller
@@ -45,6 +49,13 @@ func _ready() -> void:
 		_hitbox.monitoring = true
 	if _controller.has_signal("parried"):
 		_controller.parried.connect(_on_parried)
+	# Flow state breaks the moment you bleed.
+	if _controller.has_signal("hurt"):
+		_controller.hurt.connect(func(_amt):
+			if _streak > 0:
+				_streak = 0
+				streak_broken.emit()
+				AudioManager.play("parry_fail", -6.0, 0.0, &"SFX", 0.6))
 	# Fold in permanent skill-tree bonuses (Blade / Shadow branches).
 	damage += int(PlayerProgress.bonus("damage"))
 	_finisher_bonus = int(PlayerProgress.bonus("finisher_damage"))
@@ -62,18 +73,22 @@ func _process(delta: float) -> void:
 		_combo_timer -= delta
 		if _combo_timer <= 0.0:
 			_combo = 0
-	# Aim the hitbox by held direction: W=up, S=down, else forward (A/D facing).
+	# 8-DIRECTIONAL AIM: any held combination of W/S + A/D resolves to one of
+	# eight strike directions; nothing held = forward.
 	if _hitbox and _controller:
-		var f: int = _controller.get_facing()
-		if Input.is_action_pressed("move_up"):
-			_hitbox.position = Vector2(f * 4.0, -24.0)
-		elif Input.is_action_pressed("move_down"):
-			_hitbox.position = Vector2(f * 4.0, 24.0)
-		else:
-			# Reach forward to match the slash crescent's visual length.
-			_hitbox.position = Vector2(f * 22.0, -12.0)
+		var aim := _aim_dir()
+		_hitbox.position = Vector2(aim.x * 22.0, -12.0 + aim.y * 26.0)
 
-	if Input.is_action_just_pressed("attack") and _cooldown <= 0.0:
+	# INPUT BUFFER: an attack pressed up to 0.1s early fires the moment the
+	# cooldown ends — mashing never eats inputs.
+	_attack_buffer = maxf(0.0, _attack_buffer - delta)
+	if Input.is_action_just_pressed("attack"):
+		if _cooldown <= 0.0:
+			_do_attack()
+		elif _cooldown <= 0.1:
+			_attack_buffer = _cooldown + 0.02
+	elif _attack_buffer > 0.0 and _cooldown <= 0.0:
+		_attack_buffer = 0.0
 		_do_attack()
 	if Input.is_action_just_pressed("throw"):
 		_throw_dagger()
@@ -98,44 +113,71 @@ func _do_attack() -> void:
 	var slash_scale := 1.3 if is_finisher else 1.0
 	AudioManager.play("swipe", -12.0, 0.1)
 
-	# Directional slash by held input (rotate the flat crescent): W = up,
-	# S = down, otherwise a forward sweep — independent of movement state.
-	var pos: Vector2
+	# 8-directional slash: the crescent rotates to the aim vector. Up-strikes
+	# lift the player half a jump (aerial juggling); down-airs are the POGO.
+	var aim := _aim_dir()
+	var rot := 0.0
 	var fh := facing > 0
 	var fv := false
-	var rot := 0.0
-	if Input.is_action_pressed("move_up"):
-		rot = -PI / 2.0
-		pos = _controller.global_position + Vector2(facing * 4.0, -66.0)
-		fh = false
-	elif Input.is_action_pressed("move_down"):
-		rot = PI / 2.0
-		pos = _controller.global_position + Vector2(facing * 4.0, 60.0)
-		fh = false
+	var pos: Vector2 = _controller.global_position + Vector2(aim.x * slash_offset * 1.4, slash_height + aim.y * 56.0)
+	if aim.y != 0.0:
+		rot = aim.angle() - (0.0 if aim.x >= 0.0 else PI)
+		if aim.x == 0.0:
+			rot = -PI / 2.0 if aim.y < 0.0 else PI / 2.0
+			fh = false
 	else:
 		fv = _combo == 1   # ground combo: middle hit reverses the arc
-		pos = _controller.global_position + Vector2(facing * slash_offset, slash_height)
 	_spawn_vfx(SLASH, parent, pos, fh, fv, slash_scale, rot)
+	# The upward strike lifts you into the air you just claimed.
+	if aim.y < -0.5 and aim.x == 0.0:
+		_controller.velocity.y = minf(_controller.velocity.y, _controller.jump_velocity * 0.5)
 
 	if not _hitbox:
 		return
 	var already := {}
 	var connected := false
+	var pogoed := false
+	var heaviest := ""
 	var dmg := damage + ((1 + _finisher_bonus) if is_finisher else 0)
+	var is_down_air: bool = aim.y > 0.5 and not _controller.is_on_floor()
 	for area in _hitbox.get_overlapping_areas():
 		var body := area.get_parent()
-		if body and body.has_method("take_damage") and not already.has(body):
+		# PROJECTILE DEFLECT: catch a shot mid-flight and send it back at 1.5x.
+		if area.is_in_group("boss_projectile") and area.has_method("deflect"):
+			area.deflect(Vector2(facing, aim.y * 0.3).normalized())
+			_spawn_vfx(HIT_SPARK, parent, area.global_position, false, false, 1.3)
+			AudioManager.play("parry", -8.0, 0.05, &"SFX", 1.3)
+			connected = true
+			if is_down_air:
+				pogoed = true
+			continue
+		if body == null or already.has(body):
+			continue
+		# Corpses: pogo platforms; a finisher LAUNCHES them across the room.
+		if body.is_in_group("corpse"):
+			already[body] = true
+			connected = true
+			if is_down_air:
+				pogoed = true
+			elif is_finisher and body.has_method("launch"):
+				body.launch(Vector2(facing, -0.25).normalized())
+			continue
+		if body.has_method("take_damage"):
 			already[body] = true
 			body.take_damage(dmg, _controller.global_position)
 			_spawn_vfx(HIT_SPARK, parent, body.global_position, false)
 			connected = true
+			if is_down_air:
+				pogoed = true
+			# Track the heaviest thing we hit for the hit-stop scale.
+			var w: String = str(body.get("weight")) if body.get("weight") != null else "medium"
+			if _weight_rank(w) > _weight_rank(heaviest):
+				heaviest = w
 
+	if pogoed and _controller.has_method("pogo_bounce"):
+		_controller.pogo_bounce()
 	if connected:
-		AudioManager.combat_ping()
-		AudioManager.play("impact", -4.0 if is_finisher else -8.0, 0.08)
-		if _camera and _camera.has_method("add_trauma"):
-			_camera.add_trauma(0.5 if is_finisher else 0.32)
-		GameManager.hitstop(0.07 if is_finisher else 0.045)
+		_on_hit_connected(is_finisher, heaviest)
 
 
 ## A successful parry: a bright burst + extra shake + refilled daggers (the rest
@@ -183,6 +225,59 @@ func _launch(packed: PackedScene) -> void:
 
 func get_dagger_count() -> int:
 	return _daggers
+
+
+## Held W/S + A/D resolve to one of eight unit-ish aim vectors; default forward.
+func _aim_dir() -> Vector2:
+	var f := float(_controller.get_facing()) if _controller else 1.0
+	var y := 0.0
+	if Input.is_action_pressed("move_up"):
+		y = -1.0
+	elif Input.is_action_pressed("move_down"):
+		y = 1.0
+	var x := 0.0
+	if Input.is_action_pressed("move_left"):
+		x = -1.0
+	elif Input.is_action_pressed("move_right"):
+		x = 1.0
+	if y == 0.0:
+		return Vector2(f if x == 0.0 else x, 0.0)
+	if x == 0.0:
+		return Vector2(0.0, y)
+	return Vector2(x * 0.707, y * 0.707)   # the diagonals
+
+
+func _weight_rank(w: String) -> int:
+	match w:
+		"light": return 1
+		"medium": return 2
+		"heavy": return 3
+		"boss": return 4
+	return 0
+
+
+## Everything that happens when steel meets something: weight-scaled hit-stop
+## (light things barely pause the world; bosses bend time), flow-state streak,
+## soul-on-hit, and the usual spark and shake.
+func _on_hit_connected(is_finisher: bool, heaviest: String) -> void:
+	AudioManager.combat_ping()
+	AudioManager.play("impact", -4.0 if is_finisher else -8.0, 0.08)
+	if _camera and _camera.has_method("add_trauma"):
+		_camera.add_trauma(0.5 if is_finisher else 0.32)
+	# Hit-stop by weight: 2 / 3 / 5 / 7 frames — bosses add a beat of slow-mo.
+	match heaviest:
+		"light": GameManager.hitstop(0.033)
+		"heavy": GameManager.hitstop(0.083)
+		"boss":
+			GameManager.hitstop(0.117)
+			GameManager.slowmo(0.3, 0.08)
+		_: GameManager.hitstop(0.05)
+	# FLOW STATE: the streak climbs; at 20+, soul flows half again as fast.
+	_streak += 1
+	streak_changed.emit(_streak)
+	if _stats:
+		var gain := 2.5 * (1.5 if _streak >= 20 else 1.0)
+		_stats.refill_shadow(gain)
 
 
 # Inlined (not a static on OneShotVFX) to avoid a parse-time dependency on that

@@ -16,6 +16,7 @@ radius = 15.0
 collision_layer = 0
 collision_mask = 0
 script = ExtResource("1_bat")
+weight = "light"
 max_health = 1
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]

@@ -95,6 +95,14 @@ var speed_zone_mult: float = 1.0              ## set by WaterZones (wading drag)
 var _grappling: bool = false
 var _grapple_target := Vector2.ZERO
 var _grapple_t: float = 0.0
+# Pogo: consecutive down-air bounces grow 10% each within the chain window.
+var _pogo_chain: int = 0
+var _pogo_chain_t: float = 0.0
+# Ground slam (down + jump while airborne).
+var _slamming: bool = false
+var _slam_start_y: float = 0.0
+# Perfect parry: how long the current parry window has been open.
+var _parry_age: float = 0.0
 
 # Cached frame->seconds conversions (computed in _ready from the physics tick).
 var _coyote_time: float
@@ -183,7 +191,12 @@ func _update_timers(delta: float) -> void:
 	_hurt_iframes = maxf(0.0, _hurt_iframes - delta)
 	_hurt_stun = maxf(0.0, _hurt_stun - delta)
 	_parry_window = maxf(0.0, _parry_window - delta)
+	if _parry_window > 0.0:
+		_parry_age += delta
 	_wall_jump_lock = maxf(0.0, _wall_jump_lock - delta)
+	_pogo_chain_t = maxf(0.0, _pogo_chain_t - delta)
+	if _pogo_chain_t <= 0.0:
+		_pogo_chain = 0
 
 
 func _handle_buffered_jump_input() -> void:
@@ -213,6 +226,16 @@ func _handle_wall_slide(_delta: float) -> void:
 
 
 func _handle_jump() -> void:
+	# Down + jump while airborne = GROUND SLAM (a separate verb from the pogo).
+	# Holding down declares intent — it outranks the coyote jump.
+	if _jump_buffer_timer > 0.0 and not is_on_floor() \
+			and Input.is_action_pressed("move_down") and not _slamming:
+		_slamming = true
+		_slam_start_y = global_position.y
+		_jump_buffer_timer = 0.0
+		velocity = Vector2(0, 760.0)
+		AudioManager.play("dash", -10.0, 0.05, &"SFX", 0.7)
+		return
 	# A jump fires when a buffered press meets ground OR coyote grace.
 	var grounded_or_coyote := is_on_floor() or _coyote_timer > 0.0
 	if _jump_buffer_timer > 0.0 and grounded_or_coyote:
@@ -366,8 +389,42 @@ func _apply_horizontal_movement(delta: float) -> void:
 func _post_move() -> void:
 	# Landing detection for sfx/animation/squash later.
 	if is_on_floor() and not _was_on_floor:
+		if _slamming:
+			_slam_impact()
 		landed.emit()
 	_was_on_floor = is_on_floor()
+
+
+## The ground slam lands: an AOE shock that stuns and chips everything close.
+## Radius doubles on a long fall (3+ screens of drop).
+func _slam_impact() -> void:
+	_slamming = false
+	var fell := global_position.y - _slam_start_y
+	var radius := 120.0 if fell > 500.0 else 60.0
+	AudioManager.play("boss_slam", -8.0)
+	VFXManager.dust(global_position + Vector2(0, 10), 1.0)
+	var cam := get_node_or_null("Camera")
+	if cam and cam.has_method("add_trauma"):
+		cam.add_trauma(0.55)
+	GameManager.hitstop(0.05)
+	for e in get_tree().get_nodes_in_group("enemy"):
+		if e.global_position.distance_to(global_position) < radius:
+			if e.has_method("stagger"):
+				e.stagger(global_position, 200.0, 1.5)
+			if e.has_method("take_damage"):
+				e.take_damage(1, global_position)
+
+
+## The POGO: a down-air strike connected — bounce. Chains within 0.5s climb
+## 10% a hop, capped at 150% of a jump.
+func pogo_bounce() -> void:
+	_pogo_chain = mini(_pogo_chain + 1, 6)
+	_pogo_chain_t = 0.5
+	var mult: float = minf(1.0 + 0.1 * (_pogo_chain - 1), 1.5)
+	velocity.y = jump_velocity * mult
+	_slamming = false
+	_air_jumps = 1 if can_double_jump else 0   # a pogo refreshes the air jump
+	jumped.emit()
 
 
 # --- State (drives PlayerAnimator) ----------------------------------------
@@ -412,6 +469,7 @@ func take_damage(amount: int = 1, from_position: Vector2 = Vector2.ZERO) -> void
 		stats.take_damage(amount)
 	_hurt_iframes = hurt_invuln_time
 	_hurt_stun = hurt_stun_time
+	_slamming = false
 	# Knock back away from the damage source.
 	var dir := signf(global_position.x - from_position.x)
 	if dir == 0.0:
@@ -440,6 +498,7 @@ func receive_attack(attacker: Node = null, amount: int = 1) -> void:
 ## Opens the parry window — PlayerCombat calls this on every attack press.
 func open_parry_window() -> void:
 	_parry_window = parry_window_time
+	_parry_age = 0.0
 
 
 ## Items (smoke bomb, echo stone) buy moments of invincibility.
@@ -447,20 +506,32 @@ func grant_iframes(t: float) -> void:
 	_hurt_iframes = maxf(_hurt_iframes, t)
 
 func _do_parry(attacker: Node) -> void:
+	# PERFECT PARRY: the strike landed in the first 0.05s of the window — the
+	# read, not the reflex. Gold flash, deep stagger, soul surge, time bends.
+	var perfect := _parry_age < 0.05
 	_parry_window = 0.0
-	# GDD: full shadow-energy refill, brief slow-mo, enemy staggered.
 	var stats := get_node_or_null("Stats")
-	if stats:
-		stats.refill_shadow()
-	GameManager.slowmo(0.25, 0.18)
 	var cam := get_node_or_null("Camera")
-	if cam and cam.has_method("add_trauma"):
-		cam.add_trauma(0.45)
 	var anim := get_node_or_null("Animator")
-	if anim and anim.has_method("flash"):
-		anim.flash(Color(1.0, 1.0, 1.0))   # white parry flash
-	if attacker and is_instance_valid(attacker) and attacker.has_method("stagger"):
-		attacker.stagger(global_position)
+	if perfect:
+		if stats:
+			stats.refill_shadow(stats.max_shadow * 0.25)
+		GameManager.slowmo(0.15, 0.2)
+		if cam and cam.has_method("add_trauma"):
+			cam.add_trauma(0.7)
+		if anim and anim.has_method("flash"):
+			anim.flash(Color(1.0, 0.88, 0.45))   # gold
+		if attacker and is_instance_valid(attacker) and attacker.has_method("stagger"):
+			attacker.stagger(global_position, 180.0, 2.5)
+		AudioManager.play("parry", -2.0, 0.02, &"SFX", 1.2)
+	else:
+		GameManager.slowmo(0.3, 0.12)
+		if cam and cam.has_method("add_trauma"):
+			cam.add_trauma(0.4)
+		if anim and anim.has_method("flash"):
+			anim.flash(Color(0.85, 0.88, 0.95))  # silver
+		if attacker and is_instance_valid(attacker) and attacker.has_method("stagger"):
+			attacker.stagger(global_position, 150.0, 1.2)
 	parried.emit(attacker)
 
 ## Apply a run boon (from a Shrine) live to the current run. Routes each stat

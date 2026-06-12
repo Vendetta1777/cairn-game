@@ -22,6 +22,7 @@ fill_to = Vector2(0.5, 0)
 collision_layer = 0
 collision_mask = 0
 script = ExtResource("1_mb")
+weight = "boss"
 max_health = 20
 idle_anim = &"idle_fly"
 shard_drop = 4

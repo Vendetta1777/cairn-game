@@ -13,6 +13,8 @@ signal died
 @export var shard_drop: int = 1   ## Shards (kept on death) awarded on kill
 @export var echo_drop: int = 3    ## Echoes (lost on death) awarded on kill
 @export var stagger_resist: float = 0.45  ## <1 = heavy: shrugs off knockback (1 = light)
+## Hit-stop class: how it FEELS to hit this thing (light/medium/heavy/boss).
+@export var weight: String = "medium"
 
 var health: int
 var _dead := false
@@ -118,6 +120,13 @@ func _die() -> void:
 			tw.tween_property(_sprite, "position:y", _sprite.position.y - 16.0, 0.4)
 			tw.tween_property(_sprite, "modulate:a", 0.0, 0.4)
 		await tw.finished
+	# The body stays a moment: pogo platform, projectile shield, throwable.
+	if not is_in_group("boss") and is_inside_tree():
+		var corpse := Node2D.new()
+		corpse.set_script(preload("res://scenes/fx/Corpse.gd"))
+		corpse.tint = _sprite.modulate if _sprite else Color(0.5, 0.5, 0.55)
+		get_parent().add_child(corpse)
+		corpse.global_position = global_position + Vector2(0, 6)
 	queue_free()
 
 

@@ -28,6 +28,7 @@ fill_to = Vector2(0.5, 0)
 collision_layer = 0
 collision_mask = 0
 script = ExtResource("1_wraith")
+weight = "light"
 max_health = 2
 shard_drop = 1
 echo_drop = 4

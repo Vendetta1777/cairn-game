@@ -9,10 +9,23 @@ var _damage := 1
 var _life := 2.4
 var _age := 0.0
 var _hit := false
+var _deflected := false
 
 
 func launch(dir: Vector2) -> void:
 	_vel = dir.normalized()
+
+
+## A timed strike sends it back at 1.5x speed — and now it hunts its makers.
+func deflect(dir: Vector2) -> void:
+	if _deflected:
+		return
+	_deflected = true
+	_vel = dir.normalized()
+	_speed *= 1.5
+	_age = 0.0
+	collision_mask = 4   # enemy hurtboxes now
+	modulate = Color(0.7, 1.0, 0.95)
 
 
 func _ready() -> void:
@@ -40,6 +53,15 @@ func _process(delta: float) -> void:
 func _on_area(area: Area2D) -> void:
 	var b := area.get_parent()
 	if _hit or b == null:
+		return
+	# Deflected: double damage to whatever's in the way — ideally its maker.
+	if _deflected:
+		if b.is_in_group("enemy") and b.has_method("take_damage"):
+			_hit = true
+			b.take_damage(_damage * 2, global_position)
+			if b.has_method("stagger"):
+				b.stagger(global_position, 180.0, 1.0)
+			queue_free()
 		return
 	if b.is_in_group("player") and b.has_method("receive_attack"):
 		_hit = true

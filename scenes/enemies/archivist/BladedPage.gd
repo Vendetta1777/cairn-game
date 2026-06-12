@@ -8,11 +8,22 @@ var _vel := Vector2.ZERO
 var _damage := 1
 var _t := 0.0
 var _hit := false
+var _deflected := false
 
 
 func launch(dir: Vector2, speed: float = 190.0, damage: int = 1) -> void:
 	_vel = dir.normalized() * speed
 	_damage = damage
+
+
+## Cut it out of the air and it flies back half again as fast, edge-first.
+func deflect(dir: Vector2) -> void:
+	if _deflected:
+		return
+	_deflected = true
+	_vel = dir.normalized() * _vel.length() * 1.5
+	collision_mask = 5   # world + enemy hurtboxes
+	modulate = Color(0.7, 1.0, 0.95)
 
 
 func _ready() -> void:
@@ -44,6 +55,14 @@ func _on_body(_b: Node) -> void:
 
 func _try_hit(node: Node) -> void:
 	if _hit or node == null:
+		return
+	if _deflected:
+		if node.is_in_group("enemy") and node.has_method("take_damage"):
+			_hit = true
+			node.take_damage(_damage * 2, global_position)
+			if node.has_method("stagger"):
+				node.stagger(global_position, 180.0, 1.0)
+			_shred()
 		return
 	if node.is_in_group("player") and node.has_method("receive_attack"):
 		_hit = true
