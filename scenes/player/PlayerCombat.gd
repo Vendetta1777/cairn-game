@@ -131,6 +131,7 @@ func _do_attack() -> void:
 			connected = true
 
 	if connected:
+		AudioManager.combat_ping()
 		AudioManager.play("impact", -4.0 if is_finisher else -8.0, 0.08)
 		if _camera and _camera.has_method("add_trauma"):
 			_camera.add_trauma(0.5 if is_finisher else 0.32)

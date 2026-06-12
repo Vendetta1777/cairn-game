@@ -65,6 +65,24 @@ func _initialize() -> void:
 	_save("music_warrens", _pad_track(40.0, [38.9, 58.3, 77.8], 0.08, 0.0, 0.2))
 	_save("music_throne", _pad_track(46.0, [46.2, 69.3, 92.5], 0.11, 0.06, 0.05))
 
+	# --- M11: variations, UI voices, the combat layer ---
+	_rng.seed = 21
+	_save("step_stone_2", _step(0.08, 1050.0, 0.45))
+	_save("step_stone_3", _step(0.1, 800.0, 0.5))
+	_save("hurt_2", _grunt(140.0, 0.2))
+	_save("hurt_3", _grunt(185.0, 0.16))
+	_save("swipe_2", _whoosh(0.11, 1600.0, 600.0, 0.42))
+	_save("swipe_3", _whoosh(0.15, 1200.0, 420.0, 0.48))
+	_save("land_heavy", _thud(0.24, 80.0, 0.95))
+	_save("parry_fail", _thud(0.12, 160.0, 0.5))
+	_save("menu_click", _chime([880.0], 0.1))
+	_save("menu_select", _chime([660.0, 990.0], 0.18))
+	_save("skill_buy", _chime([220.0, 330.0, 440.0], 1.2))
+	_save("item_pickup", _chime([784.0, 1175.0], 0.3))
+	_save("map_rustle", _rustle())
+	# The combat layer: percussion-only bed that rides OVER any area track.
+	_save("music_combat_layer", _combat_layer(24.0))
+
 	print("AUDIO DONE")
 	quit()
 
@@ -320,6 +338,37 @@ func _pad_track(dur: float, chord: Array, pad_amp: float, bell_amp: float,
 			lp2 += 0.01 * (lp - lp2)
 			var t := float(i) / SR
 			b[i] += lp2 * rumble_amp * 12.0 * (0.7 + 0.3 * sin(TAU * 0.07 * t))
+	return _make_loopable(b)
+
+
+## Parchment rustle for the map tablet.
+func _rustle() -> PackedFloat32Array:
+	var b := _buf(0.35)
+	for i in range(7):
+		_noise_burst(b, i * 0.045, 0.06, _rng.randf_range(1800, 3600), 0.25, 4.0)
+	return b
+
+
+## Percussion-only combat bed: low toms + rim ticks, loopable over any pad.
+func _combat_layer(dur: float) -> PackedFloat32Array:
+	var b := _buf(dur)
+	var bpm := 96.0
+	var beat := 60.0 / bpm
+	var nbeats := int(dur / beat)
+	for k in nbeats:
+		var t0 := k * beat
+		match k % 4:
+			0:
+				_tone(b, t0, 0.22, 62.0, 0.55, 0.002, -0.3)
+				_noise_burst(b, t0, 0.05, 900.0, 0.2, 8.0)
+			1:
+				_noise_burst(b, t0 + beat * 0.5, 0.03, 3000.0, 0.16, 8.0)
+			2:
+				_tone(b, t0, 0.2, 74.0, 0.4, 0.002, -0.3)
+			3:
+				_noise_burst(b, t0, 0.04, 2200.0, 0.18, 8.0)
+				if k % 8 == 7:
+					_tone(b, t0 + beat * 0.5, 0.16, 98.0, 0.35, 0.002, -0.2)
 	return _make_loopable(b)
 
 

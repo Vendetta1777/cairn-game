@@ -12,8 +12,17 @@ var _step_t := 0.0
 
 func _ready() -> void:
 	_controller = get_parent()
-	_controller.jumped.connect(func(): AudioManager.play("jump", -10.0))
-	_controller.landed.connect(func(): AudioManager.play("land", -8.0))
+	# Double jumps ring a step higher; hard landings thud heavier.
+	_controller.jumped.connect(func():
+		var aerial: bool = not _controller.is_on_floor()
+		AudioManager.play("jump", -10.0, 0.05, &"SFX", 1.18 if aerial else 1.0))
+	_controller.landed.connect(func():
+		var anim = get_node_or_null("../Animator")
+		var hard: float = anim._last_vy / 700.0 if anim and "_last_vy" in anim else 0.3
+		if hard > 0.75:
+			AudioManager.play("land_heavy", -4.0)
+		else:
+			AudioManager.play("land", -8.0))
 	_controller.dashed.connect(func(): AudioManager.play("dash", -8.0))
 	_controller.hurt.connect(func(_amt): AudioManager.play("hurt", -4.0))
 	_controller.parried.connect(func(_a): AudioManager.play("parry", -4.0))

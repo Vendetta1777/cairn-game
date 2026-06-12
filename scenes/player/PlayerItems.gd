@@ -74,10 +74,10 @@ func _process(delta: float) -> void:
 			_ring_ui.visible = true
 		if Input.is_action_just_pressed("move_left"):
 			_sel = wrapi(_sel - 1, 0, maxi(_owned().size(), 1))
-			AudioManager.play("step_stone", -18.0)
+			AudioManager.ui("menu_click", -14.0)
 		elif Input.is_action_just_pressed("move_right"):
 			_sel = wrapi(_sel + 1, 0, maxi(_owned().size(), 1))
-			AudioManager.play("step_stone", -18.0)
+			AudioManager.ui("menu_click", -14.0)
 		_ring_ui.queue_redraw()
 	elif _ring_open:
 		_ring_open = false

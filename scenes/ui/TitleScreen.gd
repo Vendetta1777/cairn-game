@@ -51,12 +51,12 @@ func _input(event: InputEvent) -> void:
 func _nav(event: InputEvent, count: int) -> bool:
 	if event.is_action_pressed("move_up"):
 		_sel = wrapi(_sel - 1, 0, count)
-		AudioManager.play("step_stone", -18.0)
+		AudioManager.ui("menu_click", -14.0)
 		get_viewport().set_input_as_handled()
 		return true
 	if event.is_action_pressed("move_down"):
 		_sel = wrapi(_sel + 1, 0, count)
-		AudioManager.play("step_stone", -18.0)
+		AudioManager.ui("menu_click", -14.0)
 		get_viewport().set_input_as_handled()
 		return true
 	return false
@@ -73,7 +73,7 @@ func _input_main(event: InputEvent) -> void:
 	if not _confirmed(event):
 		return
 	get_viewport().set_input_as_handled()
-	AudioManager.play("chest", -14.0)
+	AudioManager.ui("menu_select", -10.0)
 	match _sel:
 		0:
 			_slots_for_new = true

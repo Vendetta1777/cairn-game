@@ -74,8 +74,10 @@ func take_damage(amount: int, _from: Vector2 = Vector2.ZERO) -> void:
 
 
 ## Subclasses chirp this when they first commit to attacking the player.
+## Also heats the dynamic-music combat layer.
 func _aggro_sound() -> void:
-	AudioManager.play_at("aggro", global_position, -12.0)
+	AudioManager.play_at("aggro", global_position, -12.0, 500.0)
+	AudioManager.combat_ping()
 
 
 func _die() -> void:

@@ -93,7 +93,7 @@ func _toggle() -> void:
 				else:
 					_etch[id] = 0.0
 					PlayerProgress.set_flag("etched_%s" % id)
-		AudioManager.play("door", -14.0)
+		AudioManager.ui("map_rustle", -8.0)
 
 
 func _seen(id: String) -> bool:

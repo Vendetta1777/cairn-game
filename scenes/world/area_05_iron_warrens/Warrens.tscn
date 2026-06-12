@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3]
+[gd_scene load_steps=33 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_05_iron_warrens/Warrens.gd" id="1_root"]
 [ext_resource type="Script" path="res://scenes/world/area_05_iron_warrens/WarrensTerrain.gd" id="2_terrain"]
@@ -29,6 +29,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/Cutscene.tscn" id="31_cut"]
 [ext_resource type="PackedScene" path="res://scenes/ui/WorldMap.tscn" id="90_wmap"]
 [ext_resource type="PackedScene" path="res://scenes/fx/PostFX.tscn" id="91_post"]
+[ext_resource type="PackedScene" path="res://scenes/world/ReverbZone.tscn" id="96_rz"]
 
 [sub_resource type="Gradient" id="grad"]
 offsets = PackedFloat32Array(0, 1)
@@ -274,3 +275,13 @@ bounds = Rect2(0, 0, 3700, 288)
 [node name="WorldMap" parent="." instance=ExtResource("90_wmap")]
 
 [node name="PostFX" parent="." instance=ExtResource("91_post")]
+
+[node name="ReverbVein" parent="." instance=ExtResource("96_rz")]
+position = Vector2(2560, 0)
+preset = "small"
+size = Vector2(540, 288)
+
+[node name="ReverbTomb" parent="." instance=ExtResource("96_rz")]
+position = Vector2(3160, 0)
+preset = "cathedral"
+size = Vector2(526, 288)

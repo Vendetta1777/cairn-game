@@ -57,10 +57,10 @@ func _process(delta: float) -> void:
 	_msg_t = maxf(0.0, _msg_t - delta)
 	if Input.is_action_just_pressed("move_up"):
 		_sel = wrapi(_sel - 1, 0, STOCK_ORDER.size())
-		AudioManager.play("step_stone", -18.0)
+		AudioManager.ui("menu_click", -14.0)
 	elif Input.is_action_just_pressed("move_down"):
 		_sel = wrapi(_sel + 1, 0, STOCK_ORDER.size())
-		AudioManager.play("step_stone", -18.0)
+		AudioManager.ui("menu_click", -14.0)
 	elif Input.is_action_just_pressed("interact") or Input.is_action_just_pressed("attack"):
 		_buy(STOCK_ORDER[_sel])
 	elif Input.is_action_just_pressed("pause") or Input.is_action_just_pressed("crouch"):

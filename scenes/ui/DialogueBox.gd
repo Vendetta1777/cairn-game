@@ -131,10 +131,10 @@ func _process(delta: float) -> void:
 	if _choice_mode:
 		if Input.is_action_just_pressed("move_up"):
 			_choice_sel = wrapi(_choice_sel - 1, 0, _choices.size())
-			AudioManager.play("step_stone", -18.0)
+			AudioManager.ui("menu_click", -14.0)
 		elif Input.is_action_just_pressed("move_down"):
 			_choice_sel = wrapi(_choice_sel + 1, 0, _choices.size())
-			AudioManager.play("step_stone", -18.0)
+			AudioManager.ui("menu_click", -14.0)
 		elif Input.is_action_just_pressed("interact"):
 			var pick := _choice_sel
 			AudioManager.play("checkpoint", -14.0)

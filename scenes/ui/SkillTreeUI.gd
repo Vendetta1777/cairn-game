@@ -87,6 +87,7 @@ func _current() -> Dictionary:
 func _try_unlock() -> void:
 	var node := _current()
 	if PlayerProgress.unlock(node.id):
+		AudioManager.ui("skill_buy", -6.0)
 		# Little confirm flash handled in _draw via _time; refresh labels.
 		_refresh()
 

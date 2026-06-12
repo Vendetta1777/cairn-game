@@ -44,7 +44,7 @@ func _on_enter(area: Area2D) -> void:
 		if echoes > 0:
 			stats.add_echoes(echoes)
 	SaveManager.autosave()
-	AudioManager.play("chest", -8.0)
+	AudioManager.play("item_pickup", -8.0)
 	_float_text()
 	_zone.set_deferred("monitoring", false)
 	var tw := create_tween()

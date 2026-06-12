@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=3]
+[gd_scene load_steps=35 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_04_pale_library/Library.gd" id="1_root"]
 [ext_resource type="Script" path="res://scenes/world/area_04_pale_library/LibraryTerrain.gd" id="2_terrain"]
@@ -31,6 +31,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/SealedGate.tscn" id="32_gate"]
 [ext_resource type="PackedScene" path="res://scenes/ui/WorldMap.tscn" id="90_wmap"]
 [ext_resource type="PackedScene" path="res://scenes/fx/PostFX.tscn" id="91_post"]
+[ext_resource type="PackedScene" path="res://scenes/world/ReverbZone.tscn" id="96_rz"]
 
 [sub_resource type="Gradient" id="grad"]
 offsets = PackedFloat32Array(0, 1)
@@ -295,3 +296,8 @@ bounds = Rect2(0, 0, 3600, 288)
 [node name="WorldMap" parent="." instance=ExtResource("90_wmap")]
 
 [node name="PostFX" parent="." instance=ExtResource("91_post")]
+
+[node name="ReverbHall" parent="." instance=ExtResource("96_rz")]
+position = Vector2(3060, 0)
+preset = "cathedral"
+size = Vector2(526, 288)
