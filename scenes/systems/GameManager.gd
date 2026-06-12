@@ -32,10 +32,13 @@ func _process(delta: float) -> void:
 var pending_spawn = null
 
 
-## Called by a Remnant Stone when the player activates it.
+## Called by a Remnant Stone when the player activates it. The checkpoint is
+## also written into PlayerProgress so it survives saves and portal round trips.
 func set_checkpoint(position: Vector2) -> void:
 	has_checkpoint = true
 	checkpoint_position = position
+	PlayerProgress.last_checkpoint = {
+		"area": current_area_id, "x": position.x, "y": position.y}
 	checkpoint_set.emit(position)
 
 ## Where the player should respawn — the last checkpoint, or the given fallback.

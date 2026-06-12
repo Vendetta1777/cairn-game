@@ -32,7 +32,11 @@ func _ready() -> void:
 	max_hearts = max_health / HALVES_PER_HEART
 	max_shadow += PlayerProgress.bonus("max_shadow")
 	_shadow_regen = PlayerProgress.bonus("shadow_regen")
-	health = max_health
+	# Current health persists across scene changes and saves (-1 = full). Never
+	# spawn at 0 — a loaded save always gets at least half a heart.
+	health = max_health if PlayerProgress.health_halves < 0 \
+		else clampi(PlayerProgress.health_halves, 1, max_health)
+	PlayerProgress.health_halves = health
 	shadow = max_shadow
 	shards = PlayerProgress.shards
 	echoes = PlayerProgress.echoes
@@ -57,6 +61,7 @@ func take_damage(amount: int = 1) -> void:
 	if health <= 0:
 		return
 	health = max(0, health - amount)
+	PlayerProgress.health_halves = health
 	health_changed.emit(health, max_health)
 	if health == 0:
 		# Roguelite penalty: Echoes are dropped on death (Shards are kept).
@@ -67,6 +72,7 @@ func take_damage(amount: int = 1) -> void:
 
 func heal(halves: int) -> void:
 	health = min(max_health, health + halves)
+	PlayerProgress.health_halves = health
 	health_changed.emit(health, max_health)
 
 
@@ -81,6 +87,7 @@ func grant_half_heart() -> bool:
 	max_hearts = max_health / HALVES_PER_HEART
 	if gained > 0:
 		health = min(max_health, health + gained)
+	PlayerProgress.health_halves = health
 	health_changed.emit(health, max_health)
 	return true
 

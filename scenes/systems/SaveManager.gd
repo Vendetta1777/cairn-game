@@ -9,16 +9,31 @@ signal saved(slot: int)
 signal loaded(slot: int)
 
 const SLOTS := 3
-const VERSION := 1
+const VERSION := 2
 
 var current_slot: int = 0
 
+## Autosaves only fire once a slot has been deliberately entered (New Game /
+## Continue on the title screen). Without this, ANY session that skips the
+## title — running a scene directly from the editor, a test script — would
+## autosave near-empty progress over the real slot 0 on the first checkpoint
+## touch. That silent stomp looks exactly like "the portal reset my save".
+var session_active: bool = false
+
 
 func _ready() -> void:
-	# Persist automatically at the natural beats.
+	# Persist automatically at every state-changing beat.
 	GameManager.checkpoint_set.connect(func(_p): autosave())
 	QuestTracker.boss_defeated.connect(func(_id): autosave())
 	QuestTracker.area_completed.connect(func(_id): autosave())
+	PlayerProgress.ability_unlocked.connect(func(_id): autosave())
+	PlayerProgress.node_unlocked.connect(func(_id): autosave())
+
+
+## The title screen calls this when a slot is chosen — arms autosaving.
+func start_session(slot: int) -> void:
+	current_slot = slot
+	session_active = true
 
 
 func _path(slot: int) -> String:
@@ -75,6 +90,7 @@ func load_slot(slot: int) -> bool:
 		return false
 	PlayerProgress.from_dict(data)
 	current_slot = slot
+	session_active = true
 	loaded.emit(slot)
 	return true
 
@@ -84,6 +100,9 @@ func delete_slot(slot: int) -> void:
 		DirAccess.remove_absolute(_path(slot))
 
 
-## Save to the active slot (called by the auto-save signal hooks).
+## Save to the active slot (called by the auto-save signal hooks). No-op until
+## a slot is properly entered, so stray sessions can't stomp a real save.
 func autosave() -> void:
+	if not session_active:
+		return
 	save_slot(current_slot)

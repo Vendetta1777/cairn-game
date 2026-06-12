@@ -115,17 +115,17 @@ func _input_slots(event: InputEvent) -> void:
 			_confirm_overwrite = _sel
 			return
 		_entering = true
-		SaveManager.current_slot = _sel
 		PlayerProgress.reset()
 		GameManager.has_checkpoint = false
 		GameManager.run_time = 0.0
+		SaveManager.start_session(_sel)
 		SaveManager.save_slot(_sel)
 		SceneFlow.travel(AREA_SCENE, "down")
 	else:
 		if not used:
 			return   # nothing to continue
 		_entering = true
-		SaveManager.load_slot(_sel)
+		SaveManager.load_slot(_sel)   # arms the session too
 		GameManager.has_checkpoint = false
 		GameManager.run_time = 0.0
 		SceneFlow.travel(HUB_SCENE, "down")

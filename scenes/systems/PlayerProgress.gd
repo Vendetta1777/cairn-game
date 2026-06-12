@@ -1,10 +1,21 @@
 extends Node
 ## Cairn — PlayerProgress (autoload). The single source of truth for everything
 ## that PERSISTS across deaths, scene changes, and save files: hard currency
-## (Shards), soft currency (Echoes), the unlocked skill nodes, permanent heart
-## upgrades, and story flags. The player's in-run PlayerStats syncs to this on
-## spawn and writes back to it, so a death or a trip to the Sanctum never loses
-## progress. SaveManager serialises this whole object.
+## (Shards), soft currency (Echoes), the unlocked skill nodes, movement
+## abilities, permanent heart upgrades, current health, the last checkpoint,
+## and story flags. The player's in-run PlayerStats syncs to this on spawn and
+## writes back to it, so a death or a trip to the Sanctum never loses progress.
+## SaveManager serialises this whole object.
+##
+## FLAG NAMING CONVENTIONS (all world state lives in `flags`):
+##   boss_<id>_dead     — boss kills        (e.g. boss_ashen_warden_dead)
+##   cache_<id>         — collected caches  (e.g. cache_a1_loft)
+##   used_<id>          — spent heart-shrines
+##   seen_<id>          — discovered areas  (world-map fog of war)
+##   etched_<id>        — areas already etched onto the map tablet
+##   area_<id>_done     — completed descents
+## Doors (SealedGates) derive openness from their boss flag — no separate door
+## state to drift out of sync.
 
 signal currency_changed(shards: int, echoes: int)
 signal node_unlocked(id: String)
@@ -18,13 +29,19 @@ const Skills = preload("res://scenes/systems/SkillTreeData.gd")
 const BASE_HEARTS := 3    ## start fragile
 const MAX_HEARTS := 5     ## hard cap — hearts are precious
 
+## Every boss in the game (including ones not built yet) — written into the
+## save as an explicit ledger so a glance at the JSON answers "what's dead".
+const KNOWN_BOSSES := ["mother_bat", "ashen_warden", "drowned_choir"]
+
 var shards: int = 0
 var echoes: int = 0
 var bonus_half_hearts: int = 0     ## permanent HALF-heart upgrades, from heart-shrines only
 var unlocked: Dictionary = {}      ## node_id -> true
 var abilities: Dictionary = {}     ## movement abilities: "dash" / "wall_jump" / "double_jump"
-var flags: Dictionary = {}         ## story / world flags
+var flags: Dictionary = {}         ## story / world flags (see conventions above)
 var furthest_area: String = "hollowed_gate"
+var health_halves: int = -1        ## current health in half-hearts; -1 = full
+var last_checkpoint: Dictionary = {}  ## {"area": id, "x": float, "y": float}
 
 
 # --- currency ----------------------------------------------------------------
@@ -140,17 +157,28 @@ func has_flag(flag: String) -> bool:
 	return flags.get(flag, false)
 
 
+func boss_defeated(boss_id: String) -> bool:
+	return has_flag("boss_%s_dead" % boss_id)
+
+
 # --- serialisation -----------------------------------------------------------
 
 func to_dict() -> Dictionary:
+	# Explicit per-boss ledger (every boss, even unbuilt) for save-file clarity.
+	var bosses := {}
+	for id in KNOWN_BOSSES:
+		bosses[id] = boss_defeated(id)
 	return {
 		"shards": shards,
 		"echoes": echoes,
 		"bonus_half_hearts": bonus_half_hearts,
+		"health": health_halves,
 		"unlocked": unlocked.keys(),
 		"abilities": abilities.keys(),
+		"bosses": bosses,
 		"flags": flags,
 		"furthest_area": furthest_area,
+		"last_checkpoint": last_checkpoint,
 	}
 
 
@@ -165,6 +193,13 @@ func from_dict(d: Dictionary) -> void:
 	for id in d.get("abilities", []):
 		abilities[id] = true
 	flags = d.get("flags", {})
+	# The boss ledger is also accepted on load (forward compat / hand edits).
+	var bosses: Dictionary = d.get("bosses", {})
+	for id in bosses:
+		if bosses[id]:
+			flags["boss_%s_dead" % id] = true
+	health_halves = int(d.get("health", -1))
+	last_checkpoint = d.get("last_checkpoint", {})
 	furthest_area = d.get("furthest_area", "hollowed_gate")
 	currency_changed.emit(shards, echoes)
 	progress_loaded.emit()
@@ -177,5 +212,7 @@ func reset() -> void:
 	unlocked = {}
 	abilities = {}
 	flags = {}
+	health_halves = -1
+	last_checkpoint = {}
 	furthest_area = "hollowed_gate"
 	currency_changed.emit(shards, echoes)

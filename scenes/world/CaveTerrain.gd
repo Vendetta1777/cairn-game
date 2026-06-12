@@ -160,8 +160,14 @@ func _setup_player() -> void:
 		return
 	_spawn = _player.global_position
 	# Checkpoints are per-level: a stone touched in the LAST area must not pull
-	# a death in THIS one back to coordinates that mean nothing here.
+	# a death in THIS one back to coordinates that mean nothing here. But if the
+	# SAVED checkpoint belongs to THIS area (a portal round trip, or Continue),
+	# restore it — the stone stays lit and the respawn point survives the trip.
 	GameManager.has_checkpoint = false
+	var lc: Dictionary = PlayerProgress.last_checkpoint
+	if lc.get("area", "") == GameManager.current_area_id and lc.has("x"):
+		GameManager.has_checkpoint = true
+		GameManager.checkpoint_position = Vector2(float(lc.x), float(lc.y))
 	var stats = _player.get_node_or_null("Stats")
 	if stats:
 		stats.died.connect(_on_player_died)
@@ -215,6 +221,9 @@ func _do_respawn() -> void:
 	_death_screen.dismiss()
 	_dying = false
 	_spawn_respawn_burst(_player.global_position)
+	# Persist the world exactly as death left it: bosses stay dead, doors stay
+	# open, Echoes stay dropped — and health is back to full at the shrine.
+	SaveManager.autosave()
 
 
 ## Free whatever enemies are left and re-instance the level's original set.

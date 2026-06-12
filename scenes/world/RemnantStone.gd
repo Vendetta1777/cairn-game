@@ -16,11 +16,18 @@ var _active := false
 func _ready() -> void:
 	add_to_group("checkpoint")   # for the map overlay
 	AudioManager.attach_loop(self, "shrine_loop", -22.0)
-	# Already-set checkpoint (e.g. returning) stays lit.
-	if GameManager.has_checkpoint and GameManager.checkpoint_position.distance_to(global_position + respawn_offset) < 4.0:
-		_set_lit(true)
+	# Already-set checkpoint (returning / loaded save) stays lit. Deferred:
+	# the terrain restores the saved checkpoint in ITS deferred setup, and we
+	# must check after that, not before.
+	call_deferred("_check_lit")
 	if _detector:
 		_detector.area_entered.connect(_on_area_entered)
+
+
+func _check_lit() -> void:
+	if GameManager.has_checkpoint \
+			and GameManager.checkpoint_position.distance_to(global_position + respawn_offset) < 4.0:
+		_set_lit(true)
 
 
 func _on_area_entered(area: Area2D) -> void:

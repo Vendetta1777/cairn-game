@@ -55,6 +55,7 @@ func _claim() -> void:
 	if stats.grant_half_heart():
 		_used = true
 		PlayerProgress.set_flag("used_%s" % shrine_id)
+		SaveManager.autosave()
 		_prompt_text.text = "(spent)"
 		create_tween().tween_property(_prompt, "modulate:a", 0.0, 0.4)
 		# Bright pulse + fade as the heart's gift passes into you.
