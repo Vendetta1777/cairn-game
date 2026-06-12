@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=3]
+[gd_scene load_steps=39 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1Terrain.gd" id="1_terrain"]
 [ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1.gd" id="1_root"]
@@ -33,6 +33,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/Shrine.tscn" id="34_shrine"]
 [ext_resource type="PackedScene" path="res://scenes/ui/WorldMap.tscn" id="90_wmap"]
 [ext_resource type="PackedScene" path="res://scenes/fx/PostFX.tscn" id="91_post"]
+[ext_resource type="PackedScene" path="res://scenes/world/GrapplePoint.tscn" id="95_gp"]
 
 [sub_resource type="Gradient" id="grad_light"]
 offsets = PackedFloat32Array(0, 1)
@@ -341,3 +342,11 @@ mouse_filter = 2
 [node name="WorldMap" parent="." instance=ExtResource("90_wmap")]
 
 [node name="PostFX" parent="." instance=ExtResource("91_post")]
+
+[node name="GapsRing" parent="." instance=ExtResource("95_gp")]
+position = Vector2(1640, 96)
+
+[node name="GapsSkyCache" parent="." instance=ExtResource("33_cache")]
+position = Vector2(1640, 120)
+cache_id = "a1_sky"
+shards = 18

@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/world/PressurePlate.gd" id="1_plate"]
+
+[sub_resource type="RectangleShape2D" id="zone_shape"]
+size = Vector2(26, 14)
+
+[node name="PressurePlate" type="Node2D"]
+script = ExtResource("1_plate")
+
+[node name="Zone" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="Shape" type="CollisionShape2D" parent="Zone"]
+position = Vector2(0, -7)
+shape = SubResource("zone_shape")

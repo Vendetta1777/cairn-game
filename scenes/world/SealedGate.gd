@@ -9,6 +9,8 @@ extends Node2D
 @export var area_id: String = "hollowed_gate"
 @export var open_objective: String = "Descend — press E at the chasm"
 @export_file("*.tscn") var next_scene: String = ""
+## A passage that was never warded (no boss guards it) — open from the start.
+@export var starts_open: bool = false
 
 var _sealed := true
 var _open_amt := 0.0     ## 0 shut .. 1 fully open
@@ -29,8 +31,9 @@ func _ready() -> void:
 	_zone.area_exited.connect(_on_exit)
 	_make_blocker()
 	_prompt.modulate.a = 0.0
-	# Already cleared (this session OR a saved one)? Start open.
-	if QuestTracker.has_flag("boss_%s_dead" % boss_id) or PlayerProgress.has_flag("boss_%s_dead" % boss_id):
+	# Already cleared (this session OR a saved one), or never warded? Start open.
+	if starts_open or QuestTracker.has_flag("boss_%s_dead" % boss_id) \
+			or PlayerProgress.has_flag("boss_%s_dead" % boss_id):
 		_sealed = false
 		_open_amt = 1.0
 		_remove_blocker()

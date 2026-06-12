@@ -81,6 +81,8 @@ func _ready() -> void:
 		_controller.dashed.connect(func(): _flash = FLASH_DASH)
 		if _controller.has_signal("jumped"):
 			_controller.jumped.connect(_on_jumped)
+		if _controller.has_signal("grappled"):
+			_controller.grappled.connect(_on_grappled)
 	var combat := get_node_or_null("../Combat")
 	if combat and combat.has_signal("attacked"):
 		combat.attacked.connect(_on_attacked)
@@ -191,6 +193,37 @@ func _spawn_ghost() -> void:
 	var tw := ghost.create_tween()
 	tw.tween_property(ghost, "modulate:a", 0.0, trail_fade)
 	tw.tween_callback(ghost.queue_free)
+
+
+## The grapple line: a taut iron-grey wire from the player to the anchor, alive
+## only while the flight lasts.
+func _on_grappled(target: Vector2) -> void:
+	var line := Line2D.new()
+	line.width = 1.6
+	line.default_color = Color(0.75, 0.78, 0.85, 0.9)
+	var host: Node = _controller.get_parent()
+	host.add_child(line)
+	var ctrl = _controller
+	var upd := func():
+		if not is_instance_valid(line):
+			return
+		line.clear_points()
+		line.add_point(ctrl.global_position + Vector2(0, -8))
+		line.add_point(target)
+	upd.call()
+	var timer := Timer.new()
+	timer.wait_time = 0.016
+	timer.autostart = true
+	line.add_child(timer)
+	timer.timeout.connect(func():
+		if not is_instance_valid(ctrl) or not ctrl.get("_grappling"):
+			if is_instance_valid(line):
+				var tw := line.create_tween()
+				tw.tween_property(line, "modulate:a", 0.0, 0.12)
+				tw.tween_callback(line.queue_free)
+			timer.stop()
+		else:
+			upd.call())
 
 
 ## A jump while clinging = wall jump: kick a burst of dust off the wall.

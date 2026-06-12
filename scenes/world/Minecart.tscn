@@ -1,0 +1,35 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scenes/world/Minecart.gd" id="1_cart"]
+[ext_resource type="FontFile" path="res://assets/fonts/silkscreen.ttf" id="2_font"]
+
+[sub_resource type="RectangleShape2D" id="zone_shape"]
+size = Vector2(50, 40)
+
+[node name="Minecart" type="Node2D"]
+script = ExtResource("1_cart")
+
+[node name="Zone" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="Shape" type="CollisionShape2D" parent="Zone"]
+position = Vector2(0, -16)
+shape = SubResource("zone_shape")
+
+[node name="Prompt" type="Control" parent="."]
+offset_left = -44.0
+offset_top = -44.0
+offset_right = 44.0
+offset_bottom = -30.0
+mouse_filter = 2
+
+[node name="Text" type="Label" parent="Prompt"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_colors/font_color = Color(0.85, 0.8, 0.7, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 8
+text = "[E] ride"
+horizontal_alignment = 1

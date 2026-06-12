@@ -48,7 +48,11 @@ class_name PlayerController
 @export var can_double_jump: bool = false     ## found in Area 3 (The Sunken Nave)
 @export var can_wall_slide: bool = true       ## wall-slide + wall-jump — found in Area 2 (The Ashpits)
 @export var can_swim: bool = false            ## Area 3
-@export var can_grapple: bool = false         ## Area 5
+@export var can_grapple: bool = false         ## won from the Pale Librarian (Area 4)
+
+@export_group("Grapple")
+@export var grapple_range: float = 170.0      ## how far an anchor can be
+@export var grapple_speed: float = 430.0      ## flight speed toward the anchor
 
 @export_group("Wall")
 @export var wall_slide_speed: float = 90.0    ## capped fall speed while hugging a wall
@@ -69,6 +73,7 @@ signal dashed
 signal landed
 signal hurt(amount: int)
 signal parried(attacker: Node)
+signal grappled(target: Vector2)
 
 # --- Internal state ---
 var _facing: int = 1                          ## 1 = right, -1 = left (for attacks/animation flip)
@@ -87,6 +92,9 @@ var _wall_jump_lock: float = 0.0
 var _is_wall_sliding: bool = false
 var _air_jumps: int = 0                       ## double-jump charges left this airtime
 var speed_zone_mult: float = 1.0              ## set by WaterZones (wading drag)
+var _grappling: bool = false
+var _grapple_target := Vector2.ZERO
+var _grapple_t: float = 0.0
 
 # Cached frame->seconds conversions (computed in _ready from the physics tick).
 var _coyote_time: float
@@ -112,10 +120,19 @@ func _apply_ability_unlocks() -> void:
 	can_dash = PlayerProgress.has_ability("dash")
 	can_wall_slide = PlayerProgress.has_ability("wall_jump")
 	can_double_jump = PlayerProgress.has_ability("double_jump")
+	can_grapple = PlayerProgress.has_ability("grapple")
 
 
 func _physics_process(delta: float) -> void:
 	_update_timers(delta)
+
+	# Grapple flight: ballistic pull toward the anchor; ends on arrival, on a
+	# wall, or when the player jumps out of it.
+	if _grappling:
+		_process_grapple(delta)
+		move_and_slide()
+		_update_state()
+		return
 
 	# Dash overrides normal movement for its (short) duration.
 	if _is_dashing:
@@ -138,6 +155,7 @@ func _physics_process(delta: float) -> void:
 	_handle_wall_slide(delta)
 	_handle_jump()
 	_handle_dash_start()
+	_handle_grapple_start()
 	_handle_crouch()
 	_apply_horizontal_movement(delta)
 
@@ -249,6 +267,72 @@ func _process_dash(delta: float) -> void:
 		velocity.x = clampf(velocity.x, -run_speed, run_speed)
 
 
+# --- Grapple ---------------------------------------------------------------
+
+## Press dash-key direction-agnostic 'grapple' (the throw key while airborne is
+## free; we use a dedicated check): fire toward the best GrapplePoint in range —
+## ahead of the player and roughly upward. The anchor pulls the player in a
+## straight flight; jump cancels into a normal arc (momentum kept).
+func _handle_grapple_start() -> void:
+	if not can_grapple or _grappling:
+		return
+	if not Input.is_action_just_pressed("grapple"):
+		return
+	var best: Node2D = null
+	var best_d := grapple_range + 1.0
+	for p in get_tree().get_nodes_in_group("grapple_point"):
+		if not (p is Node2D):
+			continue
+		var d := global_position.distance_to(p.global_position)
+		if d > grapple_range or d < 24.0:
+			continue
+		# Only anchors above the horizon — grappling downward feels wrong.
+		if p.global_position.y > global_position.y + 12.0:
+			continue
+		if d < best_d:
+			best_d = d
+			best = p
+	if best == null:
+		return
+	_grappling = true
+	_grapple_t = 0.0
+	_grapple_target = best.global_position
+	_facing = int(signf(_grapple_target.x - global_position.x)) if absf(_grapple_target.x - global_position.x) > 2.0 else _facing
+	if best.has_method("flash"):
+		best.flash()
+	grappled.emit(_grapple_target)
+
+
+func _process_grapple(delta: float) -> void:
+	_grapple_t += delta
+	var to_target := _grapple_target - global_position
+	# Arrived: release. (Brushing a wall at launch must NOT cancel the flight —
+	# only a collision that actually blocks the flight direction does.)
+	if to_target.length() < 14.0:
+		_end_grapple(true)
+		return
+	if _grapple_t > 0.06 and get_slide_collision_count() > 0:
+		var n := get_slide_collision(0).get_normal()
+		if n.dot(to_target.normalized()) < -0.5:
+			_end_grapple(true)
+			return
+	if Input.is_action_just_pressed("jump"):
+		_end_grapple(false)
+		velocity.y = jump_velocity * 0.7   # small kick on release
+		jumped.emit()
+		return
+	velocity = to_target.normalized() * grapple_speed
+
+
+func _end_grapple(arrived: bool) -> void:
+	_grappling = false
+	if arrived:
+		# Soften the arrival so you can land on the anchor's ledge.
+		velocity = velocity.limit_length(150.0)
+		velocity.y = minf(velocity.y, -60.0)
+	_air_jumps = 1 if can_double_jump else 0   # grappling refreshes the air jump
+
+
 # --- Horizontal movement & crouch -----------------------------------------
 
 func _handle_crouch() -> void:
@@ -298,6 +382,8 @@ func _update_state() -> void:
 func _resolve_state() -> String:
 	if _hurt_stun > 0.0:
 		return "hurt"
+	if _grappling:
+		return "jump"
 	if _is_dashing:
 		return "dash"
 	if _is_wall_sliding:

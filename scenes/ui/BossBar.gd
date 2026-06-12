@@ -14,6 +14,10 @@ var _shown := 1.0       ## animated fill
 var _trail := 1.0       ## lagging ghost
 var _active := false
 var _rest_y := 0.0
+## Optional phase segmentation: thresholds (descending fractions where a new
+## phase begins) and a fill colour per phase. Set via bind_phases().
+var _phase_marks: Array = []
+var _phase_colors: Array = []
 
 
 func _ready() -> void:
@@ -32,6 +36,17 @@ func bind(boss: Node, display_name: String) -> void:
 		boss.engaged.connect(_show)
 	if boss.has_signal("defeated"):
 		boss.defeated.connect(_on_defeated)
+	# Bosses that stage their bar declare it themselves.
+	if "bar_phases" in boss:
+		var cfg: Dictionary = boss.bar_phases
+		bind_phases(cfg.get("marks", []), cfg.get("colors", []))
+
+
+## Segment the bar: marks = phase thresholds (e.g. [0.6, 0.3]), colors = one
+## fill colour per phase (phase count = marks.size() + 1).
+func bind_phases(marks: Array, colors: Array) -> void:
+	_phase_marks = marks
+	_phase_colors = colors
 
 
 func _show() -> void:
@@ -79,13 +94,25 @@ func _draw() -> void:
 	# Lagging damage trail (pale).
 	if _trail > 0.0:
 		draw_rect(Rect2(x0, top, BAR_W * _trail, BAR_H), Color(0.85, 0.78, 0.82, 0.55))
-	# Live fill — violet to crimson as the boss weakens.
+	# Live fill — phase colour if segmented, else violet -> crimson with damage.
 	if _shown > 0.0:
 		var fill_col := Color(0.62, 0.2, 0.32).lerp(Color(0.78, 0.16, 0.18), 1.0 - _shown)
+		if not _phase_colors.is_empty():
+			var phase := 0
+			for m in _phase_marks:
+				if _ratio <= float(m):
+					phase += 1
+			fill_col = _phase_colors[mini(phase, _phase_colors.size() - 1)]
 		draw_rect(Rect2(x0, top, BAR_W * _shown, BAR_H), fill_col)
 		# Top sheen.
 		draw_rect(Rect2(x0, top, BAR_W * _shown, BAR_H * 0.4), Color(1, 1, 1, 0.12))
-	# Notch ticks every 1/4.
-	for i in range(1, 4):
-		var nx := x0 + BAR_W * (i / 4.0)
-		draw_line(Vector2(nx, top), Vector2(nx, top + BAR_H), Color(0.03, 0.02, 0.05, 0.7), 1.0)
+	if _phase_marks.is_empty():
+		# Notch ticks every 1/4.
+		for i in range(1, 4):
+			var nx := x0 + BAR_W * (i / 4.0)
+			draw_line(Vector2(nx, top), Vector2(nx, top + BAR_H), Color(0.03, 0.02, 0.05, 0.7), 1.0)
+	else:
+		# Bold dividers at the phase thresholds.
+		for m in _phase_marks:
+			var nx := x0 + BAR_W * float(m)
+			draw_line(Vector2(nx, top - 3), Vector2(nx, top + BAR_H + 3), Color(0.05, 0.04, 0.08), 2.0)

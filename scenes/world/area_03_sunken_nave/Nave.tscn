@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3]
+[gd_scene load_steps=36 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_03_sunken_nave/Nave.gd" id="1_root"]
 [ext_resource type="Script" path="res://scenes/world/area_03_sunken_nave/NaveTerrain.gd" id="2_terrain"]
@@ -30,6 +30,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/Portal.tscn" id="31_portal"]
 [ext_resource type="PackedScene" path="res://scenes/ui/WorldMap.tscn" id="90_wmap"]
 [ext_resource type="PackedScene" path="res://scenes/fx/PostFX.tscn" id="91_post"]
+[ext_resource type="PackedScene" path="res://scenes/world/GrapplePoint.tscn" id="95_gp"]
 
 [sub_resource type="Gradient" id="grad"]
 offsets = PackedFloat32Array(0, 1)
@@ -216,8 +217,9 @@ shards = 6
 position = Vector2(3100, 252)
 boss_id = "drowned_choir"
 area_id = "sunken_nave"
-open_objective = "The choir door grinds open — descend"
-next_scene = ""
+open_objective = "The choir door stands open — the archive waits below"
+next_scene = "res://scenes/world/area_04_pale_library/Library.tscn"
+starts_open = true
 
 [node name="Shrine" parent="." instance=ExtResource("30_shrine")]
 position = Vector2(2720, 252)
@@ -317,3 +319,11 @@ mouse_filter = 2
 [node name="WorldMap" parent="." instance=ExtResource("90_wmap")]
 
 [node name="PostFX" parent="." instance=ExtResource("91_post")]
+
+[node name="BellRing" parent="." instance=ExtResource("95_gp")]
+position = Vector2(1985, 38)
+
+[node name="BellSkyCache" parent="." instance=ExtResource("28_cache")]
+position = Vector2(1985, 58)
+cache_id = "a3_sky"
+shards = 18

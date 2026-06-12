@@ -13,8 +13,15 @@ const DIR := "res://assets/audio"
 var _rng := RandomNumberGenerator.new()
 
 
+## Optional selective generation: GEN_ONLY=name1,name2 regenerates just those.
+var _only: PackedStringArray = []
+
+
 func _initialize() -> void:
 	_rng.seed = 7
+	var filt := OS.get_environment("GEN_ONLY")
+	if filt != "":
+		_only = filt.split(",")
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(DIR))
 
 	# --- player ---
@@ -54,6 +61,9 @@ func _initialize() -> void:
 	_save("music_nave", _pad_track(44.0, [43.7, 65.5, 87.3], 0.10, 0.10, 0.0))
 	_save("music_sanctum", _pad_track(36.0, [65.4, 98.0, 130.8], 0.09, 0.03, 0.0))
 	_save("music_boss", _boss_track(32.0))
+	_save("music_library", _pad_track(42.0, [58.3, 87.3, 116.5], 0.1, 0.08, 0.0))
+	_save("music_warrens", _pad_track(40.0, [38.9, 58.3, 77.8], 0.08, 0.0, 0.2))
+	_save("music_throne", _pad_track(46.0, [46.2, 69.3, 92.5], 0.11, 0.06, 0.05))
 
 	print("AUDIO DONE")
 	quit()
@@ -62,6 +72,8 @@ func _initialize() -> void:
 # === WAV out ====================================================================
 
 func _save(name: String, samples: PackedFloat32Array) -> void:
+	if not _only.is_empty() and not (name in _only):
+		return
 	# Normalize gently, convert to 16-bit PCM, write a minimal WAV.
 	var peak := 0.0001
 	for s in samples:

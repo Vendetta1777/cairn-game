@@ -17,23 +17,38 @@ const FONT := preload("res://assets/fonts/silkscreen.ttf")
 const AREAS := [
 	{
 		"id": "sanctum", "name": "THE SANCTUM", "depth": "REFUGE",
-		"rect": Rect2(60, 120, 150, 70),
+		"rect": Rect2(60, 160, 150, 56),
 		"shrines": 0, "gates": [],
 	},
 	{
 		"id": "hollowed_gate", "name": "THE HOLLOWED GATE", "depth": "I",
-		"rect": Rect2(270, 40, 360, 86),
+		"rect": Rect2(270, 16, 360, 52),
 		"shrines": 1, "gates": ["dash", "double_jump"],
 	},
 	{
 		"id": "ashpits", "name": "THE ASHPITS", "depth": "II",
-		"rect": Rect2(270, 168, 360, 86),
+		"rect": Rect2(270, 80, 360, 52),
 		"shrines": 1, "gates": ["double_jump"],
 	},
 	{
 		"id": "sunken_nave", "name": "THE SUNKEN NAVE", "depth": "III",
-		"rect": Rect2(270, 296, 360, 86),
-		"shrines": 1, "gates": ["double_jump", "sealed"],
+		"rect": Rect2(270, 144, 360, 52),
+		"shrines": 1, "gates": ["double_jump"],
+	},
+	{
+		"id": "pale_library", "name": "THE PALE LIBRARY", "depth": "IV",
+		"rect": Rect2(270, 208, 360, 52),
+		"shrines": 0, "gates": ["grapple", "sealed"],
+	},
+	{
+		"id": "iron_warrens", "name": "THE IRON WARRENS", "depth": "V",
+		"rect": Rect2(270, 272, 360, 52),
+		"shrines": 2, "gates": ["grapple", "sealed"],
+	},
+	{
+		"id": "throne", "name": "THE SOVEREIGN'S THRONE", "depth": "VI",
+		"rect": Rect2(270, 336, 360, 52),
+		"shrines": 1, "gates": ["grapple"],
 	},
 ]
 
@@ -41,6 +56,7 @@ const GATE_TINTS := {
 	"dash": Color(0.55, 0.9, 1.0),
 	"wall_jump": Color(1.0, 0.62, 0.38),
 	"double_jump": Color(0.55, 0.95, 0.7),
+	"grapple": Color(0.95, 0.85, 0.5),
 	"sealed": Color(0.85, 0.4, 0.45),
 }
 
@@ -207,18 +223,18 @@ func _draw_area(a: Dictionary, ox: float, oy: float) -> void:
 	draw_rect(r, Color(0.32, 0.35, 0.48), false, 1.5)
 	draw_rect(r.grow(-3.0), Color(0.08, 0.085, 0.12), false, 1.0)
 	# Depth numeral + name, chisel-shadowed.
-	draw_string(FONT, Vector2(r.position.x + 10, r.position.y + 21) + Vector2(1, 1),
-		a.depth, HORIZONTAL_ALIGNMENT_LEFT, r.size.x, 11, Color(0.04, 0.045, 0.07))
-	draw_string(FONT, Vector2(r.position.x + 10, r.position.y + 21),
-		a.depth, HORIZONTAL_ALIGNMENT_LEFT, r.size.x, 11, Color(0.55, 0.6, 0.78))
-	draw_string(FONT, Vector2(r.position.x, r.position.y + 42) + Vector2(1, 1),
-		a.name, HORIZONTAL_ALIGNMENT_CENTER, r.size.x, 15, Color(0.04, 0.045, 0.07))
-	draw_string(FONT, Vector2(r.position.x, r.position.y + 42),
-		a.name, HORIZONTAL_ALIGNMENT_CENTER, r.size.x, 15, Color(0.85, 0.88, 1.0))
+	draw_string(FONT, Vector2(r.position.x + 10, r.position.y + 17) + Vector2(1, 1),
+		a.depth, HORIZONTAL_ALIGNMENT_LEFT, r.size.x, 9, Color(0.04, 0.045, 0.07))
+	draw_string(FONT, Vector2(r.position.x + 10, r.position.y + 17),
+		a.depth, HORIZONTAL_ALIGNMENT_LEFT, r.size.x, 9, Color(0.55, 0.6, 0.78))
+	draw_string(FONT, Vector2(r.position.x, r.position.y + 33) + Vector2(1, 1),
+		a.name, HORIZONTAL_ALIGNMENT_CENTER, r.size.x, 13, Color(0.04, 0.045, 0.07))
+	draw_string(FONT, Vector2(r.position.x, r.position.y + 33),
+		a.name, HORIZONTAL_ALIGNMENT_CENTER, r.size.x, 13, Color(0.85, 0.88, 1.0))
 
 	# Shrine rune marks (discovered areas only — you've walked their halls).
 	var gx := r.position.x + 14.0
-	var gy := r.end.y - 16.0
+	var gy := r.end.y - 11.0
 	for s in int(a.shrines):
 		_draw_rune(Vector2(gx, gy), 0.55 + 0.3 * sin(_t * 2.2))
 		gx += 16.0
@@ -232,7 +248,7 @@ func _draw_area(a: Dictionary, ox: float, oy: float) -> void:
 
 	# You are here: the skull.
 	if GameManager.current_area_id == id:
-		_draw_skull(Vector2(r.position.x + r.size.x * 0.5, r.end.y - 17.0))
+		_draw_skull(Vector2(r.position.x + r.size.x * 0.5, r.end.y - 15.0))
 
 
 ## A glowing shrine rune: a vertical stave with two cross-cuts.

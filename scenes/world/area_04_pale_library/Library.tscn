@@ -1,0 +1,292 @@
+[gd_scene load_steps=34 format=3]
+
+[ext_resource type="Script" path="res://scenes/world/area_04_pale_library/Library.gd" id="1_root"]
+[ext_resource type="Script" path="res://scenes/world/area_04_pale_library/LibraryTerrain.gd" id="2_terrain"]
+[ext_resource type="Texture2D" path="res://assets/environment/caverns/background.png" id="3_bg"]
+[ext_resource type="Texture2D" path="res://assets/environment/caverns/back-walls.png" id="4_walls"]
+[ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="5_player"]
+[ext_resource type="PackedScene" path="res://scenes/world/RemnantStone.tscn" id="6_stone"]
+[ext_resource type="PackedScene" path="res://scenes/npc/LoreNPC.tscn" id="7_lore"]
+[ext_resource type="Script" path="res://scenes/world/Trigger.gd" id="10_trigger"]
+[ext_resource type="Script" path="res://scenes/decor/BgDetail.gd" id="11_bgdetail"]
+[ext_resource type="Script" path="res://scenes/decor/BgArchitecture.gd" id="12_arch"]
+[ext_resource type="Script" path="res://scenes/decor/Fireflies.gd" id="14_fire"]
+[ext_resource type="Script" path="res://scenes/decor/Foreground.gd" id="15_fg"]
+[ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="16_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DialogueBox.tscn" id="17_dlg"]
+[ext_resource type="PackedScene" path="res://scenes/ui/LocationTitle.tscn" id="18_loc"]
+[ext_resource type="PackedScene" path="res://scenes/ui/MapOverlay.tscn" id="19_map"]
+[ext_resource type="PackedScene" path="res://scenes/ui/BossBar.tscn" id="20_bossbar"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ObjectiveHUD.tscn" id="21_obj"]
+[ext_resource type="PackedScene" path="res://scenes/ui/BoonChoiceUI.tscn" id="22_boon"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/boss/PaleLibrarian.tscn" id="23_boss"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/archivist/ArchivistShade.tscn" id="24_shade"]
+[ext_resource type="PackedScene" path="res://scenes/world/WaterZone.tscn" id="25_water"]
+[ext_resource type="PackedScene" path="res://scenes/world/PressurePlate.tscn" id="26_plate"]
+[ext_resource type="PackedScene" path="res://scenes/world/ExtendingBridge.tscn" id="27_bridge"]
+[ext_resource type="PackedScene" path="res://scenes/world/CarryUrn.tscn" id="28_urn"]
+[ext_resource type="PackedScene" path="res://scenes/world/PlateDoor.tscn" id="29_door"]
+[ext_resource type="PackedScene" path="res://scenes/world/GrapplePoint.tscn" id="30_gp"]
+[ext_resource type="PackedScene" path="res://scenes/world/ShardCache.tscn" id="31_cache"]
+[ext_resource type="PackedScene" path="res://scenes/world/SealedGate.tscn" id="32_gate"]
+[ext_resource type="PackedScene" path="res://scenes/ui/WorldMap.tscn" id="90_wmap"]
+[ext_resource type="PackedScene" path="res://scenes/fx/PostFX.tscn" id="91_post"]
+
+[sub_resource type="Gradient" id="grad"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_light"]
+gradient = SubResource("grad")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[sub_resource type="RectangleShape2D" id="trigger_tall"]
+size = Vector2(40, 220)
+
+[node name="Library" type="Node2D"]
+script = ExtResource("1_root")
+
+[node name="Mood" type="CanvasModulate" parent="."]
+color = Color(0.56, 0.55, 0.5, 1)
+
+[node name="Background" type="Node2D" parent="."]
+
+[node name="Deep" type="Sprite2D" parent="Background"]
+modulate = Color(0.8, 0.78, 0.72, 1)
+texture_repeat = 1
+centered = false
+texture = ExtResource("3_bg")
+region_enabled = true
+region_rect = Rect2(0, 0, 3600, 288)
+
+[node name="Walls" type="Sprite2D" parent="Background"]
+modulate = Color(0.85, 0.83, 0.76, 1)
+texture_repeat = 1
+centered = false
+texture = ExtResource("4_walls")
+region_enabled = true
+region_rect = Rect2(0, 0, 3600, 288)
+
+[node name="BgDetail" type="Node2D" parent="."]
+script = ExtResource("11_bgdetail")
+bounds = Rect2(0, 0, 3600, 288)
+
+[node name="BgArchitecture" type="Node2D" parent="."]
+script = ExtResource("12_arch")
+bounds = Rect2(0, 0, 3600, 288)
+
+[node name="Terrain" type="Node2D" parent="."]
+script = ExtResource("2_terrain")
+bounds = Rect2(0, 0, 3600, 288)
+ceiling_seed = 88
+
+[node name="CandleLightA" type="PointLight2D" parent="."]
+position = Vector2(160, 234)
+color = Color(1, 0.82, 0.5, 1)
+energy = 0.7
+texture = SubResource("tex_light")
+texture_scale = 0.9
+
+[node name="CandleLightB" type="PointLight2D" parent="."]
+position = Vector2(1000, 234)
+color = Color(1, 0.82, 0.5, 1)
+energy = 0.65
+texture = SubResource("tex_light")
+texture_scale = 0.85
+
+[node name="CandleLightC" type="PointLight2D" parent="."]
+position = Vector2(1620, 234)
+color = Color(1, 0.82, 0.5, 1)
+energy = 0.65
+texture = SubResource("tex_light")
+texture_scale = 0.85
+
+[node name="CandleLightD" type="PointLight2D" parent="."]
+position = Vector2(2300, 234)
+color = Color(1, 0.82, 0.5, 1)
+energy = 0.65
+texture = SubResource("tex_light")
+texture_scale = 0.85
+
+[node name="CandleLightE" type="PointLight2D" parent="."]
+position = Vector2(2920, 234)
+color = Color(1, 0.82, 0.5, 1)
+energy = 0.7
+texture = SubResource("tex_light")
+texture_scale = 0.9
+
+[node name="BossLight" type="PointLight2D" parent="."]
+position = Vector2(3320, 140)
+color = Color(0.92, 0.9, 0.95, 1)
+energy = 0.6
+texture = SubResource("tex_light")
+texture_scale = 1.4
+
+[node name="CheckpointAtrium" parent="." instance=ExtResource("6_stone")]
+position = Vector2(260, 252)
+
+[node name="CheckpointIndex" parent="." instance=ExtResource("6_stone")]
+position = Vector2(2300, 252)
+
+[node name="CheckpointWing" parent="." instance=ExtResource("6_stone")]
+position = Vector2(2960, 252)
+
+[node name="LoreNPC" parent="." instance=ExtResource("7_lore")]
+position = Vector2(130, 252)
+lines = PackedStringArray("Every promise the kingdom broke is shelved here, outsider. The pages keep score.", "The shades still file and re-file. Kill them gently — they were librarians once.", "Weight opens the old doors. The dead left their urns; the urns still serve.", "The Librarian binds the forbidden wing shut with its own body. It will not excuse you.")
+location_name = "THE PALE LIBRARY"
+location_subtitle = "DESCENT IV"
+reveals_location = false
+
+[node name="Player" parent="." instance=ExtResource("5_player")]
+position = Vector2(60, 215)
+z_index = 1
+
+[node name="Shade1" parent="." instance=ExtResource("24_shade")]
+position = Vector2(900, 140)
+
+[node name="Shade2" parent="." instance=ExtResource("24_shade")]
+position = Vector2(1430, 150)
+
+[node name="Shade3" parent="." instance=ExtResource("24_shade")]
+position = Vector2(2620, 140)
+
+[node name="Shade4" parent="." instance=ExtResource("24_shade")]
+position = Vector2(2860, 150)
+
+[node name="BridgePlate" parent="." instance=ExtResource("26_plate")]
+position = Vector2(1100, 252)
+targets = [NodePath("../StacksBridge")]
+
+[node name="StacksBridge" parent="." instance=ExtResource("27_bridge")]
+position = Vector2(1160, 240)
+segments = 5
+
+[node name="Urn" parent="." instance=ExtResource("28_urn")]
+position = Vector2(800, 252)
+
+[node name="WingPlate" parent="." instance=ExtResource("26_plate")]
+position = Vector2(2575, 196)
+latch = true
+targets = [NodePath("../WingDoor")]
+
+[node name="WingDoor" parent="." instance=ExtResource("29_door")]
+position = Vector2(2700, 252)
+
+[node name="WingCache" parent="." instance=ExtResource("31_cache")]
+position = Vector2(2950, 252)
+cache_id = "a4_wing"
+shards = 16
+
+[node name="IndexDeep" parent="." instance=ExtResource("25_water")]
+position = Vector2(1840, 262)
+size = Vector2(400, 26)
+deep = true
+
+[node name="ArenaWade" parent="." instance=ExtResource("25_water")]
+position = Vector2(3062, 242)
+size = Vector2(522, 10)
+slow_mult = 0.55
+
+[node name="RingIndexA" parent="." instance=ExtResource("30_gp")]
+position = Vector2(1960, 110)
+
+[node name="RingIndexB" parent="." instance=ExtResource("30_gp")]
+position = Vector2(2140, 100)
+
+[node name="RingArena" parent="." instance=ExtResource("30_gp")]
+position = Vector2(3270, 100)
+
+[node name="PaleLibrarian" parent="." instance=ExtResource("23_boss")]
+position = Vector2(3320, 120)
+arena_left = 3070.0
+arena_right = 3576.0
+floor_y = 252.0
+home_y = 120.0
+
+[node name="SealedGate" parent="." instance=ExtResource("32_gate")]
+position = Vector2(3540, 252)
+boss_id = "pale_librarian"
+area_id = "pale_library"
+next_scene = "res://scenes/world/area_05_iron_warrens/Warrens.tscn"
+
+[node name="StacksTrigger" type="Area2D" parent="." groups=["trigger"]]
+position = Vector2(780, 150)
+script = ExtResource("10_trigger")
+objective = "The Stacks — weight holds the old bridges open"
+
+[node name="Shape" type="CollisionShape2D" parent="StacksTrigger"]
+shape = SubResource("trigger_tall")
+
+[node name="IndexTrigger" type="Area2D" parent="." groups=["trigger"]]
+position = Vector2(1780, 150)
+script = ExtResource("10_trigger")
+objective = "The flooded index — the black water keeps its records"
+
+[node name="Shape" type="CollisionShape2D" parent="IndexTrigger"]
+shape = SubResource("trigger_tall")
+
+[node name="WingTrigger" type="Area2D" parent="." groups=["trigger"]]
+position = Vector2(2480, 150)
+script = ExtResource("10_trigger")
+objective = "The forbidden wing — find what opens the door"
+
+[node name="Shape" type="CollisionShape2D" parent="WingTrigger"]
+shape = SubResource("trigger_tall")
+
+[node name="BossTrigger" type="Area2D" parent="." groups=["trigger"]]
+position = Vector2(3075, 150)
+script = ExtResource("10_trigger")
+objective = "Unbind the Pale Librarian"
+engage_boss_path = NodePath("../PaleLibrarian")
+boss_display_name = "THE PALE LIBRARIAN"
+
+[node name="Shape" type="CollisionShape2D" parent="BossTrigger"]
+shape = SubResource("trigger_tall")
+
+[node name="FloatingPages" type="CPUParticles2D" parent="."]
+position = Vector2(1800, 120)
+amount = 26
+lifetime = 9.0
+preprocess = 9.0
+emission_shape = 3
+emission_rect_extents = Vector2(1790, 100)
+direction = Vector2(-1, 0)
+spread = 30.0
+gravity = Vector2(-4, 6)
+initial_velocity_min = 4.0
+initial_velocity_max = 12.0
+scale_amount_min = 1.2
+scale_amount_max = 2.2
+color = Color(0.85, 0.82, 0.72, 0.4)
+
+[node name="Fireflies" type="Node2D" parent="."]
+script = ExtResource("14_fire")
+color = Color(1, 0.85, 0.55, 1)
+
+[node name="Foreground" type="Node2D" parent="."]
+z_index = 2
+script = ExtResource("15_fg")
+bounds = Rect2(0, 0, 3600, 288)
+
+[node name="HUD" parent="." instance=ExtResource("16_hud")]
+
+[node name="DialogueBox" parent="." instance=ExtResource("17_dlg")]
+
+[node name="LocationTitle" parent="." instance=ExtResource("18_loc")]
+
+[node name="BossBar" parent="." instance=ExtResource("20_bossbar")]
+
+[node name="ObjectiveHUD" parent="." instance=ExtResource("21_obj")]
+
+[node name="BoonChoice" parent="." instance=ExtResource("22_boon")]
+
+[node name="MapOverlay" parent="." instance=ExtResource("19_map")]
+
+[node name="WorldMap" parent="." instance=ExtResource("90_wmap")]
+
+[node name="PostFX" parent="." instance=ExtResource("91_post")]

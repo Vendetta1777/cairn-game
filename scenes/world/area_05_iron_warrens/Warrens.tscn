@@ -1,0 +1,271 @@
+[gd_scene load_steps=32 format=3]
+
+[ext_resource type="Script" path="res://scenes/world/area_05_iron_warrens/Warrens.gd" id="1_root"]
+[ext_resource type="Script" path="res://scenes/world/area_05_iron_warrens/WarrensTerrain.gd" id="2_terrain"]
+[ext_resource type="Texture2D" path="res://assets/environment/caverns/background.png" id="3_bg"]
+[ext_resource type="Texture2D" path="res://assets/environment/caverns/back-walls.png" id="4_walls"]
+[ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="5_player"]
+[ext_resource type="PackedScene" path="res://scenes/world/RemnantStone.tscn" id="6_stone"]
+[ext_resource type="PackedScene" path="res://scenes/npc/LoreNPC.tscn" id="7_lore"]
+[ext_resource type="Script" path="res://scenes/world/Trigger.gd" id="10_trigger"]
+[ext_resource type="Script" path="res://scenes/decor/BgDetail.gd" id="11_bgdetail"]
+[ext_resource type="Script" path="res://scenes/decor/Fireflies.gd" id="14_fire"]
+[ext_resource type="Script" path="res://scenes/decor/Foreground.gd" id="15_fg"]
+[ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="16_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DialogueBox.tscn" id="17_dlg"]
+[ext_resource type="PackedScene" path="res://scenes/ui/LocationTitle.tscn" id="18_loc"]
+[ext_resource type="PackedScene" path="res://scenes/ui/MapOverlay.tscn" id="19_map"]
+[ext_resource type="PackedScene" path="res://scenes/ui/BossBar.tscn" id="20_bossbar"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ObjectiveHUD.tscn" id="21_obj"]
+[ext_resource type="PackedScene" path="res://scenes/ui/BoonChoiceUI.tscn" id="22_boon"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/boss/BuriedKing.tscn" id="23_boss"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/digger/MarrowDigger.tscn" id="24_digger"]
+[ext_resource type="PackedScene" path="res://scenes/world/Minecart.tscn" id="25_cart"]
+[ext_resource type="PackedScene" path="res://scenes/world/HeartShrine.tscn" id="26_heart"]
+[ext_resource type="PackedScene" path="res://scenes/world/Shrine.tscn" id="27_shrine"]
+[ext_resource type="PackedScene" path="res://scenes/world/ShardCache.tscn" id="28_cache"]
+[ext_resource type="PackedScene" path="res://scenes/world/SealedGate.tscn" id="29_gate"]
+[ext_resource type="PackedScene" path="res://scenes/world/GrapplePoint.tscn" id="30_gp"]
+[ext_resource type="PackedScene" path="res://scenes/ui/Cutscene.tscn" id="31_cut"]
+[ext_resource type="PackedScene" path="res://scenes/ui/WorldMap.tscn" id="90_wmap"]
+[ext_resource type="PackedScene" path="res://scenes/fx/PostFX.tscn" id="91_post"]
+
+[sub_resource type="Gradient" id="grad"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="tex_light"]
+gradient = SubResource("grad")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[sub_resource type="RectangleShape2D" id="trigger_tall"]
+size = Vector2(40, 220)
+
+[node name="Warrens" type="Node2D"]
+script = ExtResource("1_root")
+
+[node name="Mood" type="CanvasModulate" parent="."]
+color = Color(0.5, 0.4, 0.34, 1)
+
+[node name="Background" type="Node2D" parent="."]
+
+[node name="Deep" type="Sprite2D" parent="Background"]
+modulate = Color(0.7, 0.55, 0.45, 1)
+texture_repeat = 1
+centered = false
+texture = ExtResource("3_bg")
+region_enabled = true
+region_rect = Rect2(0, 0, 3700, 288)
+
+[node name="Walls" type="Sprite2D" parent="Background"]
+modulate = Color(0.75, 0.58, 0.46, 1)
+texture_repeat = 1
+centered = false
+texture = ExtResource("4_walls")
+region_enabled = true
+region_rect = Rect2(0, 0, 3700, 288)
+
+[node name="BgDetail" type="Node2D" parent="."]
+script = ExtResource("11_bgdetail")
+bounds = Rect2(0, 0, 3700, 288)
+
+[node name="Terrain" type="Node2D" parent="."]
+script = ExtResource("2_terrain")
+bounds = Rect2(0, 0, 3700, 288)
+ceiling_seed = 66
+
+[node name="OreLightA" type="PointLight2D" parent="."]
+position = Vector2(420, 240)
+color = Color(0.3, 0.9, 0.85, 1)
+energy = 0.6
+texture = SubResource("tex_light")
+texture_scale = 0.8
+
+[node name="OreLightB" type="PointLight2D" parent="."]
+position = Vector2(960, 240)
+color = Color(0.3, 0.9, 0.85, 1)
+energy = 0.6
+texture = SubResource("tex_light")
+texture_scale = 0.8
+
+[node name="OreLightC" type="PointLight2D" parent="."]
+position = Vector2(1290, 240)
+color = Color(0.3, 0.9, 0.85, 1)
+energy = 0.55
+texture = SubResource("tex_light")
+texture_scale = 0.75
+
+[node name="OreLightD" type="PointLight2D" parent="."]
+position = Vector2(2640, 240)
+color = Color(0.3, 0.9, 0.85, 1)
+energy = 0.6
+texture = SubResource("tex_light")
+texture_scale = 0.8
+
+[node name="OreLightE" type="PointLight2D" parent="."]
+position = Vector2(2900, 240)
+color = Color(0.3, 0.9, 0.85, 1)
+energy = 0.55
+texture = SubResource("tex_light")
+texture_scale = 0.75
+
+[node name="TombLight" type="PointLight2D" parent="."]
+position = Vector2(3450, 180)
+color = Color(0.7, 0.65, 0.6, 1)
+energy = 0.55
+texture = SubResource("tex_light")
+texture_scale = 1.4
+
+[node name="CheckpointShaft" parent="." instance=ExtResource("6_stone")]
+position = Vector2(240, 252)
+
+[node name="CheckpointRails" parent="." instance=ExtResource("6_stone")]
+position = Vector2(1600, 252)
+
+[node name="CheckpointVein" parent="." instance=ExtResource("6_stone")]
+position = Vector2(2590, 252)
+
+[node name="LoreNPC" parent="." instance=ExtResource("7_lore")]
+position = Vector2(140, 252)
+lines = PackedStringArray("Walk. WALK, outsider. The diggers are blind but the stone carries your boots.", "We dug for ore. Then we dug for the King's tomb, because the court paid in bread.", "The deep rails still run. Ride them past what cannot be walked past.", "We dug too deep and found him dreaming. Some of us are digging still.")
+location_name = "THE IRON WARRENS"
+location_subtitle = "DESCENT V"
+reveals_location = false
+
+[node name="Player" parent="." instance=ExtResource("5_player")]
+position = Vector2(60, 215)
+z_index = 1
+
+[node name="Digger1" parent="." instance=ExtResource("24_digger")]
+position = Vector2(420, 234)
+
+[node name="Digger2" parent="." instance=ExtResource("24_digger")]
+position = Vector2(880, 234)
+
+[node name="Digger3" parent="." instance=ExtResource("24_digger")]
+position = Vector2(1120, 234)
+
+[node name="Digger4" parent="." instance=ExtResource("24_digger")]
+position = Vector2(1340, 234)
+
+[node name="Digger5" parent="." instance=ExtResource("24_digger")]
+position = Vector2(2700, 234)
+
+[node name="Digger6" parent="." instance=ExtResource("24_digger")]
+position = Vector2(2980, 234)
+
+[node name="RailCart" parent="." instance=ExtResource("25_cart")]
+position = Vector2(1630, 238)
+waypoints = [Vector2(0, 0), Vector2(110, -6), Vector2(240, -26), Vector2(380, 4), Vector2(520, -20), Vector2(640, -4), Vector2(750, -12)]
+speed = 250.0
+
+[node name="RailRing" parent="." instance=ExtResource("30_gp")]
+position = Vector2(2020, 120)
+
+[node name="HeartShrine" parent="." instance=ExtResource("26_heart")]
+position = Vector2(2800, 252)
+shrine_id = "warrens_heart"
+
+[node name="Shrine" parent="." instance=ExtResource("27_shrine")]
+position = Vector2(2660, 252)
+
+[node name="VeinCache" parent="." instance=ExtResource("28_cache")]
+position = Vector2(2990, 196)
+cache_id = "a5_vein"
+shards = 14
+
+[node name="BuriedKing" parent="." instance=ExtResource("23_boss")]
+position = Vector2(3450, 200)
+arena_left = 3170.0
+arena_right = 3676.0
+floor_y = 252.0
+ceiling_y_pos = 70.0
+
+[node name="SealedGate" parent="." instance=ExtResource("29_gate")]
+position = Vector2(3640, 252)
+boss_id = "buried_king"
+area_id = "iron_warrens"
+next_scene = "res://scenes/world/area_06_throne/Throne.tscn"
+
+[node name="OreTrigger" type="Area2D" parent="." groups=["trigger"]]
+position = Vector2(730, 150)
+script = ExtResource("10_trigger")
+objective = "The ore floor — soft steps between the veins"
+
+[node name="Shape" type="CollisionShape2D" parent="OreTrigger"]
+shape = SubResource("trigger_tall")
+
+[node name="RailsTrigger" type="Area2D" parent="." groups=["trigger"]]
+position = Vector2(1580, 150)
+script = ExtResource("10_trigger")
+objective = "The deep rails — ride, or jump the pillars"
+
+[node name="Shape" type="CollisionShape2D" parent="RailsTrigger"]
+shape = SubResource("trigger_tall")
+
+[node name="VeinTrigger" type="Area2D" parent="." groups=["trigger"]]
+position = Vector2(2580, 150)
+script = ExtResource("10_trigger")
+objective = "The collapsed vein — something warm survived down here"
+
+[node name="Shape" type="CollisionShape2D" parent="VeinTrigger"]
+shape = SubResource("trigger_tall")
+
+[node name="BossTrigger" type="Area2D" parent="." groups=["trigger"]]
+position = Vector2(3180, 150)
+script = ExtResource("10_trigger")
+objective = "Wake the Buried King — strike the cracks"
+engage_boss_path = NodePath("../BuriedKing")
+boss_display_name = "THE BURIED KING"
+
+[node name="Shape" type="CollisionShape2D" parent="BossTrigger"]
+shape = SubResource("trigger_tall")
+
+[node name="MineDust" type="CPUParticles2D" parent="."]
+position = Vector2(1850, 60)
+amount = 50
+lifetime = 8.0
+preprocess = 8.0
+emission_shape = 3
+emission_rect_extents = Vector2(1830, 12)
+direction = Vector2(0, 1)
+spread = 16.0
+gravity = Vector2(4, 10)
+initial_velocity_min = 4.0
+initial_velocity_max = 12.0
+scale_amount_min = 0.6
+scale_amount_max = 1.3
+color = Color(0.6, 0.5, 0.42, 0.45)
+
+[node name="Fireflies" type="Node2D" parent="."]
+script = ExtResource("14_fire")
+color = Color(0.4, 0.95, 0.9, 1)
+
+[node name="Foreground" type="Node2D" parent="."]
+z_index = 2
+script = ExtResource("15_fg")
+bounds = Rect2(0, 0, 3700, 288)
+
+[node name="HUD" parent="." instance=ExtResource("16_hud")]
+
+[node name="DialogueBox" parent="." instance=ExtResource("17_dlg")]
+
+[node name="LocationTitle" parent="." instance=ExtResource("18_loc")]
+
+[node name="BossBar" parent="." instance=ExtResource("20_bossbar")]
+
+[node name="ObjectiveHUD" parent="." instance=ExtResource("21_obj")]
+
+[node name="BoonChoice" parent="." instance=ExtResource("22_boon")]
+
+[node name="Cutscene" parent="." instance=ExtResource("31_cut")]
+
+[node name="MapOverlay" parent="." instance=ExtResource("19_map")]
+
+[node name="WorldMap" parent="." instance=ExtResource("90_wmap")]
+
+[node name="PostFX" parent="." instance=ExtResource("91_post")]
