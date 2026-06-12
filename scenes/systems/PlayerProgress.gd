@@ -48,6 +48,8 @@ var achievements: Dictionary = {}  ## achievement_id -> true
 var charms_owned: Dictionary = {}  ## charm_id -> true
 var charms_equipped: Array = []    ## equipped charm ids (slot-checked)
 var notch_stones: int = 0          ## found stones; every 2 add a slot (cap 6)
+var blade_tier: int = 0            ## 0 Ashen -> 1 Tempered -> 2 Sovereign's Edge -> 3 Void Nail
+var pale_ore: int = 0              ## the Forger's currency
 
 
 # --- currency ----------------------------------------------------------------
@@ -305,6 +307,8 @@ func to_dict() -> Dictionary:
 		"charms_owned": charms_owned.keys(),
 		"charms_equipped": charms_equipped,
 		"notch_stones": notch_stones,
+		"blade_tier": blade_tier,
+		"pale_ore": pale_ore,
 	}
 
 
@@ -341,6 +345,8 @@ func from_dict(d: Dictionary) -> void:
 	for id in d.get("charms_equipped", []):
 		charms_equipped.append(String(id))
 	notch_stones = int(d.get("notch_stones", 0))
+	blade_tier = int(d.get("blade_tier", 0))
+	pale_ore = int(d.get("pale_ore", 0))
 	furthest_area = d.get("furthest_area", "hollowed_gate")
 	currency_changed.emit(shards, echoes)
 	progress_loaded.emit()
@@ -361,5 +367,7 @@ func reset() -> void:
 	charms_owned = {}
 	charms_equipped = []
 	notch_stones = 0
+	blade_tier = 0
+	pale_ore = 0
 	furthest_area = "hollowed_gate"
 	currency_changed.emit(shards, echoes)

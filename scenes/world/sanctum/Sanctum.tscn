@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3]
+[gd_scene load_steps=22 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/sanctum/Sanctum.gd" id="1_root"]
 [ext_resource type="Script" path="res://scenes/world/sanctum/SanctumRoom.gd" id="2_room"]
@@ -17,6 +17,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/BoonChoiceUI.tscn" id="94_boon"]
 [ext_resource type="PackedScene" path="res://scenes/world/CharmPickup.tscn" id="93_cp"]
 [ext_resource type="PackedScene" path="res://scenes/ui/CharmUI.tscn" id="94_cu"]
+[ext_resource type="PackedScene" path="res://scenes/world/OrePickup.tscn" id="95_ore"]
 
 [sub_resource type="Gradient" id="grad_light"]
 offsets = PackedFloat32Array(0, 1)
@@ -155,3 +156,8 @@ charm_id = "void_heart"
 appears_flag = "game_beaten"
 
 [node name="CharmUI" parent="." instance=ExtResource("94_cu")]
+
+[node name="OrePilgrim" parent="." instance=ExtResource("95_ore")]
+position = Vector2(710, 252)
+ore_id = "pilgrims_gift"
+appears_flag = "boss_buried_king_dead"

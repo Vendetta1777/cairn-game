@@ -1,4 +1,4 @@
-[gd_scene load_steps=41 format=3]
+[gd_scene load_steps=42 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1Terrain.gd" id="1_terrain"]
 [ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1.gd" id="1_root"]
@@ -36,6 +36,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/GrapplePoint.tscn" id="95_gp"]
 [ext_resource type="PackedScene" path="res://scenes/world/CharmPickup.tscn" id="93_cp"]
 [ext_resource type="PackedScene" path="res://scenes/ui/CharmUI.tscn" id="94_cu"]
+[ext_resource type="PackedScene" path="res://scenes/world/OrePickup.tscn" id="95_ore"]
 
 [sub_resource type="Gradient" id="grad_light"]
 offsets = PackedFloat32Array(0, 1)
@@ -367,3 +368,7 @@ notch = true
 pickup_id = "notch_a1b"
 
 [node name="CharmUI" parent="." instance=ExtResource("94_cu")]
+
+[node name="OreLoft" parent="." instance=ExtResource("95_ore")]
+position = Vector2(700, 132)
+ore_id = "crypts"

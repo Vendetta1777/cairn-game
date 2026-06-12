@@ -37,11 +37,73 @@ func _ready() -> void:
 	var digger := get_node_or_null("LoreNPC")
 	if digger:
 		digger.chose.connect(_on_digger_trade)
+	# The Pale Forger tempers.
+	var forger := get_node_or_null("PaleForger")
+	if forger:
+		forger.chose.connect(_on_forger)
 	call_deferred("_apply_pending_spawn")
 	await get_tree().process_frame
 	var title := get_tree().get_first_node_in_group("location_title")
 	if title and title.has_method("reveal"):
 		title.reveal("THE IRON WARRENS", "DESCENT V")
+
+
+const BLADE_NAMES := ["THE ASHEN BLADE", "THE TEMPERED BLADE", "THE SOVEREIGN'S EDGE", "THE VOID NAIL"]
+
+
+func _on_forger(idx: int) -> void:
+	var box := get_tree().get_first_node_in_group("dialogue")
+	var player := get_tree().get_first_node_in_group("player")
+	var stats = player.get_node_or_null("Stats") if player else null
+	match idx:
+		0:
+			if PlayerProgress.blade_tier >= 3:
+				if box:
+					box.show_text("\"It is the Void Nail. There is no further. There is barely a FURTHER for the void.\"")
+				return
+			# The last working demands the deep half-empty.
+			if PlayerProgress.blade_tier == 2:
+				for b in ["ashen_warden", "pale_librarian", "buried_king"]:
+					if not PlayerProgress.boss_defeated(b):
+						if box:
+							box.show_text("\"Not yet. The void pours only when three guardians lie quiet. Finish your work first.\"")
+						return
+			if PlayerProgress.pale_ore < 1:
+				if box:
+					box.show_text("\"No ore, no working. Six pieces in all the deep — bring me what it remembers.\"")
+				return
+			PlayerProgress.pale_ore -= 1
+			PlayerProgress.blade_tier += 1
+			SaveManager.autosave()
+			AudioManager.play("skill_buy", -4.0)
+			AudioManager.play_at("parry", player.global_position if player else global_position, -6.0)
+			var banner := get_tree().get_first_node_in_group("location_title")
+			if banner and banner.has_method("reveal"):
+				banner.reveal(BLADE_NAMES[PlayerProgress.blade_tier], "the edge remembers")
+			# Re-temper the live blade.
+			if player:
+				var combat = player.get_node_or_null("Combat")
+				if combat:
+					combat._ready()
+		1:
+			if not PlayerProgress.has_charm("fragile_strength"):
+				if box:
+					box.show_text("\"Bring me the fragile one first. Strength that breaks is half a working already.\"")
+				return
+			if stats == null or stats.shards < 150:
+				if box:
+					box.show_text("\"One hundred and fifty shards. Unbreaking a thing is dearer than breaking it.\"")
+				return
+			stats.spend_shards(150)
+			PlayerProgress.charms_owned.erase("fragile_strength")
+			PlayerProgress.charms_equipped.erase("fragile_strength")
+			PlayerProgress.grant_charm("unbreakable_strength")
+			SaveManager.autosave()
+			AudioManager.play("skill_buy", -4.0)
+			if box:
+				box.show_text("\"There. UNBREAKABLE. Death may keep its hands to itself now.\"")
+		_:
+			pass
 
 
 func _on_digger_trade(idx: int) -> void:

@@ -72,8 +72,8 @@ func _ready() -> void:
 		_base_cooldown = attack_cooldown
 		_base_daggers = max_daggers
 		_base_bolt_cost = shadow_bolt_cost
-	# Skill tree first (additive), then charms (multiplicative) on top.
-	damage = _base_damage + int(PlayerProgress.bonus("damage"))
+	# Skill tree first (additive), then the blade's temper, then charms on top.
+	damage = _base_damage + int(PlayerProgress.bonus("damage")) + PlayerProgress.blade_tier
 	_finisher_bonus = int(PlayerProgress.bonus("finisher_damage"))
 	max_daggers = _base_daggers + int(PlayerProgress.bonus("dagger_charges"))
 	shadow_bolt_cost = maxf(5.0, _base_bolt_cost - PlayerProgress.bonus("bolt_discount"))
@@ -151,7 +151,36 @@ func _do_attack() -> void:
 			fh = false
 	else:
 		fv = _combo == 1   # ground combo: middle hit reverses the arc
-	_spawn_vfx(SLASH, parent, pos, fh, fv, slash_scale, rot)
+	# The blade's temper shows in every arc: worn grey -> clean white ->
+	# gold-edged finishers -> the Void Nail's lingering dark tears.
+	var tier := PlayerProgress.blade_tier
+	var slash_tint := Color.WHITE
+	match tier:
+		0: slash_tint = Color(0.82, 0.84, 0.88)
+		1: slash_tint = Color(1.0, 1.0, 1.0)
+		2: slash_tint = Color(1.0, 0.92, 0.6) if is_finisher else Color(0.95, 0.95, 1.0)
+		3: slash_tint = Color(0.55, 0.35, 0.8)
+	var fx_slash: AnimatedSprite2D = SLASH.instantiate()
+	parent.add_child(fx_slash)
+	fx_slash.global_position = pos
+	fx_slash.flip_h = fh
+	fx_slash.flip_v = fv
+	fx_slash.scale *= slash_scale
+	fx_slash.rotation = rot
+	fx_slash.modulate = slash_tint
+	if tier >= 3:
+		# A tear in space, briefly: a frozen dark copy that bleeds out.
+		var tear: AnimatedSprite2D = SLASH.instantiate()
+		parent.add_child(tear)
+		tear.global_position = pos
+		tear.flip_h = fh
+		tear.scale *= slash_scale * 1.15
+		tear.rotation = rot
+		tear.modulate = Color(0.25, 0.1, 0.4, 0.8)
+		tear.speed_scale = 0.25
+		var tw := tear.create_tween()
+		tw.tween_property(tear, "modulate:a", 0.0, 0.5)
+		tw.tween_callback(tear.queue_free)
 	# The upward strike lifts you into the air you just claimed.
 	if aim.y < -0.5 and aim.x == 0.0:
 		_controller.velocity.y = minf(_controller.velocity.y, _controller.jump_velocity * 0.5)
