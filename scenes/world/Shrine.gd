@@ -16,6 +16,7 @@ var _t := 0.0
 
 func _ready() -> void:
 	add_to_group("shrine")   # for the map overlay
+	AudioManager.attach_loop(self, "shrine_loop", -20.0)
 	_zone.area_entered.connect(_on_enter)
 	_zone.area_exited.connect(_on_exit)
 	_prompt.modulate.a = 0.0

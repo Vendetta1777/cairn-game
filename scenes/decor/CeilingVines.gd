@@ -30,6 +30,7 @@ var _worms: Array = []
 var _banners: Array = []
 var _t := 0.0
 var _terrain
+var _redraw_gate := false
 
 
 func _hy(x: float) -> float:
@@ -65,7 +66,10 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_t += delta
-	queue_redraw()
+	# Sway at 30 Hz — half the redraw cost, indistinguishable for slow vines.
+	_redraw_gate = not _redraw_gate
+	if _redraw_gate:
+		queue_redraw()
 	for g in _worms:
 		var sx: float = sin(_t * 1.1 + g["ph"]) * 7.0
 		g["light"].position = Vector2(g["x"] + sx, _hy(g["x"]) + g["len"])
@@ -73,11 +77,24 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
+	# Cull to the camera: only what's within a screen-width of view gets drawn.
+	var cam := get_viewport().get_camera_2d()
+	var cx := bounds.size.x * 0.5
+	if cam:
+		cx = cam.get_screen_center_position().x
+	var lo := cx - 340.0
+	var hi := cx + 340.0
 	for v in _far:
+		if v["x"] < lo or v["x"] > hi:
+			continue
 		_vine(v, VINE_FAR, VINE_FAR, 1.0, 1.1)
 	for v in _near:
+		if v["x"] < lo or v["x"] > hi:
+			continue
 		_vine(v, VINE, VINE_LEAF, 1.5, 1.4)
 	for b in _banners:
+		if b["x"] < lo or b["x"] > hi:
+			continue
 		_banner(b)
 	for g in _worms:
 		var top: float = _hy(g["x"])

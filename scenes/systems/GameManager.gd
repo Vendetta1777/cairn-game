@@ -19,6 +19,7 @@ var checkpoint_position: Vector2 = Vector2.ZERO
 ## The display name of the loaded area (set by each area root) and how long this
 ## life has lasted — both shown on the death screen.
 var current_area_name: String = "THE DEEP"
+var current_area_id: String = ""
 var run_time: float = 0.0
 
 

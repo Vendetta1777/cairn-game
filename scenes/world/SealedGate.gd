@@ -79,6 +79,7 @@ func _on_boss_defeated(id: String) -> void:
 	_sealed = false
 	_remove_blocker()
 	QuestTracker.set_objective(open_objective)
+	AudioManager.play_at("door", global_position, -4.0)
 	var cam := get_viewport().get_camera_2d()
 	if cam and cam.has_method("add_trauma"):
 		cam.add_trauma(0.6)
@@ -102,7 +103,7 @@ func _descend() -> void:
 	# flash for a frame before the scene swaps).
 	QuestTracker.set_flag("area_%s_done" % area_id, true)
 	SaveManager.autosave()
-	get_tree().call_deferred("change_scene_to_file", next_scene)
+	SceneFlow.travel(next_scene, "down")
 
 
 func _draw() -> void:

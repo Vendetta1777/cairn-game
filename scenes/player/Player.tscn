@@ -1,6 +1,7 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scenes/player/PlayerController.gd" id="1_ctrl"]
+[ext_resource type="Script" path="res://scenes/player/PlayerAudio.gd" id="7_audio"]
 [ext_resource type="Script" path="res://scenes/player/PlayerStats.gd" id="2_stats"]
 [ext_resource type="Script" path="res://scenes/player/PlayerCombat.gd" id="3_combat"]
 [ext_resource type="Script" path="res://scenes/player/PlayerAnimator.gd" id="4_anim"]
@@ -74,6 +75,9 @@ script = ExtResource("3_combat")
 
 [node name="Animator" type="Node2D" parent="."]
 script = ExtResource("4_anim")
+
+[node name="Audio" type="Node" parent="."]
+script = ExtResource("7_audio")
 
 [node name="Camera" type="Camera2D" parent="."]
 zoom = Vector2(2, 2)

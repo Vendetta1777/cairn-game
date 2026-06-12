@@ -5,6 +5,9 @@ extends Node2D
 
 func _ready() -> void:
 	GameManager.current_area_name = "THE SUNKEN NAVE"
+	GameManager.current_area_id = "sunken_nave"
+	PlayerProgress.set_flag("seen_sunken_nave")
+	AudioManager.play_music("nave")
 	PlayerProgress.furthest_area = "sunken_nave"
 	QuestTracker.begin_area("Wade in — the black water drags, the deep water keeps")
 	call_deferred("_apply_pending_spawn")

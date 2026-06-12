@@ -56,6 +56,7 @@ func _physics_process(delta: float) -> void:
 			if player and _cooldown <= 0.0 \
 					and global_position.distance_to(player.global_position) < aggro_range:
 				_target = player.global_position
+				_aggro_sound()
 				_enter(DIVE)
 		DIVE:
 			velocity = global_position.direction_to(_target) * dive_speed

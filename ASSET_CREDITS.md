@@ -25,3 +25,9 @@ Cairn uses third-party art assets as placeholders/foundation. Credit where due, 
   underground theme. They may be replaced with commissioned/original art before release.
 - Before shipping commercially, re-confirm every license (some "free" packs require
   attribution or forbid redistribution of the raw pack) and keep this file current.
+
+## Audio
+All sound effects and music in `assets/audio/` are **procedurally synthesized**
+by `tools/gen_audio.gd` (noise bursts, tuned partials, slow pads) — no recorded
+samples, no external licenses. Regenerate any time with:
+`godot --headless --path . -s res://tools/gen_audio.gd`

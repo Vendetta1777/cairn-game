@@ -62,7 +62,9 @@ func play_death(area_name: String, run_time: float) -> void:
 	_quote.text = "\"%s\"" % QUOTES[randi() % QUOTES.size()]
 	_hint.text = "press any key"
 
-	# Beat 1 — 0.5s of slow motion while colour drains out of the world.
+	# Beat 1 — 0.5s of slow motion while colour drains out of the world; the
+	# soundscape ducks under with it.
+	AudioManager.duck(-12.0, 2.2)
 	Engine.time_scale = 0.18
 	var tw := _rt_tween()
 	tw.tween_method(_set_desat, 0.0, 1.0, 0.5)

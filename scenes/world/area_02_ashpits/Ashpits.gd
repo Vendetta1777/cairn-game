@@ -8,6 +8,9 @@ const BOSS_ID := "ashen_warden"
 
 func _ready() -> void:
 	GameManager.current_area_name = "THE ASHPITS"
+	GameManager.current_area_id = "ashpits"
+	PlayerProgress.set_flag("seen_ashpits")
+	AudioManager.play_music("ashpits")
 	PlayerProgress.furthest_area = "ashpits"
 	QuestTracker.begin_area("Cross the dead forges — the heat still breathes")
 	QuestTracker.boss_defeated.connect(_on_boss_defeated)

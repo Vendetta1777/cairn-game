@@ -54,10 +54,16 @@ func take_damage(amount: int, _from: Vector2 = Vector2.ZERO) -> void:
 		return
 	health -= amount
 	_flash()
+	AudioManager.play_at("enemy_hurt", global_position, -10.0)
 	if health <= 0:
 		_die()
 	else:
 		_play(&"hurt")
+
+
+## Subclasses chirp this when they first commit to attacking the player.
+func _aggro_sound() -> void:
+	AudioManager.play_at("aggro", global_position, -12.0)
 
 
 func _die() -> void:
@@ -73,6 +79,7 @@ func _die() -> void:
 					stats.add_shards(shard_drop)
 				if echo_drop > 0 and stats.has_method("add_echoes"):
 					stats.add_echoes(echo_drop)
+	AudioManager.play_at("enemy_death", global_position, -8.0)
 	if _hurtbox:
 		_hurtbox.set_deferred("monitorable", false)
 	set_deferred("velocity", Vector2.ZERO)

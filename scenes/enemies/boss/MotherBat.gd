@@ -56,6 +56,7 @@ func engage() -> void:
 		return
 	_engaged = true
 	_state = HOVER
+	AudioManager.boss_music(true)
 	engaged.emit()
 	health_changed.emit(health, max_health)
 

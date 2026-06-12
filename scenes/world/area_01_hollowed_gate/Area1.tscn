@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3]
+[gd_scene load_steps=38 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1Terrain.gd" id="1_terrain"]
 [ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1.gd" id="1_root"]
@@ -31,6 +31,8 @@
 [ext_resource type="PackedScene" path="res://scenes/world/AbilityGate.tscn" id="32_agate"]
 [ext_resource type="PackedScene" path="res://scenes/world/ShardCache.tscn" id="33_cache"]
 [ext_resource type="PackedScene" path="res://scenes/world/Shrine.tscn" id="34_shrine"]
+[ext_resource type="PackedScene" path="res://scenes/ui/WorldMap.tscn" id="90_wmap"]
+[ext_resource type="PackedScene" path="res://scenes/fx/PostFX.tscn" id="91_post"]
 
 [sub_resource type="Gradient" id="grad_light"]
 offsets = PackedFloat32Array(0, 1)
@@ -335,3 +337,7 @@ mouse_filter = 2
 [node name="BoonChoiceUI" parent="." instance=ExtResource("28_boon")]
 
 [node name="MapOverlay" parent="." instance=ExtResource("29_map")]
+
+[node name="WorldMap" parent="." instance=ExtResource("90_wmap")]
+
+[node name="PostFX" parent="." instance=ExtResource("91_post")]

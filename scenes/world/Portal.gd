@@ -49,7 +49,8 @@ func _process(delta: float) -> void:
 		SaveManager.autosave()
 		if arrival_marker != Vector2.ZERO:
 			GameManager.pending_spawn = arrival_marker
-		get_tree().call_deferred("change_scene_to_file", target_scene)
+		AudioManager.play("door", -6.0)
+		SceneFlow.travel(target_scene, "up")
 
 
 func _draw() -> void:

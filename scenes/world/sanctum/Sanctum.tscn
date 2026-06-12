@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/sanctum/Sanctum.gd" id="1_root"]
 [ext_resource type="Script" path="res://scenes/world/sanctum/SanctumRoom.gd" id="2_room"]
@@ -10,6 +10,8 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/SkillTreeUI.tscn" id="8_tree"]
 [ext_resource type="PackedScene" path="res://scenes/ui/DialogueBox.tscn" id="9_dlg"]
 [ext_resource type="PackedScene" path="res://scenes/ui/LocationTitle.tscn" id="10_loc"]
+[ext_resource type="PackedScene" path="res://scenes/ui/WorldMap.tscn" id="90_wmap"]
+[ext_resource type="PackedScene" path="res://scenes/fx/PostFX.tscn" id="91_post"]
 
 [sub_resource type="Gradient" id="grad_light"]
 offsets = PackedFloat32Array(0, 1)
@@ -100,3 +102,7 @@ mouse_filter = 2
 [node name="LocationTitle" parent="." instance=ExtResource("10_loc")]
 
 [node name="SkillTreeUI" parent="." instance=ExtResource("8_tree")]
+
+[node name="WorldMap" parent="." instance=ExtResource("90_wmap")]
+
+[node name="PostFX" parent="." instance=ExtResource("91_post")]

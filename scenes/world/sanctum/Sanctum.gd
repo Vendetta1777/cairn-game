@@ -5,6 +5,9 @@ extends Node2D
 
 func _ready() -> void:
 	GameManager.current_area_name = "THE SANCTUM"
+	GameManager.current_area_id = "sanctum"
+	PlayerProgress.set_flag("seen_sanctum")
+	AudioManager.play_music("sanctum")
 	QuestTracker.set_objective("")
 	call_deferred("_apply_pending_spawn")
 	await get_tree().process_frame

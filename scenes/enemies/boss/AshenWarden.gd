@@ -112,6 +112,7 @@ func _run_intro() -> void:
 
 func _begin_fight() -> void:
 	_state = APPROACH
+	AudioManager.boss_music(true)
 	engaged.emit()
 	health_changed.emit(health, max_health)
 
@@ -236,6 +237,7 @@ func _do_slam(delta: float, player: Node2D) -> void:
 	# IMPACT: heavy shake, dust, and a grounded-player quake in slam_range.
 	_camera_shake(0.85)
 	GameManager.hitstop(0.05)
+	AudioManager.play_at("boss_slam", global_position, 0.0)
 	_spawn_slam_dust()
 	if player and player.has_method("receive_attack") and player.has_method("is_on_floor"):
 		if player.is_on_floor() and absf(player.global_position.x - global_position.x) < slam_range:
@@ -251,6 +253,7 @@ func _do_slam(delta: float, player: Node2D) -> void:
 
 
 func _fire_sweep() -> void:
+	AudioManager.play_at("boss_sweep", global_position, -4.0)
 	for d in [-1.0, 1.0]:
 		var wave := WAVE.instantiate()
 		get_parent().add_child(wave)

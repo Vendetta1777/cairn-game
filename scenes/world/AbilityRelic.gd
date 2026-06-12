@@ -42,6 +42,7 @@ func _on_enter(area: Area2D) -> void:
 	_claimed = true
 	PlayerProgress.grant_ability(ability_id)
 	SaveManager.autosave()
+	AudioManager.play("relic", -4.0)
 	GameManager.slowmo(0.2, 0.45)
 	var banner := get_tree().get_first_node_in_group("location_title")
 	if banner and banner.has_method("reveal"):

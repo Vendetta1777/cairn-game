@@ -96,6 +96,7 @@ func _do_attack() -> void:
 	var parent: Node = _controller.get_parent()
 	var is_finisher := _combo == 2
 	var slash_scale := 1.3 if is_finisher else 1.0
+	AudioManager.play("swipe", -12.0, 0.1)
 
 	# Directional slash by held input (rotate the flat crescent): W = up,
 	# S = down, otherwise a forward sweep — independent of movement state.
@@ -130,6 +131,7 @@ func _do_attack() -> void:
 			connected = true
 
 	if connected:
+		AudioManager.play("impact", -4.0 if is_finisher else -8.0, 0.08)
 		if _camera and _camera.has_method("add_trauma"):
 			_camera.add_trauma(0.5 if is_finisher else 0.32)
 		GameManager.hitstop(0.07 if is_finisher else 0.045)
@@ -157,6 +159,7 @@ func _throw_dagger() -> void:
 func _cast_shadow_bolt() -> void:
 	if _stats == null or not _stats.spend_shadow(shadow_bolt_cost):
 		return   # not enough shadow energy
+	AudioManager.play("bolt", -6.0)
 	var bolt := SHADOW_BOLT.instantiate()
 	if bolt.has_method("setup"):
 		bolt.setup(_controller.get_facing())

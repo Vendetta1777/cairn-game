@@ -56,20 +56,63 @@ func moss_spots() -> Array:
 	return []
 
 
+## One drawable piece of the level. Each piece is its OWN canvas item so the
+## renderer culls everything off-screen — drawing the whole 3000+px level in a
+## single item cost ~16ms/frame; chunked it's only what's in view.
+class Chunk extends Node2D:
+	var kind := "stone"
+	var rect := Rect2()
+	var x0 := 0.0
+	var x1 := 0.0
+	var seg := 0
+	func _draw() -> void:
+		var t = get_parent()
+		match kind:
+			"stone": t._draw_stone_on(self, rect)
+			"crate": t._draw_crate_on(self, rect)
+			"spikes": t._draw_spikes_on(self, rect)
+			"ceiling": t._draw_ceiling_on(self, x0, x1, seg)
+
+
+const CEILING_SEG := 480.0
+
+
 func _ready() -> void:
 	add_to_group("terrain")
 	for r in solids():
 		_make_body(r)
+		_make_chunk("stone", r)
 	for r in objects():
 		_make_body(r)
+		_make_chunk("crate", r)
 	for r in hazards():
 		_make_hazard(r)
+		_make_chunk("spikes", r)
+	# Ceiling in screen-sized segments, each its own cullable item.
+	var x := bounds.position.x
+	var seg_i := 0
+	while x < bounds.end.x:
+		var c := Chunk.new()
+		c.kind = "ceiling"
+		c.x0 = x
+		c.x1 = minf(x + CEILING_SEG, bounds.end.x)
+		c.seg = seg_i
+		add_child(c)
+		x += CEILING_SEG
+		seg_i += 1
 	queue_redraw()
 	_death_screen = DEATH_SCREEN.instantiate()
 	add_child(_death_screen)
 	_death_screen.respawn_requested.connect(_do_respawn)
 	call_deferred("_setup_player")
 	call_deferred("_capture_enemy_spawns")
+
+
+func _make_chunk(kind: String, r: Rect2) -> void:
+	var c := Chunk.new()
+	c.kind = kind
+	c.rect = r
+	add_child(c)
 
 
 ## Solids + objects, for the map overlay to draw the level silhouette.
@@ -224,13 +267,8 @@ func _physics_process(_delta: float) -> void:
 # --- Drawing ----------------------------------------------------------------
 
 func _draw() -> void:
-	for r in solids():
-		_draw_stone(r)
-	_draw_ceiling()
-	for r in objects():
-		_draw_crate(r)
-	for r in hazards():
-		_draw_spikes(r)
+	# Pieces draw themselves (Chunk children, culled off-screen); the root only
+	# hosts the subclass set dressing.
 	_draw_extra()
 
 
@@ -243,36 +281,36 @@ func _is_ceiling(r: Rect2) -> bool:
 	return r.position.y <= 0.0 and r.size.x > 400.0
 
 
-func _draw_spikes(r: Rect2) -> void:
+func _draw_spikes_on(ci: CanvasItem, r: Rect2) -> void:
 	var base_y := r.end.y
 	var tip_y := r.end.y - 11.0
 	var x := r.position.x
 	while x < r.end.x - 1.0:
-		draw_colored_polygon(PackedVector2Array([
+		ci.draw_colored_polygon(PackedVector2Array([
 			Vector2(x, base_y), Vector2(x + 8.0, base_y), Vector2(x + 4.0, tip_y)]), SPIKE)
-		draw_line(Vector2(x + 4.0, tip_y), Vector2(x + 6.0, base_y), SPIKE_DK, 1.0)
+		ci.draw_line(Vector2(x + 4.0, tip_y), Vector2(x + 6.0, base_y), SPIKE_DK, 1.0)
 		x += 8.0
 
 
-func _draw_stone(r: Rect2) -> void:
+func _draw_stone_on(ci: CanvasItem, r: Rect2) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = int(r.position.x * 7.0 + r.position.y * 13.0 + 1.0)
 	var vis_h: float = maxf(r.size.y, 30.0)
 	var body := Rect2(r.position.x, r.position.y, r.size.x, vis_h)
 
-	draw_rect(body, ROCK_A)
-	draw_rect(Rect2(body.position.x, body.position.y, body.size.x, vis_h * 0.42), ROCK_B)
-	draw_rect(Rect2(body.position.x, body.position.y + vis_h * 0.74, body.size.x, vis_h * 0.26), STONE_DEEP)
+	ci.draw_rect(body, ROCK_A)
+	ci.draw_rect(Rect2(body.position.x, body.position.y, body.size.x, vis_h * 0.42), ROCK_B)
+	ci.draw_rect(Rect2(body.position.x, body.position.y + vis_h * 0.74, body.size.x, vis_h * 0.26), STONE_DEEP)
 
 	var blobs := int(clampf(r.size.x * vis_h / 240.0, 3.0, 60.0))
 	for i in blobs:
 		var bx := body.position.x + rng.randf() * r.size.x
 		var by := r.position.y + 5.0 + rng.randf() * (vis_h - 7.0)
-		draw_circle(Vector2(bx, by), rng.randf_range(3.0, 7.0), STONE_DEEP if rng.randf() > 0.55 else ROCK_B)
+		ci.draw_circle(Vector2(bx, by), rng.randf_range(3.0, 7.0), STONE_DEEP if rng.randf() > 0.55 else ROCK_B)
 	for i in blobs:
 		var px := body.position.x + rng.randf() * r.size.x
 		var py := r.position.y + rng.randf() * vis_h
-		draw_rect(Rect2(px, py, 1.0, 1.0), SPECK_LIGHT if rng.randf() > 0.55 else SPECK_DARK)
+		ci.draw_rect(Rect2(px, py, 1.0, 1.0), SPECK_LIGHT if rng.randf() > 0.55 else SPECK_DARK)
 
 	if _is_ceiling(r):
 		return
@@ -280,16 +318,16 @@ func _draw_stone(r: Rect2) -> void:
 	var x := r.position.x
 	while x < r.end.x:
 		var rr := rng.randf_range(2.6, 4.2)
-		draw_circle(Vector2(x, r.position.y + 1.5), rr, RIM)
-		draw_circle(Vector2(x, r.position.y + 0.5), rr * 0.55, RIM_HI)
+		ci.draw_circle(Vector2(x, r.position.y + 1.5), rr, RIM)
+		ci.draw_circle(Vector2(x, r.position.y + 0.5), rr * 0.55, RIM_HI)
 		x += 4.6
 
 	x = r.position.x + 6.0 + rng.randf() * 12.0
 	while x < r.end.x - 4.0:
-		draw_rect(Rect2(x - 4.0, r.position.y - 1.0, 9.0, 3.0), MOSS_D)
-		draw_rect(Rect2(x - 2.0, r.position.y - 2.0, 5.0, 2.0), MOSS_L)
-		draw_line(Vector2(x - 1.0, r.position.y - 1.0), Vector2(x - 2.0, r.position.y - 6.0), MOSS_L, 1.0)
-		draw_line(Vector2(x + 2.0, r.position.y - 1.0), Vector2(x + 2.0, r.position.y - 5.0), MOSS_D, 1.0)
+		ci.draw_rect(Rect2(x - 4.0, r.position.y - 1.0, 9.0, 3.0), MOSS_D)
+		ci.draw_rect(Rect2(x - 2.0, r.position.y - 2.0, 5.0, 2.0), MOSS_L)
+		ci.draw_line(Vector2(x - 1.0, r.position.y - 1.0), Vector2(x - 2.0, r.position.y - 6.0), MOSS_L, 1.0)
+		ci.draw_line(Vector2(x + 2.0, r.position.y - 1.0), Vector2(x + 2.0, r.position.y - 5.0), MOSS_D, 1.0)
 		x += rng.randf_range(46.0, 90.0)
 
 	x = r.position.x + 10.0 + rng.randf() * 14.0
@@ -298,12 +336,12 @@ func _draw_stone(r: Rect2) -> void:
 		var rlen := rng.randf_range(6.0, 13.0)
 		for j in 2:
 			var nxt := seg + Vector2(rng.randf_range(-2.5, 2.5), rlen * 0.5)
-			draw_line(seg, nxt, ROOT, rng.randf_range(1.0, 2.0))
+			ci.draw_line(seg, nxt, ROOT, rng.randf_range(1.0, 2.0))
 			seg = nxt
 		x += rng.randf_range(34.0, 72.0)
 
-	draw_rect(Rect2(body.position.x, body.position.y, 1.5, vis_h), STONE_DEEP)
-	draw_rect(Rect2(body.end.x - 1.5, body.position.y, 1.5, vis_h), STONE_DEEP)
+	ci.draw_rect(Rect2(body.position.x, body.position.y, 1.5, vis_h), STONE_DEEP)
+	ci.draw_rect(Rect2(body.end.x - 1.5, body.position.y, 1.5, vis_h), STONE_DEEP)
 
 
 ## Organic cave ceiling. Subclasses may override ceiling_y for a different roof.
@@ -311,58 +349,61 @@ func ceiling_y(x: float) -> float:
 	return 42.0 + sin(x * 0.013) * 11.0 + sin(x * 0.029 + 1.0) * 6.0 + sin(x * 0.061 + 2.0) * 3.0
 
 
-func _draw_ceiling() -> void:
+## One x-segment of the ceiling (deterministic per segment index).
+func _draw_ceiling_on(ci: CanvasItem, x0: float, x1: float, seg_i: int) -> void:
 	var rng := RandomNumberGenerator.new()
-	rng.seed = ceiling_seed
-	var w := bounds.size.x
+	rng.seed = ceiling_seed + seg_i * 101
+	var w := x1 - x0
 
-	var pts := PackedVector2Array([Vector2(0, 0), Vector2(w, 0)])
-	var x := w
-	while x >= 0.0:
+	var pts := PackedVector2Array([Vector2(x0, 0), Vector2(x1, 0)])
+	var x := x1
+	while x >= x0:
 		pts.append(Vector2(x, ceiling_y(x)))
 		x -= 6.0
-	draw_colored_polygon(pts, ROCK_A)
-	var pts2 := PackedVector2Array([Vector2(0, 0), Vector2(w, 0)])
-	x = w
-	while x >= 0.0:
+	pts.append(Vector2(x0, ceiling_y(x0)))   # close the seam to the next segment
+	ci.draw_colored_polygon(pts, ROCK_A)
+	var pts2 := PackedVector2Array([Vector2(x0, 0), Vector2(x1, 0)])
+	x = x1
+	while x >= x0:
 		pts2.append(Vector2(x, ceiling_y(x) * 0.45))
 		x -= 6.0
-	draw_colored_polygon(pts2, ROCK_B)
+	pts2.append(Vector2(x0, ceiling_y(x0) * 0.45))
+	ci.draw_colored_polygon(pts2, ROCK_B)
 	for i in int(w / 13.0):
-		var bx := rng.randf() * w
+		var bx := x0 + rng.randf() * w
 		var by := rng.randf() * (ceiling_y(bx) - 4.0)
-		draw_circle(Vector2(bx, by), rng.randf_range(3.0, 7.0), STONE_DEEP if rng.randf() > 0.55 else ROCK_B)
+		ci.draw_circle(Vector2(bx, by), rng.randf_range(3.0, 7.0), STONE_DEEP if rng.randf() > 0.55 else ROCK_B)
 
-	x = 0.0
-	while x < w:
-		draw_circle(Vector2(x, ceiling_y(x) - 1.0), rng.randf_range(2.6, 4.2), RIM)
+	x = x0
+	while x < x1:
+		ci.draw_circle(Vector2(x, ceiling_y(x) - 1.0), rng.randf_range(2.6, 4.2), RIM)
 		x += 4.6
-	x = 14.0
-	while x < w - 6.0:
+	x = x0 + 14.0
+	while x < x1 - 6.0:
 		var cy := ceiling_y(x)
-		draw_rect(Rect2(x - 4.0, cy - 2.0, 9.0, 3.0), MOSS_D)
-		draw_rect(Rect2(x - 2.0, cy, 5.0, 2.0), MOSS_L)
+		ci.draw_rect(Rect2(x - 4.0, cy - 2.0, 9.0, 3.0), MOSS_D)
+		ci.draw_rect(Rect2(x - 2.0, cy, 5.0, 2.0), MOSS_L)
 		x += rng.randf_range(70.0, 130.0)
-	x = 18.0
-	while x < w - 18.0:
+	x = x0 + 18.0
+	while x < x1 - 18.0:
 		if rng.randf() > 0.32:
 			var cy := ceiling_y(x)
 			var sw := rng.randf_range(5.0, 14.0)
 			var slen := rng.randf_range(10.0, 48.0)
-			draw_colored_polygon(PackedVector2Array([
+			ci.draw_colored_polygon(PackedVector2Array([
 				Vector2(x - sw, cy), Vector2(x + sw, cy), Vector2(x, cy + slen)]), STAL)
-			draw_colored_polygon(PackedVector2Array([
+			ci.draw_colored_polygon(PackedVector2Array([
 				Vector2(x - sw * 0.4, cy), Vector2(x + sw * 0.2, cy), Vector2(x, cy + slen * 0.65)]), STAL_HI)
 		x += rng.randf_range(20.0, 38.0)
 
 
-func _draw_crate(r: Rect2) -> void:
-	draw_rect(r, CRATE)
-	draw_rect(Rect2(r.position.x, r.position.y, r.size.x, 3.0), CRATE_LIP)
-	draw_rect(Rect2(r.position.x, r.position.y + r.size.y * 0.5 - 1.0, r.size.x, 1.5), CRATE_DK)
-	draw_rect(Rect2(r.position.x, r.end.y - 3.0, r.size.x, 3.0), CRATE_DK)
-	draw_rect(Rect2(r.position.x, r.position.y, 2.0, r.size.y), CRATE_DK)
-	draw_rect(Rect2(r.end.x - 2.0, r.position.y, 2.0, r.size.y), CRATE_DK)
+func _draw_crate_on(ci: CanvasItem, r: Rect2) -> void:
+	ci.draw_rect(r, CRATE)
+	ci.draw_rect(Rect2(r.position.x, r.position.y, r.size.x, 3.0), CRATE_LIP)
+	ci.draw_rect(Rect2(r.position.x, r.position.y + r.size.y * 0.5 - 1.0, r.size.x, 1.5), CRATE_DK)
+	ci.draw_rect(Rect2(r.position.x, r.end.y - 3.0, r.size.x, 3.0), CRATE_DK)
+	ci.draw_rect(Rect2(r.position.x, r.position.y, 2.0, r.size.y), CRATE_DK)
+	ci.draw_rect(Rect2(r.end.x - 2.0, r.position.y, 2.0, r.size.y), CRATE_DK)
 	for corner in [r.position + Vector2(2, 2), Vector2(r.end.x - 4, r.position.y + 2),
 			Vector2(r.position.x + 2, r.end.y - 4), r.end - Vector2(4, 4)]:
-		draw_rect(Rect2(corner.x, corner.y, 2.0, 2.0), CRATE_BOLT)
+		ci.draw_rect(Rect2(corner.x, corner.y, 2.0, 2.0), CRATE_BOLT)
