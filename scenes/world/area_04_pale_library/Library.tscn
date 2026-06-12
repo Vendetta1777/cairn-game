@@ -137,7 +137,12 @@ position = Vector2(2960, 252)
 
 [node name="LoreNPC" parent="." instance=ExtResource("7_lore")]
 position = Vector2(130, 252)
-lines = PackedStringArray("Every promise the kingdom broke is shelved here, outsider. The pages keep score.", "The shades still file and re-file. Kill them gently — they were librarians once.", "Weight opens the old doors. The dead left their urns; the urns still serve.", "The Librarian binds the forbidden wing shut with its own body. It will not excuse you.")
+npc_id = "pale_archivist"
+display_name = "THE PALE ARCHIVIST"
+portrait = "ghost"
+lines = PackedStringArray("Every promise the kingdom broke is shelved here, outsider. The pages keep score.", "The shades still file and re-file. Kill them gently — they were librarians once.", "I was the Librarian's keeper, before it learned to keep itself. It will not excuse you.", "Knowledge has a price here. It always did.")
+choice_prompt = "Buy a hint? (5 shards)"
+choice_options = PackedStringArray("Pay for a hint", "Keep your shards")
 location_name = "THE PALE LIBRARY"
 location_subtitle = "DESCENT IV"
 reveals_location = false

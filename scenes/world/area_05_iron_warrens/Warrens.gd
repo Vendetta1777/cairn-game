@@ -33,11 +33,41 @@ func _ready() -> void:
 		crown.set_script(CROWN)
 		add_child(crown)
 		crown.global_position = Vector2(3450, 252)
+	# The Digger trades.
+	var digger := get_node_or_null("LoreNPC")
+	if digger:
+		digger.chose.connect(_on_digger_trade)
 	call_deferred("_apply_pending_spawn")
 	await get_tree().process_frame
 	var title := get_tree().get_first_node_in_group("location_title")
 	if title and title.has_method("reveal"):
 		title.reveal("THE IRON WARRENS", "DESCENT V")
+
+
+func _on_digger_trade(idx: int) -> void:
+	var box := get_tree().get_first_node_in_group("dialogue")
+	var player := get_tree().get_first_node_in_group("player")
+	var stats = player.get_node_or_null("Stats") if player else null
+	if stats == null:
+		return
+	var deals := [["ichor", 10], ["charm", 25]]
+	if idx >= deals.size():
+		return
+	var id: String = deals[idx][0]
+	var cost: int = deals[idx][1]
+	if stats.shards < cost:
+		if box:
+			box.show_text("\"Come back when your pockets jingle, outsider.\"")
+		return
+	if not PlayerProgress.add_item(id):
+		if box:
+			box.show_text("\"Your ring is full. Use something first.\"")
+		return
+	stats.spend_shards(cost)
+	SaveManager.autosave()
+	AudioManager.play("chest", -10.0)
+	if box:
+		box.show_text("\"Sold. Mind the dark with it.\"")
 
 
 func _apply_pending_spawn() -> void:

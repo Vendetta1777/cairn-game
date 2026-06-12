@@ -16,6 +16,7 @@ var _claimed := false
 
 
 func _ready() -> void:
+	add_to_group("cache")   # the Pale Lantern lights these up
 	if PlayerProgress.has_flag("cache_%s" % cache_id):
 		queue_free()
 		return

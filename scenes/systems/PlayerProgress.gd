@@ -42,6 +42,7 @@ var flags: Dictionary = {}         ## story / world flags (see conventions above
 var furthest_area: String = "hollowed_gate"
 var health_halves: int = -1        ## current health in half-hearts; -1 = full
 var last_checkpoint: Dictionary = {}  ## {"area": id, "x": float, "y": float}
+var items: Dictionary = {}         ## item_id -> count (ring inventory; 4 kinds max)
 
 
 # --- currency ----------------------------------------------------------------
@@ -147,6 +148,29 @@ func grant_ability(id: String) -> void:
 	ability_unlocked.emit(id)
 
 
+# --- items ---------------------------------------------------------------------
+
+## Add one of an item. Fails (false) if it would exceed the 4-kind ring.
+func add_item(id: String) -> bool:
+	if not items.has(id) and items.size() >= 4:
+		return false
+	items[id] = int(items.get(id, 0)) + 1
+	return true
+
+
+func use_item(id: String) -> bool:
+	if int(items.get(id, 0)) <= 0:
+		return false
+	items[id] = int(items[id]) - 1
+	if items[id] <= 0:
+		items.erase(id)
+	return true
+
+
+func item_count(id: String) -> int:
+	return int(items.get(id, 0))
+
+
 # --- flags -------------------------------------------------------------------
 
 func set_flag(flag: String, value: bool = true) -> void:
@@ -179,6 +203,7 @@ func to_dict() -> Dictionary:
 		"flags": flags,
 		"furthest_area": furthest_area,
 		"last_checkpoint": last_checkpoint,
+		"items": items,
 	}
 
 
@@ -200,6 +225,10 @@ func from_dict(d: Dictionary) -> void:
 			flags["boss_%s_dead" % id] = true
 	health_halves = int(d.get("health", -1))
 	last_checkpoint = d.get("last_checkpoint", {})
+	items = {}
+	var _it: Dictionary = d.get("items", {})
+	for id in _it:
+		items[id] = int(_it[id])
 	furthest_area = d.get("furthest_area", "hollowed_gate")
 	currency_changed.emit(shards, echoes)
 	progress_loaded.emit()
@@ -214,5 +243,6 @@ func reset() -> void:
 	flags = {}
 	health_halves = -1
 	last_checkpoint = {}
+	items = {}
 	furthest_area = "hollowed_gate"
 	currency_changed.emit(shards, echoes)

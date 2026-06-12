@@ -62,6 +62,20 @@ func take_damage(amount: int = 1) -> void:
 		return
 	health = max(0, health - amount)
 	PlayerProgress.health_halves = health
+	if health == 0:
+		# A carried Bone Charm spends itself to cancel the death: back to one
+		# heart with a flash instead of the grave.
+		var items = get_node_or_null("../Items")
+		if items and items.try_cancel_death():
+			health = 2
+			PlayerProgress.health_halves = health
+			health_changed.emit(health, max_health)
+			AudioManager.play("parry", -2.0)
+			var anim = get_node_or_null("../Animator")
+			if anim and anim.has_method("flash"):
+				anim.flash(Color(1.0, 0.98, 0.85))
+			GameManager.slowmo(0.2, 0.3)
+			return
 	health_changed.emit(health, max_health)
 	if health == 0:
 		# Roguelite penalty: Echoes are dropped on death (Shards are kept).

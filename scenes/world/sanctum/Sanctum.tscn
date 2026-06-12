@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/sanctum/Sanctum.gd" id="1_root"]
 [ext_resource type="Script" path="res://scenes/world/sanctum/SanctumRoom.gd" id="2_room"]
@@ -12,6 +12,9 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/LocationTitle.tscn" id="10_loc"]
 [ext_resource type="PackedScene" path="res://scenes/ui/WorldMap.tscn" id="90_wmap"]
 [ext_resource type="PackedScene" path="res://scenes/fx/PostFX.tscn" id="91_post"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ShopUI.tscn" id="92_shop"]
+[ext_resource type="PackedScene" path="res://scenes/world/Shrine.tscn" id="93_shrine"]
+[ext_resource type="PackedScene" path="res://scenes/ui/BoonChoiceUI.tscn" id="94_boon"]
 
 [sub_resource type="Gradient" id="grad_light"]
 offsets = PackedFloat32Array(0, 1)
@@ -72,10 +75,48 @@ position = Vector2(480, 240)
 
 [node name="LoreNPC" parent="." instance=ExtResource("6_lore")]
 position = Vector2(280, 252)
-lines = PackedStringArray("You are dead, wanderer. As are we all, here.", "This is the Sanctum — the one still point in falling Cairn.", "Bring me the Shards of what you slay, and I will carve their strength into your memory at the altar.", "Echoes scatter when you fall. Strength, once carved, is yours to keep.", "Descend when you are ready. The Pale Sovereign waits below.")
-location_name = "THE SANCTUM"
-location_subtitle = "A REST BETWEEN DEATHS"
+npc_id = "keeper"
+display_name = "THE KEEPER"
+portrait = "ghost"
+lines = PackedStringArray("You are dead, wanderer. As are we all, here.", "This is the Vestibule — the one still point between all the falling depths.", "Bring me the Shards of what you slay, and the altar will carve their strength into you.", "Echoes scatter when you fall. Strength, once carved, is yours to keep.", "Descend when you are ready. The Pale Sovereign waits below the throne.")
+location_name = "THE VESTIBULE"
+location_subtitle = "BETWEEN ALL DEPTHS"
 reveals_location = false
+
+[node name="Pilgrim" parent="." instance=ExtResource("6_lore")]
+position = Vector2(680, 252)
+npc_id = "hollow_pilgrim"
+display_name = "THE HOLLOW PILGRIM"
+portrait = "pilgrim"
+appears_flag = "boss_mother_bat_dead"
+reveals_location = false
+lines = PackedStringArray("You! The outsider from the Hollowed Gate. I followed the quiet you left behind.", "I have walked every depth that would have me. None of them keep the dead like this one does.", "The brood is broken, the forge is cold... you are unmaking the kingdom one promise at a time.", "When you reach the throne — and you will — remember that grief with a crown is still grief.")
+alt_requires_flag = "boss_buried_king_dead"
+alt_lines = PackedStringArray("So the King himself is unburied. The bargain has no anchor now.", "Whatever sits the throne wearing his sorrow — it is the last thing holding the deep together.", "End it, or become it. I do not envy you the choosing.")
+
+[node name="Cartographer" parent="." instance=ExtResource("6_lore")]
+position = Vector2(180, 252)
+npc_id = "cartographer"
+display_name = "THE CARTOGRAPHER"
+portrait = "cartographer"
+appears_flag = "seen_sunken_nave"
+reveals_location = false
+lines = PackedStringArray("Stand still. You are smudging my light.", "I chart the deep for those too brief to walk it. The tablet you carry is crude, but honest.", "Fifteen shards buys the shape of a depth you have not yet bled in. A bargain, for the dead.")
+choice_prompt = "Buy a chart?"
+choice_options = PackedStringArray("Chart an unseen depth (15 shards)", "Not now")
+
+[node name="Merchant" parent="." instance=ExtResource("6_lore")]
+position = Vector2(560, 252)
+npc_id = "merchant"
+display_name = "THE MERCHANT"
+portrait = "merchant"
+reveals_location = false
+lines = PackedStringArray("Ah — coin that still walks. Welcome, welcome.", "Vials, charms, stones that unhappen mistakes. All salvage, all priced to move.", "The charms are rare — the dead clutch them so. I find more whenever a guardian falls.")
+choice_prompt = "Trade?"
+choice_options = PackedStringArray("Browse the wares", "Leave")
+
+[node name="HubShrine" parent="." instance=ExtResource("93_shrine")]
+position = Vector2(760, 252)
 
 [node name="Player" parent="." instance=ExtResource("3_player")]
 position = Vector2(110, 215)
@@ -102,6 +143,10 @@ mouse_filter = 2
 [node name="LocationTitle" parent="." instance=ExtResource("10_loc")]
 
 [node name="SkillTreeUI" parent="." instance=ExtResource("8_tree")]
+
+[node name="ShopUI" parent="." instance=ExtResource("92_shop")]
+
+[node name="BoonChoice" parent="." instance=ExtResource("94_boon")]
 
 [node name="WorldMap" parent="." instance=ExtResource("90_wmap")]
 

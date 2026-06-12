@@ -136,6 +136,11 @@ position = Vector2(2950, 252)
 
 [node name="LoreNPC" parent="Decor" instance=ExtResource("17_lore")]
 position = Vector2(110, 252)
+npc_id = "hollow_pilgrim"
+display_name = "THE HOLLOW PILGRIM"
+portrait = "pilgrim"
+vanish_flag = "boss_mother_bat_dead"
+lines = PackedStringArray("Another one falls in from the cold world. Welcome to Cairn, outsider.", "I survived the sinking by never standing still. Keep moving and the deep forgets you.", "Bats in the roost ahead — strike with J, and strike their dive to turn it.", "If you break the brood that nests over the chasm, look for me below. I follow open doors.")
 
 [node name="Player" parent="." instance=ExtResource("4_player")]
 position = Vector2(50, 215)

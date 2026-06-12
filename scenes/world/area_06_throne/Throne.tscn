@@ -135,6 +135,9 @@ position = Vector2(1820, 252)
 
 [node name="LastKnightSpot" parent="." instance=ExtResource("7_lore")]
 position = Vector2(1500, 252)
+npc_id = "last_knight"
+display_name = "THE LAST KNIGHT"
+portrait = "knight"
 lines = PackedStringArray("Halt. ... No. Forgive me. The order to halt outsiders died with the captain.", "I am the last posting of the Throne Guard. I keep the antechamber. I will keep it until I stop.", "What sits past those doors is not the King. The King is buried in the Warrens — you of all things know.", "It wears his grief like the crown. If you go in, go in as a blade. Mourning is how it catches you.")
 location_name = "THE SOVEREIGN'S THRONE"
 location_subtitle = "DESCENT VI"
@@ -212,6 +215,17 @@ max_health = 8
 [node name="EliteDrowned2" parent="." instance=ExtResource("25_drowned")]
 position = Vector2(2450, 234)
 max_health = 10
+
+[node name="SovereignEcho" parent="." instance=ExtResource("7_lore")]
+position = Vector2(2440, 252)
+npc_id = "pale_sovereign"
+display_name = "THE PALE SOVEREIGN"
+portrait = "sovereign"
+reveals_location = false
+lines = PackedStringArray("...you. The blade the surface sent down to audit our grief.", "I watched you unmake everything that kept the kingdom asleep. The brood. The forge. The binding. The King.", "I am what remains when a king's promise outlives the king. I cannot stop keeping it.", "Before you draw on me, wanderer — answer. The deep listens to its last visitor.")
+choice_prompt = "When the throne is empty — what becomes of Cairn?"
+choice_options = PackedStringArray("It must fall. The dead deserve an ending.", "It must endure. I will keep it myself.")
+choice_flags = PackedStringArray("choice_fall", "choice_endure")
 
 [node name="Shrine" parent="." instance=ExtResource("28_shrine")]
 position = Vector2(1080, 252)

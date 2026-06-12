@@ -441,6 +441,11 @@ func receive_attack(attacker: Node = null, amount: int = 1) -> void:
 func open_parry_window() -> void:
 	_parry_window = parry_window_time
 
+
+## Items (smoke bomb, echo stone) buy moments of invincibility.
+func grant_iframes(t: float) -> void:
+	_hurt_iframes = maxf(_hurt_iframes, t)
+
 func _do_parry(attacker: Node) -> void:
 	_parry_window = 0.0
 	# GDD: full shadow-energy refill, brief slow-mo, enemy staggered.

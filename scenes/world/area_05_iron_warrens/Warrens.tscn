@@ -131,7 +131,12 @@ position = Vector2(2590, 252)
 
 [node name="LoreNPC" parent="." instance=ExtResource("7_lore")]
 position = Vector2(140, 252)
-lines = PackedStringArray("Walk. WALK, outsider. The diggers are blind but the stone carries your boots.", "We dug for ore. Then we dug for the King's tomb, because the court paid in bread.", "The deep rails still run. Ride them past what cannot be walked past.", "We dug too deep and found him dreaming. Some of us are digging still.")
+npc_id = "digger"
+display_name = "THE DIGGER"
+portrait = "digger"
+lines = PackedStringArray("Walk. WALK, outsider. The diggers are blind but the stone carries your boots.", "We dug for ore. Then we dug for the King's tomb, because the court paid in bread.", "The deep rails still run. Ride them past what cannot be walked past.", "I trade what I dig up. Shards buy ichor; shards buy luck, if I have found any.")
+choice_prompt = "Trade with the Digger?"
+choice_options = PackedStringArray("Vial of Dark Ichor (10 shards)", "Bone Charm (25 shards)", "Leave")
 location_name = "THE IRON WARRENS"
 location_subtitle = "DESCENT V"
 reveals_location = false
