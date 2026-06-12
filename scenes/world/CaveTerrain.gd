@@ -113,6 +113,16 @@ func _make_chunk(kind: String, r: Rect2) -> void:
 	c.kind = kind
 	c.rect = r
 	add_child(c)
+	# Interior stone pieces occlude light — the player's aura breaks across
+	# ledges and platforms throw real shadows. (Borders/ceiling skipped: an
+	# occluding roof would just eat the whole scene's light.)
+	if kind == "stone" and not _is_ceiling(r) and r.size.y < 180.0:
+		var occ := LightOccluder2D.new()
+		var poly := OccluderPolygon2D.new()
+		poly.polygon = PackedVector2Array([
+			r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y)])
+		occ.occluder = poly
+		add_child(occ)
 
 
 ## Solids + objects, for the map overlay to draw the level silhouette.
@@ -198,6 +208,10 @@ func _on_player_died() -> void:
 	if _player == null or _dying:
 		return
 	_dying = true
+	# The body dissolves upward as the world greys out.
+	var anim = _player.get_node_or_null("Animator")
+	if anim and anim.has_method("dissolve"):
+		anim.dissolve()
 	_death_screen.play_death(GameManager.current_area_name, GameManager.run_time)
 
 
@@ -216,6 +230,9 @@ func _do_respawn() -> void:
 		if boss.has_method("reset_fight"):
 			boss.reset_fight()
 	_respawn_enemies()
+	var anim = _player.get_node_or_null("Animator")
+	if anim and anim.has_method("undissolve"):
+		anim.undissolve()
 	GameManager.run_time = 0.0
 	get_tree().paused = false
 	_death_screen.dismiss()

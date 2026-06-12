@@ -28,6 +28,7 @@ PlayerProgress="*res://scenes/systems/PlayerProgress.gd"
 SaveManager="*res://scenes/systems/SaveManager.gd"
 AudioManager="*res://scenes/systems/AudioManager.gd"
 SceneFlow="*res://scenes/systems/SceneFlow.gd"
+VFXManager="*res://scenes/systems/VFXManager.gd"
 
 [display]
 

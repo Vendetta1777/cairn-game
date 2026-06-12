@@ -65,6 +65,10 @@ var _attack_facing := 1
 var _attack_mult := 1.0
 var _was_wall_sliding := false
 var _wall_dust_t := 0.0
+var _white_flash := 0.0          ## shader hit-flash 0..1
+var _impulse := Vector2.ONE      ## squash/stretch impulse (land / jump)
+var lean_run := 0.0              ## sprint lean
+var _last_vy := 0.0              ## fall speed memory for landing dust
 
 
 func _ready() -> void:
@@ -75,6 +79,10 @@ func _ready() -> void:
 		_base_pos = _sprite.position
 		_cur_scale = _base_scale
 		_cur_pos = _base_pos
+		# The sprite FX shader: true-white hit flash + the death dissolve.
+		var mat := ShaderMaterial.new()
+		mat.shader = preload("res://scenes/fx/sprite_fx.gdshader")
+		_sprite.material = mat
 	if _controller:
 		_state = _controller.get_current_state()
 		_controller.state_changed.connect(_on_state_changed)
@@ -83,6 +91,10 @@ func _ready() -> void:
 			_controller.jumped.connect(_on_jumped)
 		if _controller.has_signal("grappled"):
 			_controller.grappled.connect(_on_grappled)
+		if _controller.has_signal("landed"):
+			_controller.landed.connect(_on_landed)
+		if _controller.has_signal("hurt"):
+			_controller.hurt.connect(func(_amt): _white_flash = 1.0)
 	var combat := get_node_or_null("../Combat")
 	if combat and combat.has_signal("attacked"):
 		combat.attacked.connect(_on_attacked)
@@ -157,9 +169,22 @@ func _process(delta: float) -> void:
 			_wall_dust_t = 0.05
 	_was_wall_sliding = _state == "wall_slide"
 
-	_sprite.scale = _cur_scale * atk_scale
+	# Squash/stretch impulse eases back; idle breathing; sprint lean — all
+	# computed BEFORE the transform is applied.
+	_impulse = _impulse.lerp(Vector2.ONE, 1.0 - exp(-12.0 * delta))
+	var breathe := 1.0
+	if _state == "idle":
+		breathe = 1.0 + sin(Time.get_ticks_msec() / 800.0) * 0.008
+	if _state == "run" and _controller and absf(_controller.velocity.x) > _controller.run_speed * 0.8:
+		lean_run = lerpf(lean_run, -0.05 * _controller.get_facing(), 8.0 * delta)
+	else:
+		lean_run = lerpf(lean_run, 0.0, 8.0 * delta)
+
+	_sprite.scale = _cur_scale * atk_scale * _impulse * breathe
 	_sprite.position = _cur_pos + atk_off
-	_sprite.rotation = lean
+	_sprite.rotation = lean + lean_run
+	if _controller:
+		_last_vy = maxf(_last_vy, _controller.velocity.y) if not _controller.is_on_floor() else 0.0
 
 	# Dash leaves a fading shadow afterimage trail.
 	if _state == "dash":
@@ -173,6 +198,10 @@ func _process(delta: float) -> void:
 	# Hit/dash flash eases back to white.
 	_flash = _flash.lerp(Color.WHITE, 1.0 - exp(-flash_fade_speed * delta))
 	_sprite.modulate = _flash
+	# Shader white-flash: spikes on hurt, decays fast (3-ish frames).
+	_white_flash = maxf(0.0, _white_flash - delta * 14.0)
+	if _sprite.material:
+		_sprite.material.set_shader_parameter("flash", _white_flash)
 
 
 ## One frozen, fading copy of the current frame — the dash trail.
@@ -226,8 +255,31 @@ func _on_grappled(target: Vector2) -> void:
 			upd.call())
 
 
+## Landing: squash + dust scaled to how hard we came down.
+func _on_landed() -> void:
+	_impulse = Vector2(1.15, 0.8)
+	var hard := clampf(_last_vy / 700.0, 0.15, 1.0)
+	VFXManager.dust(_controller.global_position + Vector2(0, 12), hard)
+	_last_vy = 0.0
+
+
+## The death dissolve: the sprite is eaten upward over ~1.2s (DeathScreen syncs).
+func dissolve() -> void:
+	if _sprite and _sprite.material:
+		var tw := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS).set_ignore_time_scale(true)
+		tw.tween_method(func(v): _sprite.material.set_shader_parameter("dissolve", v), 0.0, 1.0, 1.2)
+
+
+func undissolve() -> void:
+	if _sprite and _sprite.material:
+		_sprite.material.set_shader_parameter("dissolve", 0.0)
+
+
 ## A jump while clinging = wall jump: kick a burst of dust off the wall.
 func _on_jumped() -> void:
+	_impulse = Vector2(0.85, 1.2)
+	if _controller and _controller.is_on_floor():
+		VFXManager.dust(_controller.global_position + Vector2(0, 12), 0.25)
 	if _was_wall_sliding:
 		var wall_dir: int = _controller.get_facing() if _controller else 1
 		# facing has already flipped away from the wall, so dust goes off the

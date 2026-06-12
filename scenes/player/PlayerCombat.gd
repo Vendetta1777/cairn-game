@@ -141,6 +141,7 @@ func _do_attack() -> void:
 ## — slow-mo, shadow refill, enemy stagger — is in PlayerController._do_parry).
 func _on_parried(_attacker: Node) -> void:
 	var parent: Node = _controller.get_parent()
+	VFXManager.parry_ring(_controller.global_position + Vector2(0, -10))
 	_spawn_vfx(HIT_SPARK, parent, _controller.global_position + Vector2(0, -8), false, false, 1.6)
 	if _camera and _camera.has_method("add_trauma"):
 		_camera.add_trauma(0.4)

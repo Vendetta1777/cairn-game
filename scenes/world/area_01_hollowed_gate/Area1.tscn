@@ -318,16 +318,6 @@ color = Color(0.5, 0.72, 0.92, 0.6)
 z_index = 2
 script = ExtResource("13_foreground")
 
-[node name="Vignette" type="CanvasLayer" parent="."]
-layer = 5
-
-[node name="Tex" type="TextureRect" parent="Vignette"]
-offset_right = 960.0
-offset_bottom = 540.0
-texture = SubResource("tex_vig")
-stretch_mode = 0
-mouse_filter = 2
-
 [node name="HUD" parent="." instance=ExtResource("6_hud")]
 
 [node name="DialogueBox" parent="." instance=ExtResource("18_dlg")]

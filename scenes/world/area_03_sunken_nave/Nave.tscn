@@ -294,16 +294,6 @@ z_index = 2
 script = ExtResource("15_fg")
 bounds = Rect2(0, 0, 3200, 288)
 
-[node name="Vignette" type="CanvasLayer" parent="."]
-layer = 5
-
-[node name="Tex" type="TextureRect" parent="Vignette"]
-offset_right = 960.0
-offset_bottom = 540.0
-texture = SubResource("tex_vig")
-stretch_mode = 0
-mouse_filter = 2
-
 [node name="HUD" parent="." instance=ExtResource("16_hud")]
 
 [node name="DialogueBox" parent="." instance=ExtResource("17_dlg")]

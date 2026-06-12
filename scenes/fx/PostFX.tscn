@@ -4,8 +4,11 @@
 
 [sub_resource type="ShaderMaterial" id="mat_post"]
 shader = ExtResource("1_shader")
-shader_parameter/aberration = 0.003
-shader_parameter/grain = 0.02
+shader_parameter/aberration = 0.004
+shader_parameter/grain = 0.018
+shader_parameter/vignette_strength = 0.55
+shader_parameter/scanline = 0.03
+shader_parameter/desaturate = 0.12
 
 [node name="PostFX" type="CanvasLayer"]
 layer = 28

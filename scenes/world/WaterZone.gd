@@ -25,6 +25,27 @@ func _ready() -> void:
 	_shape.position = Vector2(size.x * 0.5, size.y * 0.5)
 	_zone.area_entered.connect(_on_enter)
 	_zone.area_exited.connect(_on_exit)
+	# The body of the water is a shader quad: it refracts the scene behind it,
+	# tints with depth, and carries a moving shimmer near the surface.
+	var body := Polygon2D.new()
+	body.polygon = PackedVector2Array([
+		Vector2(0, 3), Vector2(size.x, 3), Vector2(size.x, size.y), Vector2(0, size.y)])
+	body.uv = PackedVector2Array([
+		Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(0, 1)])
+	var mat := ShaderMaterial.new()
+	mat.shader = preload("res://scenes/fx/water.gdshader")
+	if deep:
+		mat.set_shader_parameter("tint", Color(0.02, 0.06, 0.08, 0.8))
+		mat.set_shader_parameter("distort", 0.004)
+		mat.set_shader_parameter("shimmer", 0.2)
+	body.material = mat
+	# Polygon2D UVs are in TEXTURE pixels — give it a unit texture so UV 0..1 maps.
+	var img := Image.create(2, 2, false, Image.FORMAT_RGBA8)
+	img.fill(Color.WHITE)
+	body.texture = ImageTexture.create_from_image(img)
+	body.uv = PackedVector2Array([
+		Vector2(0, 0), Vector2(2, 0), Vector2(2, 2), Vector2(0, 2)])
+	add_child(body)
 
 
 func _on_enter(area: Area2D) -> void:
@@ -75,10 +96,8 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	var body := Color(0.02, 0.07, 0.09, 0.78) if deep else Color(0.05, 0.13, 0.15, 0.6)
 	var glow := Color(0.3, 0.7, 0.7, 0.5) if not deep else Color(0.18, 0.4, 0.45, 0.45)
-	draw_rect(Rect2(0, 3, size.x, size.y - 3), body)
-	# Living surface: two overlapped sine lines.
+	# (The body itself is the shader quad; here just the live surface + bubbles.)
 	var pts := PackedVector2Array()
 	var x := 0.0
 	while x <= size.x:

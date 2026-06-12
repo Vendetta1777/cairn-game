@@ -75,3 +75,31 @@ func slowmo(scale: float, duration: float) -> void:
 	await get_tree().create_timer(duration, true, false, true).timeout
 	Engine.time_scale = 1.0
 
+
+# --- letterbox (boss intros + cutscenes) ------------------------------------
+
+var _letterbox: CanvasLayer
+var _lb_top: ColorRect
+var _lb_bottom: ColorRect
+
+
+## Cinematic black bars, slid in/out. Used by boss intros and the cutscene player.
+func letterbox(on: bool) -> void:
+	if _letterbox == null:
+		_letterbox = CanvasLayer.new()
+		_letterbox.layer = 35
+		add_child(_letterbox)
+		_lb_top = ColorRect.new()
+		_lb_top.color = Color(0.005, 0.005, 0.01)
+		_lb_top.size = Vector2(2000, 54)
+		_lb_top.position = Vector2(0, -54)
+		_letterbox.add_child(_lb_top)
+		_lb_bottom = ColorRect.new()
+		_lb_bottom.color = Color(0.005, 0.005, 0.01)
+		_lb_bottom.size = Vector2(2000, 54)
+		_lb_bottom.position = Vector2(0, 540)
+		_letterbox.add_child(_lb_bottom)
+	var tw := create_tween().set_parallel(true).set_pause_mode(Tween.TWEEN_PAUSE_PROCESS).set_ignore_time_scale(true)
+	tw.tween_property(_lb_top, "position:y", 0.0 if on else -54.0, 0.4).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_property(_lb_bottom, "position:y", 486.0 if on else 540.0, 0.4).set_trans(Tween.TRANS_CUBIC)
+

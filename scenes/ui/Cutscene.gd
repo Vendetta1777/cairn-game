@@ -39,6 +39,7 @@ func play(panels: Array) -> void:
 	_active = true
 	visible = true
 	get_tree().paused = true
+	GameManager.letterbox(true)
 	AudioManager.duck(-6.0, 1.0)
 
 
@@ -46,6 +47,7 @@ func _finish() -> void:
 	_active = false
 	visible = false
 	get_tree().paused = false
+	GameManager.letterbox(false)
 	finished.emit()
 
 

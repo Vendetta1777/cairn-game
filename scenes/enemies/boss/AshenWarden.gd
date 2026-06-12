@@ -84,6 +84,7 @@ func _run_intro() -> void:
 		_begin_fight()
 		return
 	player.set_physics_process(false)
+	GameManager.letterbox(true)
 	# A free camera glides from the player across the arena to the Warden as its
 	# furnace-heart kindles, holds on it, then returns.
 	var cine := Camera2D.new()
@@ -111,6 +112,7 @@ func _run_intro() -> void:
 
 
 func _begin_fight() -> void:
+	GameManager.letterbox(false)
 	_state = APPROACH
 	AudioManager.boss_music(true)
 	engaged.emit()

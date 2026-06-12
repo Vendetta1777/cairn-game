@@ -42,6 +42,10 @@ color = Color(0.55, 0.86, 0.95, 1)
 energy = 0.85
 texture = SubResource("tex_glow")
 texture_scale = 1.4
+shadow_enabled = true
+shadow_color = Color(0, 0, 0.02, 0.5)
+shadow_filter = 2
+shadow_filter_smooth = 3.0
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, 2)

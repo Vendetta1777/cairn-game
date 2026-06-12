@@ -17,6 +17,8 @@ signal died
 var health: int
 var _dead := false
 var _stagger_timer := 0.0
+var _breath_base := Vector2.ONE
+var _breath_phase := 0.0
 
 @onready var _sprite: AnimatedSprite2D = get_node_or_null("Sprite")
 @onready var _hurtbox: Area2D = get_node_or_null("Hurtbox")
@@ -26,11 +28,18 @@ func _ready() -> void:
 	add_to_group("enemy")   # the level's respawn registry finds enemies by this
 	health = max_health
 	_play(idle_anim)
+	if _sprite:
+		_breath_base = _sprite.scale
+	_breath_phase = randf() * TAU
 
 
 func _process(delta: float) -> void:
 	if _stagger_timer > 0.0:
 		_stagger_timer = maxf(0.0, _stagger_timer - delta)
+	# Idle breathing: every living thing pulses, just barely, out of phase.
+	if _sprite and not _dead:
+		var b := 1.0 + sin(Time.get_ticks_msec() / 600.0 + _breath_phase) * 0.012
+		_sprite.scale = Vector2(_breath_base.x, _breath_base.y * b)
 
 
 ## Knocked back and stunned (e.g. by a parry). Subclasses pause their AI while
@@ -55,6 +64,9 @@ func take_damage(amount: int, _from: Vector2 = Vector2.ZERO) -> void:
 	health -= amount
 	_flash()
 	AudioManager.play_at("enemy_hurt", global_position, -10.0)
+	# Dark ichor arcs away from the blow.
+	var dir := (global_position - _from).normalized() if _from != Vector2.ZERO else Vector2.UP
+	VFXManager.splatter(global_position + Vector2(0, -8), dir)
 	if health <= 0:
 		_die()
 	else:
@@ -80,12 +92,27 @@ func _die() -> void:
 				if echo_drop > 0 and stats.has_method("add_echoes"):
 					stats.add_echoes(echo_drop)
 	AudioManager.play_at("enemy_death", global_position, -8.0)
+	VFXManager.death_burst(global_position, _sprite.modulate if _sprite else Color(0.6, 0.8, 0.95))
 	if _hurtbox:
 		_hurtbox.set_deferred("monitorable", false)
 	set_deferred("velocity", Vector2.ZERO)
 	if _has_anim(&"die"):
 		_sprite.play(&"die")
 		await _sprite.animation_finished
+	elif _sprite:
+		# No authored death anim: a per-type procedural exit — grounded things
+		# CRUMPLE into the floor, flyers DISSIPATE upward.
+		var tw := create_tween()
+		if collision_mask & 1:
+			tw.set_parallel(true)
+			tw.tween_property(_sprite, "scale:y", _sprite.scale.y * 0.15, 0.3).set_trans(Tween.TRANS_QUAD)
+			tw.tween_property(_sprite, "position:y", _sprite.position.y + 10.0, 0.3)
+			tw.tween_property(_sprite, "modulate:a", 0.0, 0.34)
+		else:
+			tw.set_parallel(true)
+			tw.tween_property(_sprite, "position:y", _sprite.position.y - 16.0, 0.4)
+			tw.tween_property(_sprite, "modulate:a", 0.0, 0.4)
+		await tw.finished
 	queue_free()
 
 

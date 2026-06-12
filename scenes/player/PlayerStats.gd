@@ -88,6 +88,13 @@ func heal(halves: int) -> void:
 	health = min(max_health, health + halves)
 	PlayerProgress.health_halves = health
 	health_changed.emit(health, max_health)
+	# The soul-heal glow: the player's aura pulses soft white-blue.
+	var glow = get_node_or_null("../Glow")
+	if glow and halves > 0:
+		var base_e: float = glow.energy
+		var tw := create_tween()
+		tw.tween_property(glow, "energy", base_e + 1.1, 0.18)
+		tw.tween_property(glow, "energy", base_e, 0.7)
 
 
 ## Heart-shrine upgrade: +½ a heart, permanent, persisted, capped. Tops up the
