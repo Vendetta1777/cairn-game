@@ -42,7 +42,7 @@ Full design doc: [`CAIRN_GAME_BRIEF.md`](CAIRN_GAME_BRIEF.md).
 downloadable artifact. It pins Godot **4.3** — if you install a different 4.x, bump `GODOT_VERSION`
 and the container image tag, then re-save the export preset from the editor (Project → Export).
 
-## Status — Milestones 1–7 ✅ · Milestone 8 next
+## Status — Milestones 1–12 ✅ · v0.1 VERTICAL SLICE
 - **M1** scaffold · repo + branches · CI · system stubs.
 - **M2** full movement controller (run, variable jump, coyote, buffer, dash + i-frames, crouch) · pixel-art player + animator.
 - **M3** combat v1: directional 3-hit combo, parry, dagger throw, shadow bolt, hit juice.
@@ -61,4 +61,11 @@ and the container image tag, then re-save the export preset from the editor (Pro
   - **Main menu** — New Game / Continue / Settings / Quit over the animated backdrop; volume sliders + fullscreen persisted to `user://settings.json`.
   - **Polish + export** — global chromatic-aberration/film-grain post pass, directional wipes + a loading screen (threaded loads, lore quotes) on every scene change, terrain rendering chunked + culled (Area 1: 29ms → 7ms/frame), export presets for Windows / macOS / Web / Android.
 
-Next: **M8 — Area 4+**, the choir behind the sealed door, and the heart-shrine cadence (levels 5/10/15/20).
+- **M8** three new areas + two bosses: THE PALE LIBRARY (pressure plates, carry-urns, Archivist Shades, the PALE LIBRARIAN with its page shield, ink floods and script beams — drops the GRAPPLE HOOK), THE IRON WARRENS (blind Marrow Diggers, minecart rail gauntlet, the BURIED KING with crack-armour, stalactite lures and the crown throw), THE SOVEREIGN'S THRONE (elite mixes, memory echoes, the crown still on the seat).
+- **M9** the lore layer: dialogue v2 (portraits, typewriter, barks, choices), six story NPCs, the VESTIBULE hub (merchant, cartographer, memorial candles), and the 4-slot ring inventory of eight usable items.
+- **M10** the visual overhaul: one five-effect post pass, real occlusion shadows from the player's aura, true-white hit flash + death dissolve shaders, refractive water, VFXManager (soul orbs, splatter, parry rings, scaled dust), squash/stretch/breathing/lean, camera sway + combat zoom + letterbox.
+- **M11** the audio overhaul: five buses with a real effects chain, a dynamic combat percussion layer over every area bed, reverb zones (cathedral / dry / underwater), and a full variation pass on every action sound.
+- **M12** the ending: THE PALE SOVEREIGN (swordsman -> spectre -> the Cairn itself), TWO ENDINGS decided in dialogue (the escape collapse run, or the throne taken), credits, NEW GAME+ (+40% enemy health per cycle), BOSS RUSH, and fifteen achievements.
+
+**v0.1-vertical-slice** — the full descent is playable start to finish.
+Known issues: the Throne hall can dip below 60fps on mid-range hardware (worst room: ~15.4ms avg, p95 17.5ms on an M4); Windows/Android exports are configured but untested on real devices.

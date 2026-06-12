@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3]
+[gd_scene load_steps=36 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_06_throne/Throne.gd" id="1_root"]
 [ext_resource type="Script" path="res://scenes/world/area_06_throne/ThroneTerrain.gd" id="2_terrain"]
@@ -30,6 +30,9 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/WorldMap.tscn" id="90_wmap"]
 [ext_resource type="PackedScene" path="res://scenes/fx/PostFX.tscn" id="91_post"]
 [ext_resource type="PackedScene" path="res://scenes/world/ReverbZone.tscn" id="96_rz"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/boss/PaleSovereign.tscn" id="97_sov"]
+[ext_resource type="PackedScene" path="res://scenes/ui/BossBar.tscn" id="98_bar"]
+[ext_resource type="PackedScene" path="res://scenes/ui/Cutscene.tscn" id="99_cut"]
 
 [sub_resource type="Gradient" id="grad"]
 offsets = PackedFloat32Array(0, 1)
@@ -217,6 +220,13 @@ max_health = 8
 position = Vector2(2450, 234)
 max_health = 10
 
+[node name="PaleSovereign" parent="." instance=ExtResource("97_sov")]
+position = Vector2(2300, 215)
+arena_left = 1790.0
+arena_right = 2670.0
+floor_y = 252.0
+throne_x = 2260.0
+
 [node name="SovereignEcho" parent="." instance=ExtResource("7_lore")]
 position = Vector2(2440, 252)
 npc_id = "pale_sovereign"
@@ -309,3 +319,17 @@ bounds = Rect2(0, 0, 3100, 288)
 position = Vector2(1760, 0)
 preset = "cathedral"
 size = Vector2(940, 288)
+
+[node name="SovereignTrigger" type="Area2D" parent="." groups=["trigger"]]
+position = Vector2(1840, 150)
+script = ExtResource("10_trigger")
+objective = "The throne is not empty"
+engage_boss_path = NodePath("../PaleSovereign")
+boss_display_name = "THE PALE SOVEREIGN"
+
+[node name="Shape" type="CollisionShape2D" parent="SovereignTrigger"]
+shape = SubResource("trigger_tall")
+
+[node name="BossBar" parent="." instance=ExtResource("98_bar")]
+
+[node name="Cutscene" parent="." instance=ExtResource("99_cut")]

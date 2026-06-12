@@ -29,6 +29,7 @@ SaveManager="*res://scenes/systems/SaveManager.gd"
 AudioManager="*res://scenes/systems/AudioManager.gd"
 SceneFlow="*res://scenes/systems/SceneFlow.gd"
 VFXManager="*res://scenes/systems/VFXManager.gd"
+Achievements="*res://scenes/systems/Achievements.gd"
 
 [display]
 

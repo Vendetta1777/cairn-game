@@ -39,7 +39,11 @@ func has_flag(flag: String) -> bool:
 
 ## A boss reports its death here; gates listen for the matching id. The flag is
 ## mirrored into PlayerProgress (which is saved) so the kill sticks across saves.
+## In Boss Rush the kill only EMITS — nothing is written to the world.
 func report_boss_defeated(boss_id: String) -> void:
+	if GameManager.boss_rush_mode:
+		boss_defeated.emit(boss_id)
+		return
 	set_flag("boss_%s_dead" % boss_id, true)
 	PlayerProgress.set_flag("boss_%s_dead" % boss_id, true)
 	boss_defeated.emit(boss_id)

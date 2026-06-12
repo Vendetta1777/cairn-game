@@ -79,8 +79,14 @@ func ceiling_y(x: float) -> float:
 	return 28.0 + sin(x * 0.006 + 0.4) * 7.0 + sin(x * 0.02 + 1.5) * 4.0
 
 
+var _redraw_gate := false
+
+
 func _process(_delta: float) -> void:
-	queue_redraw()   # brazier flames on the root item
+	# 30 Hz is plenty for flame flicker — halves the root redraw cost.
+	_redraw_gate = not _redraw_gate
+	if _redraw_gate:
+		queue_redraw()   # brazier flames on the root item
 
 
 func _draw_extra() -> void:

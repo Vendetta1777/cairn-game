@@ -14,7 +14,28 @@ const HUB_SCENE := "res://scenes/world/sanctum/Sanctum.tscn"
 
 enum Screen { MAIN, SLOTS, SETTINGS }
 
-const MAIN_ITEMS := ["NEW GAME", "CONTINUE", "SETTINGS", "QUIT"]
+const BASE_ITEMS := ["NEW GAME", "CONTINUE", "SETTINGS", "QUIT"]
+
+## BOSS RUSH joins the menu once any save has beaten the game.
+func _main_items() -> Array:
+	var items := BASE_ITEMS.duplicate()
+	if _beaten_slot() != -1:
+		items.insert(2, "BOSS RUSH")
+	return items
+
+
+func _beaten_slot() -> int:
+	for i in SaveManager.SLOTS:
+		if not SaveManager.has_slot(i):
+			continue
+		var f := FileAccess.open("user://cairn_save_%d.json" % i, FileAccess.READ)
+		if f == null:
+			continue
+		var d = JSON.parse_string(f.get_as_text())
+		f.close()
+		if typeof(d) == TYPE_DICTIONARY and d.get("flags", {}).get("game_beaten", false):
+			return i
+	return -1
 const SETTING_ITEMS := ["MASTER", "MUSIC", "SFX", "FULLSCREEN", "BACK"]
 
 var _screen := Screen.MAIN
@@ -68,26 +89,35 @@ func _confirmed(event: InputEvent) -> bool:
 
 
 func _input_main(event: InputEvent) -> void:
-	if _nav(event, MAIN_ITEMS.size()):
+	var items := _main_items()
+	if _nav(event, items.size()):
 		return
 	if not _confirmed(event):
 		return
 	get_viewport().set_input_as_handled()
 	AudioManager.ui("menu_select", -10.0)
-	match _sel:
-		0:
+	match items[_sel]:
+		"NEW GAME":
 			_slots_for_new = true
 			_screen = Screen.SLOTS
 			_sel = 0
 			_confirm_overwrite = -1
-		1:
+		"CONTINUE":
 			_slots_for_new = false
 			_screen = Screen.SLOTS
 			_sel = 0
-		2:
+		"BOSS RUSH":
+			# Loads the beaten save's power WITHOUT arming autosave — the rush
+			# can never write back to the file.
+			_entering = true
+			SaveManager.load_slot(_beaten_slot())
+			SaveManager.session_active = false
+			GameManager.run_time = 0.0
+			SceneFlow.travel("res://scenes/world/bossrush/BossRush.tscn", "down")
+		"SETTINGS":
 			_screen = Screen.SETTINGS
 			_sel = 0
-		3:
+		"QUIT":
 			get_tree().quit()
 
 
@@ -308,11 +338,12 @@ func _draw_title() -> void:
 
 
 func _draw_main() -> void:
+	var items := _main_items()
 	var y0 := 250.0
-	for i in MAIN_ITEMS.size():
-		var iy := y0 + i * 44.0
+	for i in items.size():
+		var iy := y0 + i * 44.0 - (items.size() - 4) * 14.0
 		var selected := i == _sel
-		var label: String = MAIN_ITEMS[i]
+		var label: String = items[i]
 		var dim := label == "CONTINUE" and not _any_slot_used()
 		var col := Color(0.45, 0.48, 0.6)
 		if dim:

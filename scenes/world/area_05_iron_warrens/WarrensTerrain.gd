@@ -98,8 +98,14 @@ func ceiling_y(x: float) -> float:
 	return 62.0 + sin(x * 0.014 + 0.8) * 12.0 + sin(x * 0.05 + 2.0) * 5.0
 
 
+var _redraw_gate := false
+
+
 func _process(_delta: float) -> void:
-	queue_redraw()   # vein shimmer on the root item only
+	# 30 Hz is plenty for flame flicker — halves the root redraw cost.
+	_redraw_gate = not _redraw_gate
+	if _redraw_gate:
+		queue_redraw()   # vein shimmer on the root item only
 
 
 func _draw_extra() -> void:

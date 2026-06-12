@@ -1,0 +1,65 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scenes/world/bossrush/BossRush.gd" id="1_root"]
+[ext_resource type="Script" path="res://scenes/world/bossrush/BossRushTerrain.gd" id="2_terrain"]
+[ext_resource type="Texture2D" path="res://assets/environment/caverns/background.png" id="3_bg"]
+[ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="5_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="16_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/LocationTitle.tscn" id="18_loc"]
+[ext_resource type="PackedScene" path="res://scenes/ui/BossBar.tscn" id="20_bossbar"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ObjectiveHUD.tscn" id="21_obj"]
+[ext_resource type="PackedScene" path="res://scenes/fx/PostFX.tscn" id="91_post"]
+[ext_resource type="FontFile" path="res://assets/fonts/silkscreen.ttf" id="40_font"]
+
+[sub_resource type="Gradient" id="grad"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[node name="BossRush" type="Node2D"]
+script = ExtResource("1_root")
+
+[node name="Mood" type="CanvasModulate" parent="."]
+color = Color(0.46, 0.45, 0.55, 1)
+
+[node name="Background" type="Node2D" parent="."]
+
+[node name="Deep" type="Sprite2D" parent="Background"]
+modulate = Color(0.6, 0.58, 0.7, 1)
+texture_repeat = 1
+centered = false
+texture = ExtResource("3_bg")
+region_enabled = true
+region_rect = Rect2(0, 0, 960, 288)
+
+[node name="Terrain" type="Node2D" parent="."]
+script = ExtResource("2_terrain")
+bounds = Rect2(0, 0, 960, 288)
+ceiling_seed = 5
+
+[node name="Player" parent="." instance=ExtResource("5_player")]
+position = Vector2(120, 215)
+z_index = 1
+
+[node name="RushHUD" type="CanvasLayer" parent="."]
+layer = 12
+
+[node name="Clock" type="Label" parent="RushHUD"]
+offset_left = 420.0
+offset_top = 56.0
+offset_right = 540.0
+offset_bottom = 84.0
+theme_override_colors/font_color = Color(0.85, 0.88, 1, 1)
+theme_override_fonts/font = ExtResource("40_font")
+theme_override_font_sizes/font_size = 16
+text = "0:00.00"
+horizontal_alignment = 1
+
+[node name="HUD" parent="." instance=ExtResource("16_hud")]
+
+[node name="LocationTitle" parent="." instance=ExtResource("18_loc")]
+
+[node name="BossBar" parent="." instance=ExtResource("20_bossbar")]
+
+[node name="ObjectiveHUD" parent="." instance=ExtResource("21_obj")]
+
+[node name="PostFX" parent="." instance=ExtResource("91_post")]

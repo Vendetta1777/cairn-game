@@ -43,6 +43,8 @@ var furthest_area: String = "hollowed_gate"
 var health_halves: int = -1        ## current health in half-hearts; -1 = full
 var last_checkpoint: Dictionary = {}  ## {"area": id, "x": float, "y": float}
 var items: Dictionary = {}         ## item_id -> count (ring inventory; 4 kinds max)
+var ng_plus: int = 0               ## New Game+ cycle (enemies +40% health each)
+var achievements: Dictionary = {}  ## achievement_id -> true
 
 
 # --- currency ----------------------------------------------------------------
@@ -171,6 +173,26 @@ func item_count(id: String) -> int:
 	return int(items.get(id, 0))
 
 
+# --- New Game+ -----------------------------------------------------------------
+
+## Begin the next cycle: abilities, skills, hearts, shards and items are KEPT;
+## the world itself is reborn — bosses alive, caches refilled, doors sealed.
+func start_ng_plus() -> void:
+	ng_plus += 1
+	var kept := {}
+	for f in flags:
+		# Keep meta flags (endings seen, achievements live separately, map
+		# discovery); drop world-state flags so the deep resets.
+		if String(f).begins_with("seen_") or String(f).begins_with("ending_") \
+				or f == "game_beaten":
+			kept[f] = flags[f]
+	flags = kept
+	health_halves = -1
+	last_checkpoint = {}
+	echoes = 0
+	furthest_area = "hollowed_gate"
+
+
 # --- flags -------------------------------------------------------------------
 
 func set_flag(flag: String, value: bool = true) -> void:
@@ -204,6 +226,8 @@ func to_dict() -> Dictionary:
 		"furthest_area": furthest_area,
 		"last_checkpoint": last_checkpoint,
 		"items": items,
+		"ng_plus": ng_plus,
+		"achievements": achievements.keys(),
 	}
 
 
@@ -229,6 +253,10 @@ func from_dict(d: Dictionary) -> void:
 	var _it: Dictionary = d.get("items", {})
 	for id in _it:
 		items[id] = int(_it[id])
+	ng_plus = int(d.get("ng_plus", 0))
+	achievements = {}
+	for id in d.get("achievements", []):
+		achievements[id] = true
 	furthest_area = d.get("furthest_area", "hollowed_gate")
 	currency_changed.emit(shards, echoes)
 	progress_loaded.emit()
@@ -244,5 +272,7 @@ func reset() -> void:
 	health_halves = -1
 	last_checkpoint = {}
 	items = {}
+	ng_plus = 0
+	achievements = {}
 	furthest_area = "hollowed_gate"
 	currency_changed.emit(shards, echoes)

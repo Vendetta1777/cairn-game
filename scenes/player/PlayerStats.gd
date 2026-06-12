@@ -69,6 +69,7 @@ func take_damage(amount: int = 1) -> void:
 		if items and items.try_cancel_death():
 			health = 2
 			PlayerProgress.health_halves = health
+			PlayerProgress.set_flag("charm_saved_you")
 			health_changed.emit(health, max_health)
 			AudioManager.play("parry", -2.0)
 			var anim = get_node_or_null("../Animator")

@@ -98,6 +98,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		return   # the box handles choice input itself
 	if not _talking:
 		_talking = true
+		if npc_id != "":
+			PlayerProgress.set_flag("talked_%s" % npc_id)
 		if not _revealed and reveals_location:
 			_revealed = true
 			var title = get_tree().get_first_node_in_group("location_title")

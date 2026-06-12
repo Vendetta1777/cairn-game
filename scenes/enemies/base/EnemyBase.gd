@@ -26,6 +26,9 @@ var _breath_phase := 0.0
 
 func _ready() -> void:
 	add_to_group("enemy")   # the level's respawn registry finds enemies by this
+	# New Game+: every cycle hardens the deep by 40%.
+	if PlayerProgress.ng_plus > 0:
+		max_health = int(ceil(max_health * (1.0 + 0.4 * PlayerProgress.ng_plus)))
 	health = max_health
 	_play(idle_anim)
 	if _sprite:

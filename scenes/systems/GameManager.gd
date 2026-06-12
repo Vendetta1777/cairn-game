@@ -21,6 +21,8 @@ var checkpoint_position: Vector2 = Vector2.ZERO
 var current_area_name: String = "THE DEEP"
 var current_area_id: String = ""
 var run_time: float = 0.0
+## Boss Rush plays with real bosses but must not write world flags or saves.
+var boss_rush_mode: bool = false
 
 
 func _process(delta: float) -> void:
