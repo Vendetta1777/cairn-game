@@ -34,5 +34,7 @@ func _on_area(area: Area2D) -> void:
 			for bar in get_tree().get_nodes_in_group("boss_bar"):
 				if bar.has_method("bind"):
 					bar.bind(boss, boss_display_name)
+			if "boss_id" in boss:
+				GameManager.note_boss_engaged(boss.boss_id)
 			if boss.has_method("engage"):
 				boss.engage()

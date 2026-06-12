@@ -130,6 +130,18 @@ func _draw() -> void:
 	for i in _dagger_max:
 		_draw_dagger(Vector2(dx + i * 9.0, origin.y - 1.0), i < _daggers)
 
+	# WAYWARD COMPASS: a sliver of map lives in the corner — your dot on the
+	# level's span, always.
+	if PlayerProgress.charm_bonus("compass") > 0.0:
+		var terrain := get_tree().get_first_node_in_group("terrain")
+		var player := get_tree().get_first_node_in_group("player")
+		if terrain and player and "bounds" in terrain:
+			var strip := Rect2(size.x - 130.0, size.y - 26.0, 116.0, 12.0)
+			draw_rect(strip, Color(0.04, 0.05, 0.08, 0.8))
+			draw_rect(strip, Color(0.4, 0.44, 0.58, 0.7), false, 1.0)
+			var frac: float = clampf((player.global_position.x - terrain.bounds.position.x) / terrain.bounds.size.x, 0.0, 1.0)
+			draw_circle(Vector2(strip.position.x + 4.0 + frac * (strip.size.x - 8.0), strip.get_center().y), 2.2, Color(0.95, 0.95, 1.0))
+
 	# FLOW STATE tally: small strokes stack under the daggers; glows at 10+,
 	# burns gold at 20+ (soul surge), shatters outward when you get hit.
 	if _streak >= 2:

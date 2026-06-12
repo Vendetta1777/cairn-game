@@ -45,7 +45,7 @@ func _physics_process(delta: float) -> void:
 		IDLE:
 			velocity.x = 0.0
 			_play(&"idle")
-			if player and absf(player.global_position.x - global_position.x) < aggro_range \
+			if player and _can_sense(player) and absf(player.global_position.x - global_position.x) < aggro_range \
 					and absf(player.global_position.y - global_position.y) < 60.0:
 				_aggro_sound()
 				_state = WALK

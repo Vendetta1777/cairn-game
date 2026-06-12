@@ -53,7 +53,7 @@ func _physics_process(delta: float) -> void:
 		HOVER:
 			_t += delta * bob_speed
 			velocity = Vector2(0.0, cos(_t) * bob_amplitude)
-			if player and _cooldown <= 0.0 \
+			if player and _cooldown <= 0.0 and _can_sense(player) \
 					and global_position.distance_to(player.global_position) < aggro_range:
 				_target = player.global_position
 				_aggro_sound()

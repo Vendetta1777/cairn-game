@@ -1,4 +1,4 @@
-[gd_scene load_steps=39 format=3]
+[gd_scene load_steps=41 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1Terrain.gd" id="1_terrain"]
 [ext_resource type="Script" path="res://scenes/world/area_01_hollowed_gate/Area1.gd" id="1_root"]
@@ -34,6 +34,8 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/WorldMap.tscn" id="90_wmap"]
 [ext_resource type="PackedScene" path="res://scenes/fx/PostFX.tscn" id="91_post"]
 [ext_resource type="PackedScene" path="res://scenes/world/GrapplePoint.tscn" id="95_gp"]
+[ext_resource type="PackedScene" path="res://scenes/world/CharmPickup.tscn" id="93_cp"]
+[ext_resource type="PackedScene" path="res://scenes/ui/CharmUI.tscn" id="94_cu"]
 
 [sub_resource type="Gradient" id="grad_light"]
 offsets = PackedFloat32Array(0, 1)
@@ -345,3 +347,23 @@ position = Vector2(1640, 96)
 position = Vector2(1640, 120)
 cache_id = "a1_sky"
 shards = 18
+
+[node name="CharmLongNail" parent="." instance=ExtResource("93_cp")]
+position = Vector2(660, 132)
+charm_id = "long_nail"
+
+[node name="CharmSwarm" parent="." instance=ExtResource("93_cp")]
+position = Vector2(3560, 252)
+charm_id = "gathering_swarm"
+
+[node name="Notch1" parent="." instance=ExtResource("93_cp")]
+position = Vector2(350, 210)
+notch = true
+pickup_id = "notch_a1"
+
+[node name="Notch2" parent="." instance=ExtResource("93_cp")]
+position = Vector2(2245, 96)
+notch = true
+pickup_id = "notch_a1b"
+
+[node name="CharmUI" parent="." instance=ExtResource("94_cu")]

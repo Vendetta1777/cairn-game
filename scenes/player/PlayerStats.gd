@@ -22,16 +22,34 @@ var shadow: float
 var echoes: int = 0
 var shards: int = 0
 var _shadow_regen: float = 0.0         ## per-second, from the Shadow skill branch
+var _heal_mult := 1.0                  ## Joni's penalty
+var _heal_bonus := 0                   ## Deep Focus extra halves
+var _hurt_soul := 0.0                  ## Grubsong: soul gained on damage
+var _has_hiveblood := false            ## regen a half after a quiet stretch
+var _regen_wait := 8.0
+var _unhurt_t := 0.0
+var _bases_captured := false
+var _base_max_shadow := 50.0
 
 
 func _ready() -> void:
 	# Pull everything persistent (hearts, currency) from PlayerProgress and fold
 	# in the unlocked skill-tree bonuses, so a fresh player in any scene starts
 	# with the player's permanent progression already applied.
+	if not _bases_captured:
+		_bases_captured = true
+		_base_max_shadow = max_shadow
 	max_health = PlayerProgress.max_half_hearts()   # in half-heart units
+	# Joni's Blessing: more life in a stranger shape.
+	max_health = int(round(max_health * (1.0 + PlayerProgress.charm_bonus("hp_mult"))))
 	max_hearts = max_health / HALVES_PER_HEART
-	max_shadow += PlayerProgress.bonus("max_shadow")
-	_shadow_regen = PlayerProgress.bonus("shadow_regen")
+	max_shadow = _base_max_shadow + PlayerProgress.bonus("max_shadow")
+	_shadow_regen = PlayerProgress.bonus("shadow_regen") + PlayerProgress.charm_bonus("shadow_regen")
+	_heal_mult = 1.0 + PlayerProgress.charm_bonus("heal_mult")
+	_heal_bonus = int(PlayerProgress.charm_bonus("heal_bonus"))
+	_hurt_soul = PlayerProgress.charm_bonus("hurt_soul")
+	_has_hiveblood = PlayerProgress.charm_bonus("regen") > 0.0
+	_regen_wait = 5.0 if PlayerProgress.charm_bonus("regen_fast") > 0.0 else 8.0
 	# Current health persists across scene changes and saves (-1 = full). Never
 	# spawn at 0 — a loaded save always gets at least half a heart.
 	health = max_health if PlayerProgress.health_halves < 0 \
@@ -48,6 +66,13 @@ func _process(delta: float) -> void:
 	if _shadow_regen > 0.0 and shadow < max_shadow:
 		shadow = minf(max_shadow, shadow + _shadow_regen * delta)
 		shadow_changed.emit(shadow, max_shadow)
+	# Hiveblood: an unbroken quiet stretch knits half a heart back.
+	if _has_hiveblood and health > 0 and health < max_health:
+		_unhurt_t += delta
+		if _unhurt_t >= _regen_wait:
+			_unhurt_t = 0.0
+			heal(1)
+			AudioManager.play("heal", -14.0)
 
 
 func _broadcast() -> void:
@@ -62,6 +87,24 @@ func take_damage(amount: int = 1) -> void:
 		return
 	health = max(0, health - amount)
 	PlayerProgress.health_halves = health
+	_unhurt_t = 0.0
+	# Grubsong: pain pays, a little.
+	if _hurt_soul > 0.0:
+		refill_shadow(_hurt_soul)
+	if health == 0:
+		# Void Heart: once between rests, death is asked to wait.
+		if PlayerProgress.is_equipped("void_heart") \
+				and not PlayerProgress.has_flag("void_heart_spent"):
+			PlayerProgress.set_flag("void_heart_spent")
+			health = 2
+			PlayerProgress.health_halves = health
+			health_changed.emit(health, max_health)
+			AudioManager.play("heal", -2.0, 0.0, &"SFX", 0.6)
+			GameManager.slowmo(0.15, 0.4)
+			var anim = get_node_or_null("../Animator")
+			if anim and anim.has_method("flash"):
+				anim.flash(Color(0.55, 0.4, 0.8))
+			return
 	if health == 0:
 		# A carried Bone Charm spends itself to cancel the death: back to one
 		# heart with a flash instead of the grave.
@@ -79,13 +122,22 @@ func take_damage(amount: int = 1) -> void:
 			return
 	health_changed.emit(health, max_health)
 	if health == 0:
-		# Roguelite penalty: Echoes are dropped on death (Shards are kept).
+		# Roguelite penalty: Echoes are dropped on death (Shards are kept) —
+		# and anything fragile you wore shatters for good.
+		var broken := PlayerProgress.break_fragile_charms()
+		if not broken.is_empty():
+			var banner := get_tree().get_first_node_in_group("location_title")
+			if banner and banner.has_method("reveal"):
+				banner.reveal("SOMETHING SHATTERED", String(broken[0]).to_upper())
 		PlayerProgress.drop_echoes()
 		echoes = 0
 		died.emit()
 
 
 func heal(halves: int) -> void:
+	# Deep Focus deepens it; Joni's Blessing resents it.
+	if halves > 0:
+		halves = maxi(1, int(round(halves * _heal_mult))) + _heal_bonus
 	health = min(max_health, health + halves)
 	PlayerProgress.health_halves = health
 	health_changed.emit(health, max_health)

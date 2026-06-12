@@ -24,6 +24,40 @@ var run_time: float = 0.0
 ## Boss Rush plays with real bosses but must not write world flags or saves.
 var boss_rush_mode: bool = false
 
+# --- no-hit boss tracking (charm rewards + the Ghost achievement) ---------------
+var _nohit_boss := ""
+var _nohit_clean := true
+var _nohit_hooked := false
+
+
+## Trigger calls this when it engages a boss; a clean kill earns its mark.
+func note_boss_engaged(boss_id: String) -> void:
+	_nohit_boss = boss_id
+	_nohit_clean = true
+	var player := get_tree().get_first_node_in_group("player")
+	if player and player.has_signal("hurt") and not _nohit_hooked:
+		_nohit_hooked = true
+		player.hurt.connect(func(_amt): _nohit_clean = false)
+	if not QuestTracker.boss_defeated.is_connected(_on_nohit_check):
+		QuestTracker.boss_defeated.connect(_on_nohit_check)
+
+
+func _on_nohit_check(boss_id: String) -> void:
+	if boss_rush_mode or boss_id != _nohit_boss or not _nohit_clean:
+		return
+	PlayerProgress.set_flag("nohit_%s" % boss_id)
+	# Untouchable kills carve legendary charms.
+	var reward := ""
+	match boss_id:
+		"ashen_warden": reward = "mark_of_pride"
+		"pale_librarian": reward = "soul_eater"
+	if reward != "" and not PlayerProgress.has_charm(reward):
+		PlayerProgress.grant_charm(reward)
+		var banner := get_tree().get_first_node_in_group("location_title")
+		if banner and banner.has_method("reveal"):
+			banner.reveal("UNTOUCHED", "a legendary charm is carved")
+	SaveManager.autosave()
+
 
 func _process(delta: float) -> void:
 	if not get_tree().paused:
@@ -41,6 +75,8 @@ func set_checkpoint(position: Vector2) -> void:
 	checkpoint_position = position
 	PlayerProgress.last_checkpoint = {
 		"area": current_area_id, "x": position.x, "y": position.y}
+	# A rest re-arms the Void Heart.
+	PlayerProgress.set_flag("void_heart_spent", false)
 	checkpoint_set.emit(position)
 
 ## Where the player should respawn — the last checkpoint, or the given fallback.

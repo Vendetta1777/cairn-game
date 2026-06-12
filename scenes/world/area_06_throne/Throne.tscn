@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3]
+[gd_scene load_steps=38 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_06_throne/Throne.gd" id="1_root"]
 [ext_resource type="Script" path="res://scenes/world/area_06_throne/ThroneTerrain.gd" id="2_terrain"]
@@ -33,6 +33,8 @@
 [ext_resource type="PackedScene" path="res://scenes/enemies/boss/PaleSovereign.tscn" id="97_sov"]
 [ext_resource type="PackedScene" path="res://scenes/ui/BossBar.tscn" id="98_bar"]
 [ext_resource type="PackedScene" path="res://scenes/ui/Cutscene.tscn" id="99_cut"]
+[ext_resource type="PackedScene" path="res://scenes/world/CharmPickup.tscn" id="93_cp"]
+[ext_resource type="PackedScene" path="res://scenes/ui/CharmUI.tscn" id="94_cu"]
 
 [sub_resource type="Gradient" id="grad"]
 offsets = PackedFloat32Array(0, 1)
@@ -333,3 +335,14 @@ shape = SubResource("trigger_tall")
 [node name="BossBar" parent="." instance=ExtResource("98_bar")]
 
 [node name="Cutscene" parent="." instance=ExtResource("99_cut")]
+
+[node name="CharmJoni" parent="." instance=ExtResource("93_cp")]
+position = Vector2(2860, 252)
+charm_id = "jonis_blessing"
+
+[node name="Notch8" parent="." instance=ExtResource("93_cp")]
+position = Vector2(1490, 170)
+notch = true
+pickup_id = "notch_a6"
+
+[node name="CharmUI" parent="." instance=ExtResource("94_cu")]

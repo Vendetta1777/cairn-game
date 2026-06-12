@@ -7,6 +7,7 @@ class_name RemnantStone
 @export var respawn_offset := Vector2(0, -6)
 
 var _active := false
+var _player_near := false
 
 @onready var _light: PointLight2D = get_node_or_null("Light")
 @onready var _detector: Area2D = get_node_or_null("Detector")
@@ -22,6 +23,7 @@ func _ready() -> void:
 	call_deferred("_check_lit")
 	if _detector:
 		_detector.area_entered.connect(_on_area_entered)
+		_detector.area_exited.connect(_on_area_exited)
 
 
 func _check_lit() -> void:
@@ -35,6 +37,22 @@ func _on_area_entered(area: Area2D) -> void:
 	if body and body.is_in_group("player"):
 		_activate()
 		_maybe_heal(body)
+		_player_near = true
+
+
+func _on_area_exited(area: Area2D) -> void:
+	var body := area.get_parent()
+	if body and body.is_in_group("player"):
+		_player_near = false
+
+
+## E at a lit stone opens the ATTUNEMENT screen (charms equip only here).
+func _unhandled_input(event: InputEvent) -> void:
+	if _player_near and _active and event.is_action_pressed("interact"):
+		var ui := get_tree().get_first_node_in_group("charm_ui")
+		if ui and ui.has_method("open_charms"):
+			ui.open_charms()
+			get_viewport().set_input_as_handled()
 
 
 ## A remnant's small mercy: if you arrive hurt and down to 2 hearts or fewer,

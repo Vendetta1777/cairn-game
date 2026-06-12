@@ -46,7 +46,7 @@ func _physics_process(delta: float) -> void:
 	match _state:
 		PERCH:
 			velocity = (target + Vector2(0, sin(_bob) * 5.0) - global_position) * 4.0
-			if player and global_position.distance_to(player.global_position) < aggro_range and _t <= 0.0:
+			if player and _can_sense(player) and global_position.distance_to(player.global_position) < aggro_range and _t <= 0.0:
 				_state = AIM
 				_t = 0.6
 				_aggro_sound()

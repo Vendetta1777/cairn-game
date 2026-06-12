@@ -45,6 +45,9 @@ var last_checkpoint: Dictionary = {}  ## {"area": id, "x": float, "y": float}
 var items: Dictionary = {}         ## item_id -> count (ring inventory; 4 kinds max)
 var ng_plus: int = 0               ## New Game+ cycle (enemies +40% health each)
 var achievements: Dictionary = {}  ## achievement_id -> true
+var charms_owned: Dictionary = {}  ## charm_id -> true
+var charms_equipped: Array = []    ## equipped charm ids (slot-checked)
+var notch_stones: int = 0          ## found stones; every 2 add a slot (cap 6)
 
 
 # --- currency ----------------------------------------------------------------
@@ -173,6 +176,77 @@ func item_count(id: String) -> int:
 	return int(items.get(id, 0))
 
 
+# --- charms --------------------------------------------------------------------
+
+const Charms = preload("res://scenes/systems/CharmDB.gd")
+
+
+func charm_slots() -> int:
+	return mini(3 + notch_stones / 2, 6)
+
+
+func slots_used() -> int:
+	var used := 0
+	for id in charms_equipped:
+		used += int(Charms.get_charm(id).get("slots", 1))
+	return used
+
+
+func grant_charm(id: String) -> void:
+	charms_owned[id] = true
+
+
+func has_charm(id: String) -> bool:
+	return charms_owned.get(id, false)
+
+
+func is_equipped(id: String) -> bool:
+	return id in charms_equipped
+
+
+func equip_charm(id: String) -> bool:
+	if not has_charm(id) or is_equipped(id):
+		return false
+	var cost := int(Charms.get_charm(id).get("slots", 1))
+	if slots_used() + cost > charm_slots():
+		return false
+	charms_equipped.append(id)
+	return true
+
+
+func unequip_charm(id: String) -> void:
+	charms_equipped.erase(id)
+
+
+## Sum one effect key across every equipped charm, plus any active synergies.
+func charm_bonus(key: String) -> float:
+	var total := 0.0
+	for id in charms_equipped:
+		var eff: Dictionary = Charms.get_charm(id).get("effect", {})
+		if eff.has(key):
+			total += float(eff[key])
+	for syn in Charms.SYNERGIES:
+		var both := true
+		for pid in syn.pair:
+			if not is_equipped(pid):
+				both = false
+				break
+		if both and syn.effect.has(key):
+			total += float(syn.effect[key])
+	return total
+
+
+## Death shatters Fragile Strength (the unbreakable rework is immune).
+func break_fragile_charms() -> Array:
+	var broken := []
+	for id in charms_equipped.duplicate():
+		if Charms.get_charm(id).get("fragile", false):
+			charms_equipped.erase(id)
+			charms_owned.erase(id)
+			broken.append(Charms.get_charm(id).get("name", id))
+	return broken
+
+
 # --- New Game+ -----------------------------------------------------------------
 
 ## Begin the next cycle: abilities, skills, hearts, shards and items are KEPT;
@@ -228,6 +302,9 @@ func to_dict() -> Dictionary:
 		"items": items,
 		"ng_plus": ng_plus,
 		"achievements": achievements.keys(),
+		"charms_owned": charms_owned.keys(),
+		"charms_equipped": charms_equipped,
+		"notch_stones": notch_stones,
 	}
 
 
@@ -257,6 +334,13 @@ func from_dict(d: Dictionary) -> void:
 	achievements = {}
 	for id in d.get("achievements", []):
 		achievements[id] = true
+	charms_owned = {}
+	for id in d.get("charms_owned", []):
+		charms_owned[id] = true
+	charms_equipped = []
+	for id in d.get("charms_equipped", []):
+		charms_equipped.append(String(id))
+	notch_stones = int(d.get("notch_stones", 0))
 	furthest_area = d.get("furthest_area", "hollowed_gate")
 	currency_changed.emit(shards, echoes)
 	progress_loaded.emit()
@@ -274,5 +358,8 @@ func reset() -> void:
 	items = {}
 	ng_plus = 0
 	achievements = {}
+	charms_owned = {}
+	charms_equipped = []
+	notch_stones = 0
 	furthest_area = "hollowed_gate"
 	currency_changed.emit(shards, echoes)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3]
+[gd_scene load_steps=37 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_04_pale_library/Library.gd" id="1_root"]
 [ext_resource type="Script" path="res://scenes/world/area_04_pale_library/LibraryTerrain.gd" id="2_terrain"]
@@ -32,6 +32,8 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/WorldMap.tscn" id="90_wmap"]
 [ext_resource type="PackedScene" path="res://scenes/fx/PostFX.tscn" id="91_post"]
 [ext_resource type="PackedScene" path="res://scenes/world/ReverbZone.tscn" id="96_rz"]
+[ext_resource type="PackedScene" path="res://scenes/world/CharmPickup.tscn" id="93_cp"]
+[ext_resource type="PackedScene" path="res://scenes/ui/CharmUI.tscn" id="94_cu"]
 
 [sub_resource type="Gradient" id="grad"]
 offsets = PackedFloat32Array(0, 1)
@@ -301,3 +303,18 @@ bounds = Rect2(0, 0, 3600, 288)
 position = Vector2(3060, 0)
 preset = "cathedral"
 size = Vector2(526, 288)
+
+[node name="CharmCatcher" parent="." instance=ExtResource("93_cp")]
+position = Vector2(980, 170)
+charm_id = "soul_catcher"
+
+[node name="CharmStalker" parent="." instance=ExtResource("93_cp")]
+position = Vector2(2900, 252)
+charm_id = "stalkers_mark"
+
+[node name="Notch5" parent="." instance=ExtResource("93_cp")]
+position = Vector2(2205, 196)
+notch = true
+pickup_id = "notch_a4"
+
+[node name="CharmUI" parent="." instance=ExtResource("94_cu")]

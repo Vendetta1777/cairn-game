@@ -11,6 +11,9 @@ const HINTS := [
 	"\"The Librarian's shield turns with one gap. Strike where the pages are not.\"",
 	"\"When the ink rises, the platforms are scripture. Stand on them and be patient.\"",
 	"\"The rigger's rings above the flooded index — useless now. Priceless later.\"",
+	"\"Charms speak to each other. The Long Nail and the Mark of Pride share one philosophy of distance.\"",
+	"\"The Soul Catcher feeds the Shaman Stone something extra. The bolt comes out... hungrier. Searing.\"",
+	"\"Hiveblood under a Stalwart Shell — the smiths called that build 'the anvil'. Nothing killed them. Eventually nothing tried.\"",
 ]
 
 

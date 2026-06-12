@@ -22,6 +22,11 @@ func _process(delta: float) -> void:
 			var to: Vector2 = player.global_position + Vector2(0, -12) - global_position
 			if to.length() < 12.0:
 				VFXManager.dust(global_position, 0.15)
+				# Gathering Swarm: the essence arrives with interest.
+				if PlayerProgress.charm_bonus("gather") > 0.0:
+					var stats = player.get_node_or_null("Stats")
+					if stats:
+						stats.add_echoes(1)
 				queue_free()
 				return
 			position += to.normalized() * minf(420.0, 140.0 + _t * 260.0) * delta

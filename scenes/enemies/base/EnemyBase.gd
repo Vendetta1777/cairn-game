@@ -78,6 +78,12 @@ func take_damage(amount: int, _from: Vector2 = Vector2.ZERO) -> void:
 		_play(&"hurt")
 
 
+## Stalker's Mark: a player who has stood still long enough is, as far as the
+## deep is concerned, furniture. Subclasses gate their aggro checks on this.
+func _can_sense(player: Node) -> bool:
+	return player != null and player.get("hidden_still") != true
+
+
 ## Subclasses chirp this when they first commit to attacking the player.
 ## Also heats the dynamic-music combat layer.
 func _aggro_sound() -> void:

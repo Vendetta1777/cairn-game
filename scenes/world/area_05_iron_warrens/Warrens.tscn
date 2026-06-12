@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3]
+[gd_scene load_steps=35 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_05_iron_warrens/Warrens.gd" id="1_root"]
 [ext_resource type="Script" path="res://scenes/world/area_05_iron_warrens/WarrensTerrain.gd" id="2_terrain"]
@@ -30,6 +30,8 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/WorldMap.tscn" id="90_wmap"]
 [ext_resource type="PackedScene" path="res://scenes/fx/PostFX.tscn" id="91_post"]
 [ext_resource type="PackedScene" path="res://scenes/world/ReverbZone.tscn" id="96_rz"]
+[ext_resource type="PackedScene" path="res://scenes/world/CharmPickup.tscn" id="93_cp"]
+[ext_resource type="PackedScene" path="res://scenes/ui/CharmUI.tscn" id="94_cu"]
 
 [sub_resource type="Gradient" id="grad"]
 offsets = PackedFloat32Array(0, 1)
@@ -285,3 +287,23 @@ size = Vector2(540, 288)
 position = Vector2(3160, 0)
 preset = "cathedral"
 size = Vector2(526, 288)
+
+[node name="CharmShell" parent="." instance=ExtResource("93_cp")]
+position = Vector2(2750, 184)
+charm_id = "stalwart_shell"
+
+[node name="CharmSprint" parent="." instance=ExtResource("93_cp")]
+position = Vector2(2420, 252)
+charm_id = "sprintmaster"
+
+[node name="Notch6" parent="." instance=ExtResource("93_cp")]
+position = Vector2(940, 200)
+notch = true
+pickup_id = "notch_a5"
+
+[node name="Notch7" parent="." instance=ExtResource("93_cp")]
+position = Vector2(2020, 96)
+notch = true
+pickup_id = "notch_a5b"
+
+[node name="CharmUI" parent="." instance=ExtResource("94_cu")]

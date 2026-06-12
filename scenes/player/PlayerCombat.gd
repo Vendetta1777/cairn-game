@@ -31,6 +31,14 @@ var _combo_timer := 0.0
 var _daggers := 3
 var _streak := 0          ## consecutive hits without taking damage (flow state)
 var _attack_buffer := 0.0 ## input buffering: a press just before ready still fires
+var _range_mult := 1.0    ## charm reach (Long Nail / Mark of Pride)
+var _soul_gain_mult := 1.0
+var _bases_captured := false
+var _base_damage := 1
+var _base_cooldown := 0.28
+var _base_daggers := 3
+var _base_bolt_cost := 20.0
+var _streak_hooked := false
 var _finisher_bonus := 0      ## extra finisher damage from the Blade tree
 var _bolt_pierce_bonus := 0   ## extra shadow-bolt pierce from the Shadow tree
 var _controller
@@ -47,21 +55,36 @@ func _ready() -> void:
 	# Hitbox stays live so overlaps are always tracked; damage only on input.
 	if _hitbox:
 		_hitbox.monitoring = true
-	if _controller.has_signal("parried"):
+	if _controller.has_signal("parried") and not _controller.parried.is_connected(_on_parried):
 		_controller.parried.connect(_on_parried)
 	# Flow state breaks the moment you bleed.
-	if _controller.has_signal("hurt"):
+	if _controller.has_signal("hurt") and not _streak_hooked:
+		_streak_hooked = true
 		_controller.hurt.connect(func(_amt):
 			if _streak > 0:
 				_streak = 0
 				streak_broken.emit()
 				AudioManager.play("parry_fail", -6.0, 0.0, &"SFX", 0.6))
-	# Fold in permanent skill-tree bonuses (Blade / Shadow branches).
-	damage += int(PlayerProgress.bonus("damage"))
+	# Bonuses recompute from captured bases so re-attuning never stacks.
+	if not _bases_captured:
+		_bases_captured = true
+		_base_damage = damage
+		_base_cooldown = attack_cooldown
+		_base_daggers = max_daggers
+		_base_bolt_cost = shadow_bolt_cost
+	# Skill tree first (additive), then charms (multiplicative) on top.
+	damage = _base_damage + int(PlayerProgress.bonus("damage"))
 	_finisher_bonus = int(PlayerProgress.bonus("finisher_damage"))
-	max_daggers += int(PlayerProgress.bonus("dagger_charges"))
-	shadow_bolt_cost = maxf(5.0, shadow_bolt_cost - PlayerProgress.bonus("bolt_discount"))
+	max_daggers = _base_daggers + int(PlayerProgress.bonus("dagger_charges"))
+	shadow_bolt_cost = maxf(5.0, _base_bolt_cost - PlayerProgress.bonus("bolt_discount"))
 	_bolt_pierce_bonus = int(PlayerProgress.bonus("bolt_pierce"))
+	damage = maxi(1, int(round(damage * (1.0 + PlayerProgress.charm_bonus("damage_mult")))))
+	attack_cooldown = _base_cooldown / (1.0 + PlayerProgress.charm_bonus("atk_speed"))
+	_range_mult = 1.0 + PlayerProgress.charm_bonus("range_mult")
+	if _hitbox:
+		_hitbox.scale = Vector2(_range_mult, _range_mult)
+	_soul_gain_mult = 1.0 + PlayerProgress.charm_bonus("soul_gain")
+	shadow_bolt_cost = maxf(4.0, shadow_bolt_cost * (1.0 + PlayerProgress.charm_bonus("bolt_cost_mult")))
 	_daggers = max_daggers
 	call_deferred("emit_signal", "daggers_changed", _daggers)
 
@@ -119,7 +142,8 @@ func _do_attack() -> void:
 	var rot := 0.0
 	var fh := facing > 0
 	var fv := false
-	var pos: Vector2 = _controller.global_position + Vector2(aim.x * slash_offset * 1.4, slash_height + aim.y * 56.0)
+	var pos: Vector2 = _controller.global_position + Vector2(aim.x * slash_offset * 1.4 * _range_mult, slash_height + aim.y * 56.0 * _range_mult)
+	slash_scale *= _range_mult
 	if aim.y != 0.0:
 		rot = aim.angle() - (0.0 if aim.x >= 0.0 else PI)
 		if aim.x == 0.0:
@@ -208,6 +232,15 @@ func _cast_shadow_bolt() -> void:
 	if bolt.has_method("setup"):
 		bolt.setup(_controller.get_facing())
 	bolt.pierce += _bolt_pierce_bonus
+	# Shaman Stone: a bigger, harder bolt. Catcher+Stone synergy: it SEARS.
+	var bd := int(PlayerProgress.charm_bonus("bolt_damage"))
+	if bd > 0 and bolt.get("damage") != null:
+		bolt.damage += bd
+	bolt.scale *= (1.0 + PlayerProgress.charm_bonus("bolt_size"))
+	if PlayerProgress.charm_bonus("bolt_burn") > 0.0:
+		bolt.modulate = Color(1.0, 0.7, 0.45)
+		if bolt.get("damage") != null:
+			bolt.damage += 1
 	_controller.get_parent().add_child(bolt)
 	var f: int = _controller.get_facing()
 	bolt.global_position = _controller.global_position + Vector2(f * 12.0, -8.0)
@@ -276,7 +309,7 @@ func _on_hit_connected(is_finisher: bool, heaviest: String) -> void:
 	_streak += 1
 	streak_changed.emit(_streak)
 	if _stats:
-		var gain := 2.5 * (1.5 if _streak >= 20 else 1.0)
+		var gain := 2.5 * (1.5 if _streak >= 20 else 1.0) * _soul_gain_mult
 		_stats.refill_shadow(gain)
 
 

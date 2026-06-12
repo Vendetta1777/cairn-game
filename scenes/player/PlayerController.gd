@@ -103,6 +103,15 @@ var _slamming: bool = false
 var _slam_start_y: float = 0.0
 # Perfect parry: how long the current parry window has been open.
 var _parry_age: float = 0.0
+# Stalker's Mark: stand still 1s and the dark stops mentioning you.
+var _has_stealth := false
+var _still_t: float = 0.0
+var hidden_still := false
+var _bases_captured := false
+var _base_run_speed := 0.0
+var _base_parry_window := 0.0
+var _base_iframes := 0.0
+var _unlock_hooked := false
 
 # Cached frame->seconds conversions (computed in _ready from the physics tick).
 var _coyote_time: float
@@ -113,15 +122,25 @@ func _ready() -> void:
 	var tick := float(ProjectSettings.get_setting("physics/common/physics_ticks_per_second", 60))
 	_coyote_time = coyote_frames / tick
 	_jump_buffer_time = jump_buffer_frames / tick
-	# Permanent Body / Blade skill-tree bonuses.
-	run_speed += PlayerProgress.bonus("run_speed")
-	parry_window_time += PlayerProgress.bonus("parry_window")
-	hurt_invuln_time += PlayerProgress.bonus("dash_iframes")
+	# Bonuses recompute from captured bases so re-attuning never stacks.
+	if not _bases_captured:
+		_bases_captured = true
+		_base_run_speed = run_speed
+		_base_parry_window = parry_window_time
+		_base_iframes = hurt_invuln_time
+	run_speed = (_base_run_speed + PlayerProgress.bonus("run_speed")) \
+		* (1.0 + PlayerProgress.charm_bonus("run_speed_mult"))
+	parry_window_time = _base_parry_window + PlayerProgress.bonus("parry_window")
+	hurt_invuln_time = _base_iframes + PlayerProgress.bonus("dash_iframes") \
+		+ PlayerProgress.charm_bonus("iframes")
+	_has_stealth = PlayerProgress.charm_bonus("stealth") > 0.0
 	# Movement powers come from found Ability Relics (persisted), and switch on
 	# live the moment one is claimed mid-level.
 	if require_unlocks:
 		_apply_ability_unlocks()
-		PlayerProgress.ability_unlocked.connect(func(_id): _apply_ability_unlocks())
+		if not _unlock_hooked:
+			_unlock_hooked = true
+			PlayerProgress.ability_unlocked.connect(func(_id): _apply_ability_unlocks())
 
 
 func _apply_ability_unlocks() -> void:
@@ -197,6 +216,13 @@ func _update_timers(delta: float) -> void:
 	_pogo_chain_t = maxf(0.0, _pogo_chain_t - delta)
 	if _pogo_chain_t <= 0.0:
 		_pogo_chain = 0
+	# Stalker's Mark stillness tracking.
+	if _has_stealth and velocity.length() < 4.0 and is_on_floor():
+		_still_t += delta
+		hidden_still = _still_t >= 1.0
+	else:
+		_still_t = 0.0
+		hidden_still = false
 
 
 func _handle_buffered_jump_input() -> void:

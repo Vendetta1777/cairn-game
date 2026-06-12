@@ -1,4 +1,4 @@
-[gd_scene load_steps=37 format=3]
+[gd_scene load_steps=39 format=3]
 
 [ext_resource type="Script" path="res://scenes/world/area_03_sunken_nave/Nave.gd" id="1_root"]
 [ext_resource type="Script" path="res://scenes/world/area_03_sunken_nave/NaveTerrain.gd" id="2_terrain"]
@@ -32,6 +32,8 @@
 [ext_resource type="PackedScene" path="res://scenes/fx/PostFX.tscn" id="91_post"]
 [ext_resource type="PackedScene" path="res://scenes/world/GrapplePoint.tscn" id="95_gp"]
 [ext_resource type="PackedScene" path="res://scenes/world/ReverbZone.tscn" id="96_rz"]
+[ext_resource type="PackedScene" path="res://scenes/world/CharmPickup.tscn" id="93_cp"]
+[ext_resource type="PackedScene" path="res://scenes/ui/CharmUI.tscn" id="94_cu"]
 
 [sub_resource type="Gradient" id="grad"]
 offsets = PackedFloat32Array(0, 1)
@@ -328,3 +330,18 @@ size = Vector2(1130, 288)
 position = Vector2(2410, 0)
 preset = "cathedral"
 size = Vector2(776, 288)
+
+[node name="CharmTwister" parent="." instance=ExtResource("93_cp")]
+position = Vector2(1685, 228)
+charm_id = "spell_twister"
+
+[node name="CharmDeepFocus" parent="." instance=ExtResource("93_cp")]
+position = Vector2(2070, 64)
+charm_id = "deep_focus"
+
+[node name="Notch4" parent="." instance=ExtResource("93_cp")]
+position = Vector2(485, 206)
+notch = true
+pickup_id = "notch_a3"
+
+[node name="CharmUI" parent="." instance=ExtResource("94_cu")]

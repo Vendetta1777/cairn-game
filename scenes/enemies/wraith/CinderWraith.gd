@@ -60,7 +60,7 @@ func _physics_process(delta: float) -> void:
 				cos(_t * 3.1) * 22.0 + sin(_t * 7.3) * 9.0)
 			var target := _home + wob
 			velocity = (target - global_position) * 3.4
-			if player and _cooldown <= 0.0 \
+			if player and _cooldown <= 0.0 and _can_sense(player) \
 					and global_position.distance_to(player.global_position) < aggro_range:
 				_aggro_sound()
 				_enter(DIVE)
