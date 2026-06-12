@@ -29,7 +29,7 @@ const TORCHES := [
 ]
 const CRYSTALS := [
 	Vector2(70, 252), Vector2(300, 210), Vector2(930, 205),
-	Vector2(2850, 124), Vector2(2980, 252), Vector2(3300, 252),
+	Vector2(620, 252), Vector2(2980, 252), Vector2(3300, 252),
 ]
 const ROCKS := [
 	Vector2(230, 252), Vector2(1000, 252), Vector2(2960, 252),

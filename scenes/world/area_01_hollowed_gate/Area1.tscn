@@ -185,8 +185,8 @@ position = Vector2(2245, 128)
 cache_id = "a1_tides_loft"
 shards = 12
 
-[node name="ChimneyShrine" parent="." instance=ExtResource("34_shrine")]
-position = Vector2(2850, 124)
+[node name="Shrine" parent="." instance=ExtResource("34_shrine")]
+position = Vector2(650, 252)
 
 [node name="MotherBat" parent="." instance=ExtResource("20_boss")]
 position = Vector2(3180, 110)
@@ -226,7 +226,7 @@ shape = SubResource("trigger_tall")
 [node name="AscentTrigger" type="Area2D" parent="." groups=["trigger"]]
 position = Vector2(2600, 150)
 script = ExtResource("22_trigger")
-objective = "The Ascent — jump between the walls to climb"
+objective = "The Crossing — hop the stones, dash carries you further"
 
 [node name="Shape" type="CollisionShape2D" parent="AscentTrigger"]
 shape = SubResource("trigger_tall")

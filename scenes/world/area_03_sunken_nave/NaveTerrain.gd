@@ -16,9 +16,15 @@ const TERRAIN: Array[Rect2] = [
 	Rect2(0, 0, 14, 288),         # left wall
 	Rect2(3186, 0, 14, 288),      # right wall
 
-	# R1 — FLOODED ENTRY x14..760
-	Rect2(14, 252, 746, 36),
-	Rect2(320, 206, 80, 14),      # fallen lintel to hop the second pool
+	# R1 — FLOODED ENTRY x14..760: the nave floor has GIVEN WAY in two places,
+	# and black water fills the sunken basins to the brim. Wade through (it
+	# drags) or hop the fallen lintel over the second pool.
+	Rect2(14, 252, 136, 36),      # x14..150
+	Rect2(150, 276, 140, 12),     # basin A floor — water fills the recess
+	Rect2(290, 252, 140, 36),     # x290..430
+	Rect2(430, 276, 130, 12),     # basin B floor
+	Rect2(560, 252, 200, 36),     # x560..760
+	Rect2(455, 206, 80, 14),      # fallen lintel over basin B
 
 	# R2 — SUBMERGED LIBRARY x760..1890: shelf-tops over deep water
 	Rect2(870, 224, 70, 14),
@@ -38,12 +44,15 @@ const TERRAIN: Array[Rect2] = [
 	Rect2(2200, 140, 80, 14),     # broken arch...
 	Rect2(2330, 200, 80, 14),     # ...stepping down
 
-	# R4 — ANTECHAMBER x2410..3186
-	Rect2(2410, 252, 776, 36),
+	# R4 — ANTECHAMBER x2410..3186: one more collapsed stretch of floor before
+	# the choir door, drowned like the entry.
+	Rect2(2410, 252, 350, 36),    # x2410..2760
+	Rect2(2760, 276, 140, 12),    # sunken basin floor
+	Rect2(2900, 252, 286, 36),    # x2900..3186
 ]
 
 const OBJECTS: Array[Rect2] = [
-	Rect2(180, 222, 26, 30),      # waterlogged crates
+	Rect2(80, 222, 26, 30),       # waterlogged crates
 	Rect2(2520, 222, 26, 30),
 ]
 
@@ -95,7 +104,7 @@ func ceiling_y(x: float) -> float:
 ## The great bell in the tower, and the drowned pews of the antechamber.
 func _draw_extra() -> void:
 	_draw_bell(Vector2(2031, 50))
-	for px in [2560.0, 2680.0, 2860.0, 3000.0]:
+	for px in [2560.0, 2680.0, 2960.0, 3060.0]:
 		_draw_pew(Vector2(px, 252.0))
 
 

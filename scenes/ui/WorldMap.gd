@@ -23,7 +23,7 @@ const AREAS := [
 	{
 		"id": "hollowed_gate", "name": "THE HOLLOWED GATE", "depth": "I",
 		"rect": Rect2(270, 40, 360, 86),
-		"shrines": 1, "gates": ["dash", "wall_jump", "double_jump"],
+		"shrines": 1, "gates": ["dash", "double_jump"],
 	},
 	{
 		"id": "ashpits", "name": "THE ASHPITS", "depth": "II",

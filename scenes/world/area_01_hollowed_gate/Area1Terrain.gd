@@ -34,15 +34,11 @@ const TERRAIN: Array[Rect2] = [
 	Rect2(2200, 128, 90, 14),     # high loft above the rest — double-jump only
 	Rect2(2480, 252, 110, 36),    # landing
 
-	# S5 — THE ASCENT: pit 2590..2900. The low route hops across; the chimney
-	# is a wall-jump-only climb to a shrine (a backtracking reward — wall jump
-	# is found later, in The Ashpits).
+	# S5 — THE CROSSING: pit 2590..2900, a rhythm of hops at staggered heights.
+	# (No wall-jump anything here — that power is found in The Ashpits.)
 	Rect2(2624, 230, 56, 14),     # stepping stone
-	Rect2(2700, 238, 96, 14),     # chimney base
-	Rect2(2706, 120, 14, 70),     # left wall
-	Rect2(2782, 120, 14, 70),     # right wall
-	Rect2(2796, 124, 110, 16),    # exit ledge (shrine up here)
-	Rect2(2826, 218, 64, 14),     # low-route hop to the arena side
+	Rect2(2716, 242, 72, 14),     # low mid stone
+	Rect2(2826, 218, 64, 14),     # last hop to the arena side
 
 	# S6 — THE BROOD (boss arena + chasm + threshold)
 	Rect2(2900, 252, 786, 36),    # x2900..3686
@@ -59,7 +55,7 @@ const HAZARDS: Array[Rect2] = [
 	Rect2(2590, 262, 310, 26),    # S5
 ]
 
-const MOSS_SPOTS := [Vector2(355, 198), Vector2(975, 193), Vector2(1575, 194), Vector2(2850, 112)]
+const MOSS_SPOTS := [Vector2(355, 198), Vector2(975, 193), Vector2(1575, 194), Vector2(2745, 236)]
 
 
 func solids() -> Array[Rect2]:

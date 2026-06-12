@@ -135,7 +135,7 @@ texture = SubResource("tex_light")
 texture_scale = 1.2
 
 [node name="CheckpointEntry" parent="." instance=ExtResource("6_stone")]
-position = Vector2(220, 252)
+position = Vector2(340, 252)
 
 [node name="CheckpointLanding" parent="." instance=ExtResource("6_stone")]
 position = Vector2(1770, 252)
@@ -144,7 +144,7 @@ position = Vector2(1770, 252)
 position = Vector2(2470, 252)
 
 [node name="LoreNPC" parent="." instance=ExtResource("7_lore")]
-position = Vector2(150, 252)
+position = Vector2(90, 252)
 lines = PackedStringArray("They came down here to pray the sinking away. The water heard them first.", "Stay out of the black water, outsider. The shallow only slows you. The deep KEEPS.", "The choir still sings behind the sealed door. Do not learn the words.")
 location_name = "THE SUNKEN NAVE"
 location_subtitle = "DESCENT III"
@@ -155,21 +155,21 @@ position = Vector2(60, 215)
 z_index = 1
 
 [node name="WadePoolA" parent="." instance=ExtResource("25_water")]
-position = Vector2(150, 226)
-size = Vector2(140, 26)
+position = Vector2(150, 254)
+size = Vector2(140, 22)
 
 [node name="WadePoolB" parent="." instance=ExtResource("25_water")]
-position = Vector2(430, 226)
-size = Vector2(130, 26)
+position = Vector2(430, 254)
+size = Vector2(130, 22)
 
 [node name="LibraryDeep" parent="." instance=ExtResource("25_water")]
-position = Vector2(760, 264)
-size = Vector2(990, 24)
+position = Vector2(760, 256)
+size = Vector2(990, 32)
 deep = true
 
 [node name="WadePoolC" parent="." instance=ExtResource("25_water")]
-position = Vector2(2820, 226)
-size = Vector2(120, 26)
+position = Vector2(2760, 254)
+size = Vector2(140, 22)
 
 [node name="DrownedGuard" parent="." instance=ExtResource("23_drowned")]
 position = Vector2(640, 234)
